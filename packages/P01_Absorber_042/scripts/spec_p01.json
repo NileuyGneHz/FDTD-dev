@@ -1,0 +1,221 @@
+{
+  "schema_version": "1.0",
+  "meta": {
+    "package": "P01",
+    "paper": {
+      "title": "Infrared Spatial and Frequency Selective Metamaterial with Near-Unity Absorbance",
+      "authors": "Liu, Starr, Starr, Padilla",
+      "journal": "Phys. Rev. Lett.",
+      "volume": "104",
+      "page": "207403",
+      "year": 2010,
+      "doi": "10.1103/PhysRevLett.104.207403"
+    },
+    "target_figure": "Fig. 2(a) simulated R/T/A",
+    "source_pages": [
+      1,
+      2
+    ],
+    "extracted_by": "agent",
+    "extracted_on": "2026-11-03"
+  },
+  "parameters": {
+    "a": 2e-06,
+    "l": 1.7e-06,
+    "w": 4e-07,
+    "tm": 1e-07,
+    "ts": 1.85e-07,
+    "t_sub": 2e-06
+  },
+  "lattice": {
+    "type": "square",
+    "period_x": "a",
+    "period_y": "a",
+    "supercell": {
+      "nx": 1,
+      "ny": 1
+    }
+  },
+  "materials": {
+    "Au_paper": {
+      "kind": "drude",
+      "wp": 1.3665928e+16,
+      "wc": 40840704500000.0,
+      "unit": "rad/s",
+      "cite": "Methods: wp = 2*pi*2175 THz, wc = 2*pi*6.5 THz"
+    },
+    "Al2O3_paper": {
+      "kind": "constant_nk",
+      "n": 1.5105,
+      "k": 0.0302,
+      "cite": "Methods: eps = 2.28, tan(delta) = 0.04 -> n=1.5105, k=0.0302"
+    },
+    "Si": {
+      "kind": "builtin",
+      "name": "Si (Silicon) - Palik",
+      "cite": "text: gold deposited on a silicon substrate"
+    }
+  },
+  "objects": [
+    {
+      "id": "Si_sub",
+      "type": "box",
+      "material": "Si",
+      "mesh_order": 4,
+      "center": [
+        "0",
+        "0",
+        "-(ts + tm + t_sub/2)"
+      ],
+      "span": [
+        "a",
+        "a",
+        "t_sub"
+      ]
+    },
+    {
+      "id": "Au_ground",
+      "type": "box",
+      "material": "Au_paper",
+      "mesh_order": 2,
+      "center": [
+        "0",
+        "0",
+        "-(ts + tm/2)"
+      ],
+      "span": [
+        "a",
+        "a",
+        "tm"
+      ]
+    },
+    {
+      "id": "Al2O3_spacer",
+      "type": "box",
+      "material": "Al2O3_paper",
+      "mesh_order": 3,
+      "center": [
+        "0",
+        "0",
+        "-ts/2"
+      ],
+      "span": [
+        "a",
+        "a",
+        "ts"
+      ]
+    },
+    {
+      "id": "cross_x",
+      "type": "box",
+      "material": "Au_paper",
+      "mesh_order": 1,
+      "center": [
+        "0",
+        "0",
+        "tm/2"
+      ],
+      "span": [
+        "l",
+        "w",
+        "tm"
+      ]
+    },
+    {
+      "id": "cross_y",
+      "type": "box",
+      "material": "Au_paper",
+      "mesh_order": 1,
+      "center": [
+        "0",
+        "0",
+        "tm/2"
+      ],
+      "span": [
+        "w",
+        "l",
+        "tm"
+      ]
+    }
+  ],
+  "simulation": {
+    "dimension": "3D",
+    "bc": {
+      "x": "Periodic",
+      "y": "Periodic",
+      "z": "PML"
+    },
+    "mesh_accuracy": 4,
+    "mesh_override": {
+      "dx": 3e-08,
+      "dy": 3e-08,
+      "dz": 2e-08,
+      "z_range": [
+        "-(ts + tm)",
+        "tm + 5e-8"
+      ]
+    },
+    "auto_shutoff": 0.0001,
+    "simulation_time": 5e-12,
+    "air_above": 2.5e-06,
+    "below_structure": 1e-06,
+    "source": {
+      "type": "plane_wave",
+      "direction": "Backward",
+      "polarization_deg": 0,
+      "wavelength_range": [
+        4e-06,
+        8.5e-06
+      ],
+      "npts": 91,
+      "z": "auto"
+    },
+    "monitors": {
+      "R": {
+        "z": "auto",
+        "span": [
+          "a",
+          "a"
+        ]
+      },
+      "T": {
+        "z": "auto",
+        "span": [
+          "a",
+          "a"
+        ]
+      }
+    }
+  },
+  "targets": [
+    {
+      "quantity": "peak_absorption",
+      "value": 0.97,
+      "at_wavelength": 6e-06,
+      "tolerance": 0.05,
+      "where": "Fig. 2(a)"
+    },
+    {
+      "quantity": "fwhm",
+      "value": 1e-06,
+      "tolerance": 2e-07,
+      "where": "text"
+    }
+  ],
+  "assumptions": [
+    "Substrate thickness set to 2 um; the paper does not state it, and the 100 nm ground plane makes it optically irrelevant.",
+    "Source spectral range 4-8.5 um chosen to cover the 6 um peak; the paper plots 3-11 um.",
+    "Cross arms modelled as two overlapping boxes (plus sign), matching Fig. 1(a).",
+    "Custom materials are named Au_paper / Al2O3_paper: naming them Au / Al2O3 collides with the built-in database and the assignment picks the wrong entry."
+  ],
+  "missing": [
+    {
+      "field": "spacer_thickness_reference_surface",
+      "question": "Is t = 0.185 um measured from the top of the ground plane, or from the mid-plane of the cross?"
+    },
+    {
+      "field": "substrate_thickness",
+      "question": "Not stated; assumed thick enough to be opaque."
+    }
+  ]
+}

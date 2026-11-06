@@ -1,0 +1,116 @@
+All processes are communicating and ready to proceed to simulation...
+Ansys Lumerical 2025 R1 FDTD Solver Version 8.33.3999 (Windows 64bit)
+ expires (month/day/year): 12/31/2035
+using config file: Ansys Licensing set with ANSYSLMD_LICENSE_FILE
+license host: 1055@localhost
+current time: 周四 10月 1 12:04:17 2026
+Running on host: Enemal
+host available memory (GiB) 17.832
+
+All processes are communicating and ready to proceed to simulation...
+Running fsp file: F:\Lumercial_WS\ANSYS Inc\v251\Lumerical\bin\fdtd-engine-msmpi.exe -t 1 -remote -shared-solve-license QU5TWVNfTElDRU5TSU5HX0NPTlRFWFRfREFUQT08QU5TWVNfTElDRU5TSU5HX0NPTlRFWFRfREFUQT48REFUQT5QRTlMUlZsZlUwbGFSVDRLTVRJNENqd3ZUMHRGV1Y5VFNWcEZQZ284UlU1RFgxTkpXa1UtQ2pFeU9BbzhMMFZPUTE5VFNWcEZQZ284U1ZaZlUwbGFSVDRLT0FvOEwwbFdYMU5KV2tVLUNqeE5VMGRmVTBsYVJUNEtNVE13Q2p3dlRWTkhYMU5KV2tVLUNqeE5VMGMtQ2s0elpWUnhiVWhsYzA1T2VqZEhaVWRrTWxCMlJYZGFRWFV3V0doMk5uTlZNbVp2VGxkVVdVZzRSVE5PVUd4bU1rbFllVko0TWxORlMyeE5TWEp2YURSUGNVaDVOa1Z3UmxsU1NHSkJOM1l3TFMxRFdHTmhabWd5Y0dkV2FTMDRhVlZxTVcwM1JsVm9VRTFuT1dwdGFVUk5PV0l3VURoVFYzUlZRa1JFTjFsUFdsVlRSMjVIVGpscWQxTTBZMVpqYVVObFNVcDZSbXBFWWxwQ1VHdEdia3d5VUhkWExWWlRiMUpKVHpOSWFFbHVZa0pEVlVsZlYydHpWR0U1YjFremVVa3RNSE15VkUxWVFXMHlTa0ppWlhORWMzRk9aVkYzVFdGcExVTlFia3BtZEhoRWFGcG1lazFLTTB0UVEwc3lSRUozWldwQ1gxODBZMUpDTUZocmJVZHZSVTEwZVdWUmNreDJiMVYwVVcxNUxVUXdORnByTmxCSllYSm5NMUUxTVY5d05HOU5lbFZPYVd4NE9EQjJSMXBoVms1R05UUkxhMUZLV1dKT2RGVXdZelZ5WkRBdGFGWnFUVUp6V0Zwb1owb3lhVVpzU0dGWFpHVm9hMFpZVVc0S1BDOU5VMGMtQ2c8L0RBVEE+PC9BTlNZU19MSUNFTlNJTkdfQ09OVEVYVF9EQVRBPgpBTlNZU19MSUNFTlNJTkdfV09SS0ZMT1dfU0VTU0lPTj08REFUQT48SUQ+RW5lbWFsX05pbGV1eV8yNTE8L0lEPjwvREFUQT4K F:/Lumercial_WS/FDTD_WS/packages/P08_BroadbandAbsorber_043/fsp/wd_BFASK.fsp
+Estimate of memory required: 0.108 GiB
+
+number of processors is 8
+processors are distributed as: 4x2x1
+Peak memory used by end of initialization: 0.077672 GiB
+Running 2D Simulation
+Split-field FDTD is activated with propagation along axis 2, center frequency is 2, n=1
+Starting meshing
+Simulation size in gridpoints: 201 x 118 x 1
+Refined 0 mesh cells (0.000000%)
+Completed meshing!
+Meshing complete in 0.000000 seconds of CPU time
+Numerical discretization of material 'User_Ag' might be unstable! Max. imaginary part of epsilon is 0.001643!
+Numerical discretization of material 'User_Si' might be unstable! Max. imaginary part of epsilon is 0.003948!
+Starting meshing
+Simulation size in gridpoints: 201 x 118 x 1
+Refined 0 mesh cells (0.000000%)
+Completed meshing!
+Meshing complete in 0.000000 seconds of CPU time
+Numerical discretization of material 'User_Ag' might be unstable! Max. imaginary part of epsilon is 0.001643!
+Numerical discretization of material 'User_Si' might be unstable! Max. imaginary part of epsilon is 0.003948!
+finished material properties
+Selected kernel with optimization level: 2 and split-field propagation direction: 2
+Split-field FDTD is activated with propagation along axis 2, center frequency is 2, n=1
+Starting meshing
+Simulation size in gridpoints: 201 x 118 x 1
+Refined 0 mesh cells (0.000000%)
+Completed meshing!
+Meshing complete in 0.000000 seconds of CPU time
+Numerical discretization of material 'User_Ag' might be unstable! Max. imaginary part of epsilon is 0.001643!
+Numerical discretization of material 'User_Si' might be unstable! Max. imaginary part of epsilon is 0.003948!
+Selected kernel with optimization level: 2 and split-field propagation direction: 2
+-----------------------------------------
+Beginning initialization of 2D FDTD Simulation
+  Including TM Simulation
+Starting to add sources to simulation
+
+Adding Gaussian source propagating in Y
+Reverted to narrowband source injection
+Starting to add boundary conditions to simulation
+Adding parallel BC
+Adding parallel BC
+Adding PML BC
+Adding parallel BC
+Starting to add monitors to Simulation
+Adding analysis monitor
+Adding frequency monitor
+Adding frequency monitor
+Finished initialization of 2D Simulation
+-----------------------------------------
+Peak memory used by end of meshing: 0.085423 GiB
+All processes are communicating and ready to proceed to simulation...
+Starting 85651 total iterations
+0.0560416% complete. Elapsed simulation time: 2.80208e-17 secs. Max time remaining: 2 mins, 40 secs. Auto Shutoff: 1
+1.17687% complete. Elapsed simulation time: 5.88437e-16 secs. Max time remaining: 59 secs. Auto Shutoff: 1
+2.37243% complete. Elapsed simulation time: 1.18621e-15 secs. Max time remaining: 56 secs. Auto Shutoff: 1
+4.76354% complete. Elapsed simulation time: 2.38177e-15 secs. Max time remaining: 52 secs. Auto Shutoff: 1
+7.15465% complete. Elapsed simulation time: 3.57732e-15 secs. Max time remaining: 50 secs. Auto Shutoff: 1
+9.54576% complete. Elapsed simulation time: 4.77288e-15 secs. Max time remaining: 48 secs. Auto Shutoff: 1
+11.9369% complete. Elapsed simulation time: 5.96843e-15 secs. Max time remaining: 46 secs. Auto Shutoff: 1
+14.328% complete. Elapsed simulation time: 7.16399e-15 secs. Max time remaining: 44 secs. Auto Shutoff: 1
+16.7191% complete. Elapsed simulation time: 8.35954e-15 secs. Max time remaining: 43 secs. Auto Shutoff: 1
+19.1102% complete. Elapsed simulation time: 9.5551e-15 secs. Max time remaining: 42 secs. Auto Shutoff: 1
+21.5013% complete. Elapsed simulation time: 1.07507e-14 secs. Max time remaining: 41 secs. Auto Shutoff: 1
+23.8924% complete. Elapsed simulation time: 1.19462e-14 secs. Max time remaining: 40 secs. Auto Shutoff: 1
+26.2835% complete. Elapsed simulation time: 1.31418e-14 secs. Max time remaining: 38 secs. Auto Shutoff: 1
+28.6746% complete. Elapsed simulation time: 1.43373e-14 secs. Max time remaining: 37 secs. Auto Shutoff: 1
+31.0657% complete. Elapsed simulation time: 1.55329e-14 secs. Max time remaining: 36 secs. Auto Shutoff: 0.0548839
+33.4569% complete. Elapsed simulation time: 1.67284e-14 secs. Max time remaining: 35 secs. Auto Shutoff: 0.0503023
+35.848% complete. Elapsed simulation time: 1.7924e-14 secs. Max time remaining: 34 secs. Auto Shutoff: 0.0351339
+38.2391% complete. Elapsed simulation time: 1.91195e-14 secs. Max time remaining: 33 secs. Auto Shutoff: 0.0202682
+40.6302% complete. Elapsed simulation time: 2.03151e-14 secs. Max time remaining: 31 secs. Auto Shutoff: 0.0100742
+43.0213% complete. Elapsed simulation time: 2.15106e-14 secs. Max time remaining: 30 secs. Auto Shutoff: 0.00469043
+45.4124% complete. Elapsed simulation time: 2.27062e-14 secs. Max time remaining: 29 secs. Auto Shutoff: 0.00203828
+47.8035% complete. Elapsed simulation time: 2.39018e-14 secs. Max time remaining: 28 secs. Auto Shutoff: 0.000854167
+50.1946% complete. Elapsed simulation time: 2.50973e-14 secs. Max time remaining: 26 secs. Auto Shutoff: 0.000398491
+52.5857% complete. Elapsed simulation time: 2.62929e-14 secs. Max time remaining: 25 secs. Auto Shutoff: 0.000208465
+54.9768% complete. Elapsed simulation time: 2.74884e-14 secs. Max time remaining: 24 secs. Auto Shutoff: 0.000116503
+57.3679% complete. Elapsed simulation time: 2.8684e-14 secs. Max time remaining: 22 secs. Auto Shutoff: 6.35196e-05
+59.7591% complete. Elapsed simulation time: 2.98795e-14 secs. Max time remaining: 21 secs. Auto Shutoff: 3.5327e-05
+62.1502% complete. Elapsed simulation time: 3.10751e-14 secs. Max time remaining: 20 secs. Auto Shutoff: 1.83171e-05
+64.3089% complete. Elapsed simulation time: 3.21545e-14 secs. Max time remaining: 18 secs. Auto Shutoff: 9.75137e-06
+100% complete. Max time remaining: 0 mins, 0 secs. Auto Shutoff: 9.75137e-06
+Early termination of simulation, the autoshutoff criteria are satisfied.
+Completed 55081 iterations, or 3.215447e-14s of Simulation Time
+Peak memory used running the simulation: 0.086076 GiB
+Process 0 starting to collect data
+    collecting TM monitor data
+    collecting TE monitor data
+    collecting TM source data
+Reverted to narrowband source injection
+Using BFAST in the 2d sources! Injection direction: -1, index: 1
+    collecting TE source data
+Finished collecting data
+Simulation completed successfully at: 周四 10月 1 12:04:50 2026
+Peak memory used in the simulation (GiB): 0.109353
+Overall wall time measurements in seconds: 34.220390
+  time to mesh and initialize: 0.044708
+  time to run FDTD simulation: 33.317637
+  time to checkpoint simulation: 0.000000
+  time to finalize data and save to files: 0.249548
+  miscellaneous time: 0.608468
+  FDTD solver speed on process 0 (Mnodes/s): 39.210799
+  total FDTD solver speed on 8 processes (Mnodes/s): 313.686389
+

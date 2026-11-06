@@ -1,0 +1,49 @@
+data = getresult("field_big","E");
+x = data.x;
+z = data.z;
+E = data.E;
+
+lenx = length(x);
+lenz = length(z);
+
+Ex_matrix = matrix(lenx,lenz); 
+Ex_matrix(:,:) = real(E(:,1,:,1,1));
+
+Ey_matrix = matrix(lenx,lenz); 
+Ey_matrix(:,:) = real(E(:,1,:,1,2));
+
+Ez_matrix = matrix(lenx,lenz); 
+Ez_matrix(:,:) = real(E(:,1,:,1,3));
+
+len_thetar = 300;
+thetar = linspace(-85,85,len_thetar);
+
+k0 = 2*pi/850e-9;
+kx_list = k0*sin(thetar*pi/180);
+kz_list = k0*cos(thetar*pi/180);
+
+P_list = matrix(len_thetar);
+
+for(i = 1:len_thetar)
+{
+    ?num2str(i/len_thetar*100)+" %";
+    
+    delta_k = 0.1*k0;
+    kx = linspace(kx_list(i)-delta_k, kx_list(i)+delta_k, 3);
+    kz = linspace(kz_list(i)-delta_k, kz_list(i)+delta_k, 3);
+    
+    Ex_k = czt(Ex_matrix,x,z,kx,kz)/(lenx*lenz)*2;
+    P_list(i) = P_list(i) + abs(Ex_k(2,2))^2;
+    
+    Ey_k = czt(Ey_matrix,x,z,kx,kz)/(lenx*lenz)*2;
+    P_list(i) = P_list(i) + abs(Ey_k(2,2))^2;
+    
+    Ez_k = czt(Ez_matrix,x,z,kx,kz)/(lenx*lenz)*2;
+    P_list(i) = P_list(i) + abs(Ez_k(2,2))^2;
+}
+
+
+plot(thetar,P_list);
+
+
+

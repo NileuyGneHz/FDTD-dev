@@ -1,0 +1,139 @@
+{
+  "schema_version": "1.0",
+  "_how_to_use": "Copy to packages/P0N_.../scripts/spec_<id>.json, replace every TODO, delete the keys starting with underscore that you do not need, then run validate_spec.py. Every value in metres; wp/wc in rad/s.",
+  "meta": {
+    "package": "TODO P0N_...",
+    "paper": {
+      "title": "TODO",
+      "authors": "TODO",
+      "journal": "TODO",
+      "volume": "TODO",
+      "page": "TODO",
+      "year": 0,
+      "doi": "TODO"
+    },
+    "target_figure": "TODO e.g. Fig. 2(a)",
+    "source_pages": [1],
+    "extracted_by": "agent",
+    "extracted_on": "TODO YYYY-MM-DD"
+  },
+  "parameters": {
+    "a": 0.0,
+    "l": 0.0,
+    "w": 0.0,
+    "tm": 0.0,
+    "ts": 0.0,
+    "t_sub": 0.0
+  },
+  "lattice": {
+    "type": "square",
+    "period_x": "a",
+    "period_y": "a",
+    "supercell": { "nx": 1, "ny": 1 }
+  },
+  "materials": {
+    "Metal": {
+      "kind": "drude",
+      "wp": 0.0,
+      "wc": 0.0,
+      "unit": "rad/s",
+      "cite": "TODO Methods / ref. N"
+    },
+    "Spacer": {
+      "kind": "constant_nk",
+      "n": 0.0,
+      "k": 0.0,
+      "cite": "TODO Methods"
+    },
+    "Substrate": {
+      "kind": "builtin",
+      "name": "TODO e.g. Si (Silicon) - Palik",
+      "cite": "TODO Methods"
+    }
+  },
+  "objects": [
+    {
+      "id": "substrate",
+      "type": "box",
+      "material": "Substrate",
+      "mesh_order": 4,
+      "center": ["0", "0", "-(ts + tm + t_sub/2)"],
+      "span": ["a", "a", "t_sub"]
+    },
+    {
+      "id": "ground",
+      "type": "box",
+      "material": "Metal",
+      "mesh_order": 2,
+      "center": ["0", "0", "-(ts + tm/2)"],
+      "span": ["a", "a", "tm"]
+    },
+    {
+      "id": "spacer",
+      "type": "box",
+      "material": "Spacer",
+      "mesh_order": 3,
+      "center": ["0", "0", "-ts/2"],
+      "span": ["a", "a", "ts"]
+    },
+    {
+      "id": "feature_x",
+      "type": "box",
+      "material": "Metal",
+      "mesh_order": 1,
+      "center": ["0", "0", "tm/2"],
+      "span": ["l", "w", "tm"]
+    },
+    {
+      "id": "feature_y",
+      "type": "box",
+      "material": "Metal",
+      "mesh_order": 1,
+      "center": ["0", "0", "tm/2"],
+      "span": ["w", "l", "tm"]
+    }
+  ],
+  "simulation": {
+    "dimension": "3D",
+    "bc": { "x": "Periodic", "y": "Periodic", "z": "PML" },
+    "mesh_accuracy": 4,
+    "mesh_override": {
+      "dx": 3.0e-8,
+      "dy": 3.0e-8,
+      "dz": 2.0e-8,
+      "z_range": ["-(ts + tm)", "tm + 5e-8"]
+    },
+    "auto_shutoff": 1e-4,
+    "simulation_time": 5e-12,
+    "source": {
+      "type": "plane_wave",
+      "direction": "Backward",
+      "polarization_deg": 0,
+      "wavelength_range": [4.0e-6, 8.5e-6],
+      "npts": 91,
+      "z": "auto"
+    },
+    "monitors": {
+      "R": { "z": "auto", "span": ["a", "a"] },
+      "T": { "z": "auto", "span": ["a", "a"] }
+    }
+  },
+  "targets": [
+    {
+      "quantity": "peak_absorption",
+      "value": 0.97,
+      "at_wavelength": 6.0e-6,
+      "tolerance": 0.05,
+      "where": "TODO Fig. N"
+    }
+  ],
+  "assumptions": [
+    "TODO every value you inferred rather than read, with the reason"
+  ],
+  "missing": [
+    {
+      "field": "TODO field name",
+      "question": "TODO the question to ask the author"
+    }
+  ]
+}

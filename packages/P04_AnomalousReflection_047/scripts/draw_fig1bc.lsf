@@ -1,0 +1,44 @@
+# Fig.1b
+data = getsweepresult("sweepL","field");
+x = data.x;
+z = data.z;
+L = data.L;
+E = data.E;
+Px = getnamed("FDTD","x span");
+
+lenx = length(x);
+lenz = length(z);
+lenL = length(L);
+
+Ey_combined = matrix(lenx*lenL, lenz);
+x_combined = matrix(lenx*lenL);
+for(i = 1:lenL)
+{
+    Ey_combined((1:lenx)+(i-1)*lenx, :) = real(E(:, 1, :, 1, i, 2));
+    x_combined((1:lenx)+(i-1)*lenx) = x + (i-1)*Px;
+}
+image(x_combined*1e9, z*1e9, Ey_combined, "x/nm", "z/nm", "Fig.1b");
+
+
+# Fig.1c
+
+data = getsweepresult("sweepL","phase");
+E = data.E;
+Ey = matrix(lenL);
+Ey(:) = E(1,1,1,1,:,2);
+phase = angle(Ey);
+x = matrix(lenL);
+for(i = 1:lenL)
+{
+    x(i) = Px*i*2;
+}
+plot(x*1e9, phase*180/pi, "x/nm", "phase/deg", "Fig.1c", "plot type=point");
+
+
+
+
+
+
+
+
+

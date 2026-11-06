@@ -1,0 +1,43 @@
+{
+  "name": "P01_perfectCross",
+  "structure": {
+    "a": 2e-06,
+    "l": 1.7e-06,
+    "w": 4e-07,
+    "tm": 1e-07,
+    "ts": 1.85e-07,
+    "t_sub": 2e-06
+  },
+  "materials": {
+    "metal": {
+      "model": "Plasma",
+      "name": "Au_paper",
+      "resonance": 1.3665928e+16,
+      "collision": 40840704000000.0
+    },
+    "spacer": {
+      "model": "(n,k)",
+      "name": "Al2O3_paper",
+      "n": 1.5105,
+      "k": 0.0302
+    },
+    "substrate": "Si (Silicon) - Palik"
+  },
+  "simulation": {
+    "bc_xy": "Periodic",
+    "mesh_accuracy": 4,
+    "mesh_override": {
+      "dx": 3e-08,
+      "dy": 3e-08,
+      "dz": 2e-08
+    },
+    "lam_lo": 4e-06,
+    "lam_hi": 8.5e-06,
+    "npts": 91,
+    "air_above": 2.5e-06,
+    "z_below_ground": 1e-06,
+    "auto_shutoff": 0.0001,
+    "simulation_time": 5e-12
+  },
+  "sweep": []
+}

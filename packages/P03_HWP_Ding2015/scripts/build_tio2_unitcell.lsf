@@ -1,0 +1,393 @@
+#################################################################
+#  TiO2 纳米砖单元胞 —— 骨架工程构建脚本
+#  rev5  (2026-09-18)  已在 v251 上实机跑通验证（含仿真，单次约 39 s）
+#
+#  适用：几何相位(PB)透射式超表面 / 超表面全息
+#  软件：Ansys Lumerical FDTD 2025 R1 (v251)
+#
+#  用法：FDTD 中【新建空白工程】-> Script File Editor 打开本文件 -> F5
+#        运行结束后自动保存为 TiO2_nanobrick_unitcell.fsp
+#
+#  ============================================================
+#  ⚠⚠⚠  在 GUI 里运行本脚本前，必读  ⚠⚠⚠
+#  ============================================================
+#  本脚本第 55 行有一句  deleteall;
+#  它会【清空当前 GUI 里打开着的那个工程】！
+#
+#  ✗ 错误用法：把你自己的工程（或导师的工程）打开着，直接按 F5
+#              -> 你的工程内容当场被清空，若此时再点保存就覆盖了原文件。
+#  ✓ 正确用法（二选一）：
+#      (A) 推荐：根本不要在 GUI 里跑。用 Python 驱动无界面运行：
+#              python scripts/build_tio2_unitcell.py
+#          全程无弹窗、不碰你 GUI 里打开的任何东西。
+#      (B) 一定要在 GUI 里跑：先 File -> New 新建一个【空白】工程，
+#          再打开本脚本按 F5，且看到 "Save changes?" 一律选 Don't Save。
+#
+#  另一个提醒：脚本末尾会自动 save() 到固定路径
+#      F:/Lumercial_WS/WS/TiO2_nanobrick_unitcell.fsp
+#  如果该文件正被 GUI 打开，会触发 Lumerical 的"文件已在磁盘上被修改"
+#  提示。想只预览不落盘，把第 9 节的 save(...) 一行注释掉即可。
+#  ============================================================
+#
+#  物理结构（z 轴向上）：
+#     z > H        : 空气
+#     0 < z < H    : TiO2 纳米砖 (Lx × Ly × H)
+#     z < 0        : SiO2 玻璃基底
+#     入射：平面波从基底内部沿 +z 传播（透射式标准构型）
+#
+#  ★ 本工程的正确用法（先读这段，否则数据会白跑）★
+#  这是个「单元胞表征工程」，不是成品超表面。要拿到元原子库，需要：
+#    第 1 步  polarization angle = 0   -> 读 (|Ex|, phase_x) ，即 x 主轴响应
+#    第 2 步  polarization angle = 90  -> 读 (|Ey|, phase_y) ，即 y 主轴响应
+#             （注意：单次运行里 Ex 和 Ey 是同一入射条件下的两个分量，
+#               所以必须跑两次才能分别得到两个主轴的"自己的"响应）
+#    第 3 步  算双折射相位差  delta = phase_x - phase_y
+#             判据：delta 约 180 度  且 |Ex|,|Ey| 都接近 1  -> 等效半波片，
+#             该几何尺寸可入选元原子库
+#    第 4 步  对入选尺寸，把纳米砖绕 z 转一个角度 theta，测"交叉偏振"分量
+#             （x 入射看 Ey），其相位应满足  psi = 2*theta  —— 这就是
+#             PB(几何)相位的来源，也是排布整片超表面时的相位字典。
+#             rev4 尚未包含第 4 步的转角模型，需要时我再补一个旋转扫参脚本。
+#
+# ============ rev1 -> rev2 -> rev3 -> rev4 修改记录 ============
+# [BUG-1] 删除 set("name","FDTD")
+#         v251 中 FDTD 求解区虽然属性表里列有 name，但该属性为 inactive，
+#         调用即抛 "the requested property 'name' is inactive" 并中断脚本。
+#         求解区默认名就是 "FDTD"，不能也不需要重命名。
+#         （已实测：其余 82 个属性全部可设，只有这一个坏点）
+# [BUG-2] 平面波源补 set("override global source settings",1)
+#         不开这个开关时 "wavelength start/stop" 同样是 inactive 属性，
+#         会在同一位置再报一次相同的错。
+# [BUG-3] 开头加 switchtolayout，避免上次仿真的 analysis 模式导致 set 报错
+#         （官方文档：set 在 analysis 模式会直接返回错误）。
+# [BUG-4] rev3 实跑发现：默认只有 5 个频点，采样最近点落在 547.8 nm，
+#         根本打不到设计波长 532 nm。rev4 显式指定监视器波长栅格，
+#         使 532 nm 精确落在采样点上。
+# [BUG-5] rev3 的判据文字有误导（写成"|Ex| 约等于 |Ey| 约等于 1"，容易被
+#         理解成同一次运行里两个分量都要接近 1）。rev4 改为上面的分步说明。
+# [调整 ] rev2 曾用 try/catch 做容错守卫 —— 实测该语法在 v251 的脚本
+#         环境里不被接受，已全部移除，改回直白的 set，靠读回校验兜底。
+# ============ rev4 -> rev5 修改记录 ============
+# [新增 ] 文件开头加大字警示：第 55 行 deleteall 会清空 GUI 当前工程。
+#         起因：在 GUI 里对着自己的工程按 F5，工程被清空后一直弹
+#         "Save changes?"，产生了一批 21 MB 的重复 .fsp。
+# [新增 ] 保存路径提为开头变量 SAVE_TO，并在末尾用注释开关控制是否落盘。
+# [踩坑 ] 保存动作不能包进 if/else 条件块：试过 SAVE_ENABLE 开关写法，
+#         整段脚本 1 s 内报 "Failed to evaluate code"（同文件第 329 行的
+#         if/else 却正常，故并非 else 本身的问题）。已改回无条件 save。
+#################################################################
+
+# ============================================================
+# 0. 前置：保存路径 + 强制回到 layout 模式，清空工程
+# ============================================================
+# 跑完会保存到这里。若只想在 GUI 里预览、不想覆盖磁盘文件，
+# 把第 9 节（靠近文件末尾）的 save(...) 那一行前面加 # 注释掉即可。
+#   ―― 实测记录：不要把这个保存动作包进 if/else 条件块里（原本想做个
+#      SAVE_ENABLE 开关），那会让整段脚本在 1 秒内直接报
+#      "Failed to evaluate code"。注意本文件第 329 行确实用了
+#      if/else 且完全正常，所以不是 else 本身的问题，而是「含 save() 与
+#      ? 输出的多行条件块」会踩到解释器的坑。为稳妥起见这里用注释开关。
+SAVE_TO = "F:/Lumercial_WS/WS/TiO2_nanobrick_unitcell.fsp";
+
+# ↓↓↓ 下面这句会清空当前工程！别在 GUI 里对着自己的工程按 F5 ↓↓↓
+switchtolayout;
+deleteall;
+
+# ============================================================
+# 1. 设计参数（改这里就够了，其余全部由这些量推导）
+# ============================================================
+P        = 250e-9;    # 单元胞周期（正方晶格，亚波长）
+H        = 600e-9;    # 纳米砖高度
+Lx       = 120e-9;    # 纳米砖 x 向尺寸（长边，扫参变量 1）
+Ly       =  60e-9;    # 纳米砖 y 向尺寸（短边，扫参变量 2）
+lambda0  = 532e-9;    # 设计波长（绿光，论文高频用到的波长）
+
+c0       = 299792458; # 光速，用于频率<->波长换算
+
+# 材料名（必须与材料库中的名字完全一致）
+mat_sub   = "SiO2 (Glass) - Palik";
+mat_brick = "TiO2 (Titanium Dioxide) - Siefke";   # 可见光波段 ALD TiO2
+# 备选（本机材料库中还有）：
+#   "TiO2 (Titanium Dioxide) - Devore"
+#   "TiO2 (Titanium Dioxide) - Kischkat"
+#   "TiO2 (Titanium Dioxide) - Sarkar"
+# 注意：同一组扫参里只能用一个数据源，不同文献的 n/k 差异会直接影响相位
+
+# 仿真区 z 范围（基底要伸出仿真区下边界，让 PML 正确吸收）
+z_sim_min = -700e-9;
+z_sim_max =  900e-9;
+z_span    =  z_sim_max - z_sim_min;
+z_center  = (z_sim_max + z_sim_min) / 2;
+
+# 基底：下沿伸出仿真区 400 nm
+z_sub_top    = 0;
+z_sub_bot    = z_sim_min - 400e-9;
+z_sub_span   = z_sub_top - z_sub_bot;
+z_sub_center = (z_sub_top + z_sub_bot) / 2;
+
+# 监视器 / 光源位置
+z_source = -350e-9;                  # 平面波源，位于基底内部
+z_R      = -180e-9;                  # 反射监视器（源与结构之间）
+z_T      =  z_sim_max - 150e-9;      # 透射监视器（空气中）
+
+# 网格细化步长（纳米砖处）
+mesh_dx = 8e-9;
+mesh_dy = 8e-9;
+mesh_dz = 8e-9;
+
+# 光源带宽与监视器采样（rev4 新增）
+# 默认只有 5 个频点，最近点会落在 547.8 nm 而不是 532 nm —— 必须显式指定
+band_span = 200e-9;                 # 带宽 200 nm
+lam_start = lambda0 - band_span/2;  # 432 nm
+lam_stop  = lambda0 + band_span/2;  # 632 nm
+lam_step  = 2e-9;                   # 监视器波长步长 2 nm
+n_points  = band_span/lam_step + 1; # 101 个采样点（均匀栅格 = band_span/(n-1)）
+# 注意：不要把 lam_step 直接赋给 "global monitor sample spacing" ——
+# 那个属性是字符串下拉框（取值 "uniform"/"custom"），不是数值。
+
+# ============================================================
+# 2. 基底 SiO2
+# ============================================================
+? "";
+? "=========================================================";
+? " 1. 构建对象";
+? "=========================================================";
+
+addrect;
+set("name", "substrate");
+set("x", 0);        set("x span", P);
+set("y", 0);        set("y span", P);
+set("z", z_sub_center); set("z span", z_sub_span);
+set("material", mat_sub);
+set("override mesh order from material database", 1);
+set("mesh order", 2);
+
+# ============================================================
+# 3. TiO2 纳米砖
+# ============================================================
+addrect;
+set("name", "nanobrick");
+set("x", 0);  set("x span", Lx);
+set("y", 0);  set("y span", Ly);
+set("z", H/2); set("z span", H);
+set("material", mat_brick);
+set("override mesh order from material database", 1);
+set("mesh order", 1);
+
+# ============================================================
+# 4. FDTD 仿真区 + 边界条件
+#    ※ 这里不要 set("name", ...)：FDTD 求解区不可改名（默认即 "FDTD"）
+# ============================================================
+addfdtd;
+set("x", 0); set("x span", P);
+set("y", 0); set("y span", P);
+set("z", z_center); set("z span", z_span);
+
+# x / y 周期边界（单元胞的关键）；z 方向 PML 吸收
+set("x min bc", "Periodic");  set("x max bc", "Periodic");
+set("y min bc", "Periodic");  set("y max bc", "Periodic");
+set("z min bc", "PML");       set("z max bc", "PML");
+
+set("mesh accuracy", 3);
+set("simulation time", 3000e-15);
+set("use early shutoff", 1);
+set("auto shutoff min", 1e-5);
+
+# ============================================================
+# 5. 网格细化（纳米砖区域，相位精度靠它）
+# ============================================================
+addmesh;
+set("name", "mesh_brick");
+set("x", 0); set("x span", P);
+set("y", 0); set("y span", P);
+set("z", H/2); set("z span", H + 200e-9);
+set("dx", mesh_dx);
+set("dy", mesh_dy);
+set("dz", mesh_dz);
+
+# ============================================================
+# 6. 平面波光源（位于基底内，沿 +z 传播）
+# ============================================================
+addplane;
+set("name", "source");
+set("injection axis", "z");
+set("direction", "Forward");                 # +z
+set("x", 0); set("x span", P);
+set("y", 0); set("y span", P);
+set("z", z_source);
+set("polarization angle", 0);                # 0 度 = 沿 x 线偏振；扫参时改 90
+set("amplitude", 1);
+set("phase", 0);
+# 必须先开启 override，否则 wavelength start/stop 是 inactive 属性（rev1 的坑）
+set("override global source settings", 1);
+# 带宽以设计波长为中心对称，这样 lambda0 才能精确落在监视器采样点上
+set("wavelength start", lam_start);
+set("wavelength stop",  lam_stop);
+
+# ============================================================
+# 7. 监视器
+# ============================================================
+# 透射功率（跨越一个周期，亚波长周期下只有 0 级透射）
+addpower;
+set("name", "T");
+set("monitor type", "2D Z-normal");
+set("x", 0); set("x span", P);
+set("y", 0); set("y span", P);
+set("z", z_T);
+
+# 反射功率（置于光源与结构之间；结果含义见文末备注）
+addpower;
+set("name", "R");
+set("monitor type", "2D Z-normal");
+set("x", 0); set("x span", P);
+set("y", 0); set("y span", P);
+set("z", z_R);
+
+# 点场监视器 —— 用于提取透射复振幅（振幅 + 相位）
+# 透射只有 0 级，波前均匀，因此取单点即可代表整个单元胞
+addprofile;
+set("name", "T_pt");
+set("monitor type", "Point");
+set("x", 0);
+set("y", 0);
+set("z", z_T);
+
+# ============================================================
+# 7.5 监视器频率采样（关键，rev4 新增）
+#      全局监视器设置挂在 FDTD 求解区对象上，而此刻选中的是刚加的 T_pt，
+#      所以必须先 select("FDTD") 把操作对象切回求解区，否则会报
+#      "property not found"。这是 Lumerical 脚本最常见的坑：set 只作用于
+#      当前选中对象。
+#      另外要先关掉 "use source limits"，否则下面是 inactive 属性。
+#      用「按波长等间距」模式并把中心定在 lambda0，532 nm 才会精确落在采样点。
+# ============================================================
+select("FDTD");
+set("global monitor use source limits", 0);
+set("global monitor use wavelength spacing", 1);
+set("global monitor wavelength center", lambda0);
+set("global monitor wavelength span", band_span);
+set("global monitor frequency points", n_points);
+# 栅格为均匀分布（sample spacing = "uniform"），
+# 200 nm 跨度 101 点 -> 步长 2 nm，532 nm 正好是中心点（第 51 点）。
+
+# ============================================================
+# 8. 关键参数读回校验（先看这一段，再决定要不要往下跑）
+# ============================================================
+? "";
+? "=========================================================";
+? " 2. 关键参数读回校验";
+? "=========================================================";
+
+? "  substrate  x span  = " + num2str(getnamed("substrate", "x span")) + " m";
+? "  substrate  material= " + getnamed("substrate", "material");
+? "  nanobrick  Lx,Ly,H = " + num2str(getnamed("nanobrick", "x span")) + ", " + num2str(getnamed("nanobrick", "y span")) + ", " + num2str(getnamed("nanobrick", "z span")) + " m";
+? "  nanobrick  material= " + getnamed("nanobrick", "material");
+? "  FDTD       dim     = " + getnamed("FDTD", "dimension");
+? "  FDTD       x span  = " + num2str(getnamed("FDTD", "x span")) + " m";
+? "  FDTD       z span  = " + num2str(getnamed("FDTD", "z span")) + " m";
+? "  FDTD       x min bc= " + getnamed("FDTD", "x min bc");
+? "  FDTD       mesh acc= " + num2str(getnamed("FDTD", "mesh accuracy"));
+? "  mesh_brick dx      = " + num2str(getnamed("mesh_brick", "dx")) + " m";
+? "  source     axis/z  = " + getnamed("source", "injection axis") + " / " + num2str(getnamed("source", "z")) + " m";
+? "  source     lam起止  = " + num2str(getnamed("source", "wavelength start")) + " ~ " + num2str(getnamed("source", "wavelength stop")) + " m";
+? "  source     pol     = " + num2str(getnamed("source", "polarization angle")) + " deg";
+? "  T   monitor type/z = " + getnamed("T", "monitor type") + " / " + num2str(getnamed("T", "z")) + " m";
+? "  R   monitor z      = " + num2str(getnamed("R", "z")) + " m";
+? "  T_pt monitor type  = " + getnamed("T_pt", "monitor type");
+? "  monitor use_src    = " + num2str(getnamed("FDTD", "global monitor use source limits")) + "  (0 = 自定义栅格)";
+? "  monitor 波长栅格    = " + num2str(getnamed("FDTD", "global monitor minimum wavelength")*1e9) + " ~ " + num2str(getnamed("FDTD", "global monitor maximum wavelength")*1e9) + " nm";
+? "  monitor 频点数      = " + num2str(getnamed("FDTD", "global monitor frequency points"));
+
+# ============================================================
+# 9. 保存
+# ============================================================
+# 不想让脚本覆盖磁盘上的工程，就把下面 save 那行注释掉（行首加 #）。
+save(SAVE_TO);
+? "";
+? "已保存工程 -> " + SAVE_TO;
+
+? "";
+? "开始仿真 ...";
+run;
+? "仿真结束。";
+
+# ============================================================
+# 10. 结果提取（透射功率 + 复振幅）
+# ============================================================
+? "";
+? "========== 结果 (Lx = " + num2str(Lx*1e9) + " nm, Ly = " + num2str(Ly*1e9) + " nm) ==========";
+
+# --- 复振幅：线性插值到设计波长 ---
+# 监视器栅格是均匀分布，lambda0 不一定正好落在采样点上（rev4 实测：
+# 432~632 nm 共 100 点、步长 2.02 nm，532 nm 恰好在两点正中）。
+# 所以这里不取"最近点"，而是取夹住 lambda0 的两点做复线性插值，
+# 这样结果与栅格设置无关，改带宽/点数都不用重跑分析。
+r = getresult("T_pt", "E");
+f = r.f;
+n = length(f);
+f0 = c0 / lambda0;
+
+# 最近点
+idx  = 1;
+dmin = 1e30;
+for (i = 1:n) {
+    d = abs(f(i) - f0);
+    if (d < dmin) { dmin = d; idx = i; }
+}
+
+# 挑一个邻居，使两点夹住 f0（与 f 是升序还是降序无关）
+j = idx;
+if (idx < n) { j = idx + 1; } else { j = idx - 1; }
+if ( (f(idx) - f0) * (f(j) - f0) > 0 ) {
+    if (idx > 1) { j = idx - 1; }
+}
+w = (f0 - f(idx)) / (f(j) - f(idx));
+
+Ex_sel = r.Ex(idx) + w*(r.Ex(j) - r.Ex(idx));
+Ey_sel = r.Ey(idx) + w*(r.Ey(j) - r.Ey(idx));
+lam_near = c0 / f(idx);
+
+? "频点总数 = " + num2str(n) + "   波长覆盖 = " + num2str(min(c0/f)*1e9) + " ~ " + num2str(max(c0/f)*1e9) + " nm";
+? "最近采样点 = " + num2str(lam_near*1e9) + " nm  (与设计波长差 " + num2str(abs(lam_near-lambda0)*1e9) + " nm，插值权重 w = " + num2str(w) + ")";
+? "入射偏振角 = " + num2str(getnamed("source", "polarization angle")) + " deg";
+? "|Ex| = " + num2str(abs(Ex_sel)) + "   phase(Ex) = " + num2str(angle(Ex_sel)*180/pi) + " deg";
+? "|Ey| = " + num2str(abs(Ey_sel)) + "   phase(Ey) = " + num2str(angle(Ey_sel)*180/pi) + " deg";
+
+# --- 透射效率（该带内的功率透过率）---
+T_spec = transmission("T");
+? "T 全谱 min/max/mean = " + num2str(min(T_spec)) + " / " + num2str(max(T_spec)) + " / " + num2str(mean(T_spec));
+if (length(T_spec) == n) {
+    ? "T @ 最近采样点 = " + num2str(T_spec(idx));
+}
+
+? "";
+? "=========================================================";
+? " 怎么读这组数（重要）";
+? "=========================================================";
+? " 偏振角 = 0  时：|Ex|,phase_x 是 x 主轴自己的响应（共偏振）";
+? "                 |Ey| 是交叉偏振分量，未加转角的方块砖应接近 0";
+? " 偏振角 = 90 时：|Ey|,phase_y 才是 y 主轴自己的响应";
+? " 所以要跑两次，再算双折射相位差 delta = phase_x - phase_y";
+? " 判据：delta 约 180 度 且 |Ex|,|Ey| 都接近 1  ->  可入选元原子库";
+? "";
+? " 注意：本工程没有给纳米砖加转角，所以交叉偏振恒为 0、拿不到 PB 相位。";
+? " 对入选尺寸，还需要把砖绕 z 转 theta、测交叉偏振相位 psi = 2*theta。";
+? " 需要的话再补一个转角扫参脚本（rev4 未包含）。";
+
+# ============================================================
+# 备注
+# ============================================================
+# 关于 R 监视器：平面波源是单向的，光源下方无场，因此 R 必须放在
+# 光源与结构之间。此时 transmission("R") 给出的是净功率流
+# (入射 - 反射)，即 1 - R。所以：
+#      反射率 R_reflect = 1 - transmission("R")
+# 本脚本先只打印 T，反射按需自行换算。
+#
+# 关于 PB 相位：单元胞进入库的判据是
+#      |phi_x - phi_y| 约等于 180 度  且  |Ex| 约等于 |Ey| 约等于 1
+# 满足即接近理想半波片，偏振转换效率最高。
+#
+# 关于 inactive 属性：v251 中 FDTD 求解区的 name 不可设；凡是被主控属性
+# 支配的属性（例如未开 override 时的 wavelength start），未激活时 set 会抛
+# "the requested property 'X' is inactive"。排查办法：先 select 该对象，
+# 再执行 ?set; 打印它的完整属性表。

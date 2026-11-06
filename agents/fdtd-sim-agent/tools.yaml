@@ -1,0 +1,63 @@
+# tools.yaml — what fdtd-sim-agent may call, and what each call needs first.
+# Every entry is something that has actually been run on this machine; nothing here is aspirational.
+
+tools:
+  - id: lumapi_session
+    kind: python-api
+    entry: lumapi.FDTD(hide=True)
+    requires:
+      - ANSYSLMD_LICENSE_FILE=1055@localhost
+      - sys.path includes "F:\Lumercial_WS\ANSYS Inc\v251\Lumerical\api\python"
+      - the Lumerical GUI is closed (it competes for the same seat)
+    gives: an object-model handle; ~3 s to open
+    failure: "Failed to checkout feature 'lumerical_gui'" -> memory/known-issues.md item 1
+    note: always close in a finally block, or the next run inherits a stale seat
+
+  - id: run_fdtd_sweep
+    kind: skill-script
+    entry: ../../skills/lumerical-unitcell-simulation/scripts/run_fdtd_sweep.py
+    requires: a spec that passes validate_spec --strict
+    gives: per-point CSV (lam_um,R,T,A) + summary.csv + the .fsp actually simulated
+    flags: ["--spec", "--sweep-json", "--out", "--dry-run"]
+    note: "--dry-run first, always — it costs one second and catches a malformed spec"
+
+  - id: validate_spec
+    kind: skill-script
+    entry: ../../skills/paper-fdtd-parameter-extraction/scripts/validate_spec.py
+    requires: a spec JSON
+    gives: ERROR/WARN list, exit code 0 only when clean
+    flags: ["--strict"]
+    note: catches unit drift (185 written for 185 nm) before it reaches the solver
+
+  - id: extract_pdf_text
+    kind: skill-script
+    entry: ../../skills/paper-fdtd-parameter-extraction/scripts/extract_pdf_text.py
+    requires: PyMuPDF (present in the managed venv)
+    gives: page-marked text + a page-by-page scan verdict
+    flags: ["--out", "--images", "--dpi"]
+
+  - id: check_packages
+    kind: repo-script
+    entry: ../../tools/check_packages.py
+    requires: nothing
+    gives: package integrity report (paper/fsp/scripts/results counts, non-ASCII names, README state)
+    flags: ["--pkg"]
+
+  - id: lmutil_lmstat
+    kind: cli
+    entry: F:/Lumercial/Shared Files/fnp/winx64/lmutil.exe lmstat -c 1055@localhost -a
+    requires: nothing (read-only)
+    gives: two UP lines — broker and vendor daemon — or the failure that explains a dead licence
+    note: healthy means BOTH "license server UP" and "ansyslmd: UP"
+
+  - id: engine_log
+    kind: file-read
+    entry: "<project>_p0.log"
+    requires: the .fsp was saved before the run
+    gives: "Starting N total iterations" and the final "Auto Shutoff: <value>"
+    note: grep with [0-9.eE+-] — a plain [0-9.]+ truncates 8.8e-05 to 8.8 and inverts the verdict
+
+denied:
+  - running an unvalidated spec
+  - launching the Lumerical GUI (use lumapi; the GUI steals the seat and breaks headless runs)
+  - writing outside packages/ and _scratch/

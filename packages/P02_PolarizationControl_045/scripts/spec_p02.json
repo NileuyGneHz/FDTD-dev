@@ -1,0 +1,177 @@
+{
+  "schema_version": "1.0",
+  "meta": {
+    "package": "P02",
+    "paper": {
+      "title": "Broadband highly-efficient dielectric metadevices for polarization control",
+      "authors": "Kruk, Hopkins, Kravchenko, Miroshnichenko, Neshev, Kivshar",
+      "journal": "APL Photonics",
+      "volume": "1",
+      "page": "030801",
+      "year": 2016,
+      "doi": "10.1063/1.4948946"
+    },
+    "target_figure": "Fig. 3(a) transmission along both pillar axes",
+    "source_pages": [
+      4,
+      5
+    ],
+    "extracted_by": "agent",
+    "extracted_on": "2026-11-04"
+  },
+  "parameters": {
+    "D": 7.5e-07,
+    "a": 2.8e-07,
+    "b": 4.3e-07,
+    "c": 8.5e-07,
+    "t_sub": 1e-06,
+    "pol": 0
+  },
+  "lattice": {
+    "type": "square",
+    "period_x": "D",
+    "period_y": "D",
+    "supercell": {
+      "nx": 1,
+      "ny": 1
+    }
+  },
+  "materials": {
+    "Si": {
+      "kind": "builtin",
+      "name": "Si (Silicon) - Palik",
+      "cite": "text: polycrystalline silicon on quartz; no poly-Si entry in the database"
+    },
+    "SiO2": {
+      "kind": "builtin",
+      "name": "SiO2 (Glass) - Palik",
+      "cite": "text: quartz substrate"
+    }
+  },
+  "objects": [
+    {
+      "id": "substrate",
+      "type": "box",
+      "material": "SiO2",
+      "mesh_order": 3,
+      "center": [
+        "0",
+        "0",
+        "-t_sub/2"
+      ],
+      "span": [
+        "D",
+        "D",
+        "t_sub"
+      ]
+    },
+    {
+      "id": "nanopillar",
+      "type": "ellipse",
+      "material": "Si",
+      "mesh_order": 1,
+      "center": [
+        "0",
+        "0",
+        "c/2"
+      ],
+      "axes": [
+        "a",
+        "b"
+      ],
+      "height": "c",
+      "n_vertices": 64
+    }
+  ],
+  "simulation": {
+    "mode": "transmission",
+    "dimension": "3D",
+    "bc": {
+      "x": "Periodic",
+      "y": "Periodic",
+      "z": "PML"
+    },
+    "mesh_accuracy": 4,
+    "mesh_override": {
+      "dx": 2e-08,
+      "dy": 2e-08,
+      "dz": 2e-08,
+      "z_range": [
+        "-5e-8",
+        "c + 5e-8"
+      ]
+    },
+    "auto_shutoff": 0.0001,
+    "simulation_time": 1e-12,
+    "air_above": 1.2e-06,
+    "below_structure": 2e-06,
+    "source": {
+      "type": "plane_wave",
+      "polarization_deg": "pol",
+      "wavelength_range": [
+        1.4e-06,
+        1.7e-06
+      ],
+      "npts": 101,
+      "z": "auto"
+    },
+    "monitors": {
+      "R": {
+        "z": "auto",
+        "span": [
+          "D",
+          "D"
+        ]
+      },
+      "T": {
+        "z": "auto",
+        "span": [
+          "D",
+          "D"
+        ]
+      }
+    }
+  },
+  "targets": [
+    {
+      "quantity": "peak_transmittance",
+      "value": 0.95,
+      "tolerance": 0.05,
+      "where": "Fig. 3(a): both axes near unity"
+    },
+    {
+      "quantity": "bandwidth_T90",
+      "value": 1.52e-07,
+      "tolerance": 3e-08,
+      "where": "supplementary: 152 nm bandwidth"
+    }
+  ],
+  "assumptions": [
+    "a and b are taken as FULL diameters of the elliptical cross-section: with D = 750 nm a semi-axis interpretation would give b = 900 nm > period, which is impossible.",
+    "Silicon modelled with the crystalline Palik entry; the paper uses polycrystalline Si and states no optical constants. Expect a small index offset.",
+    "Fig. 2 quotes a=285, b=450, c=860 nm while the Fig. 3 text quotes a=280, b=430, c=850 nm for the half-wave plate. The Fig. 3 values are used because that is the target figure.",
+    "Substrate truncated to 1 um; a 1 um quartz layer is opaque over the C+L band only in the sense that it is transparent — it is the propagation medium, so the thickness is not critical.",
+    "Light is incident from the substrate side and collected in air, matching the standard transmission measurement for an on-glass metasurface.",
+    "Fig. 3(a) shows transmission for polarizations along both pillar axes; the sweep over pol = 0 deg and 90 deg supplies the two curves. Which axis maps to 0 deg is unstated, so the two spectra are labelled by angle only."
+  ],
+  "missing": [
+    {
+      "field": "poly_si_optical_constants",
+      "question": "Which refractive index data was used for the LPCVD polycrystalline silicon? Crystalline Palik differs from poly-Si mainly by grain-boundary absorption."
+    },
+    {
+      "field": "pillar_rotation",
+      "question": "Is the ellipse major axis aligned with x or y? The paper states polarization is 'parallel to the short axis' in Fig. 2 without defining the axis orientation."
+    },
+    {
+      "field": "substrate_in_simulation",
+      "question": "Was the quartz substrate included in the FDTD domain, or replaced by an index-matched port?"
+    }
+  ],
+  "sweep": {
+    "pol": [
+      0,
+      90
+    ]
+  }
+}

@@ -1,0 +1,64 @@
+data = getresult("T","E");
+E = data.E;
+data = getresult("T","H");
+H = data.H;
+
+x = data.x;
+y = data.y;
+z = data.z;
+f = data.f;
+lmd = data.lambda;
+
+nx = length(x);
+ny = length(y);
+nz = length(z);
+nf = length(f);
+
+# *** y -> LCP ***
+
+E1 = E(:,:,:,:,2)*exp(-1i*pi/2);
+E2 = E(:,:,:,:,1)*cos(pi/4) + E1*sin(pi/4);
+H1 = H(:,:,:,:,1)*exp(-1i*pi/2);
+H2 = H1*cos(3*pi/4) + H(:,:,:,:,2)*sin(3*pi/4);
+S = conj(E2)*H2;
+S = 0.5*real(S);
+power_tran = integrate2(S(:,:,:,:), 1:2, x, y); # W
+SP = sourcepower(f);
+T1 = power_tran/SP;
+
+
+# *** y -> RCP ***
+
+E1 = E(:,:,:,:,2)*exp(1i*pi/2);
+E2 = E(:,:,:,:,1)*cos(pi/4) + E1*sin(pi/4);
+H1 = H(:,:,:,:,1)*exp(1i*pi/2);
+H2 = H1*cos(3*pi/4) + H(:,:,:,:,2)*sin(3*pi/4);
+S = conj(E2)*H2;
+S = 0.5*real(S);
+power_tran = integrate2(S(:,:,:,:), 1:2, x, y); # W
+SP = sourcepower(f);
+T2 = power_tran/SP;
+
+# *** total ***
+data = getresult("T", "T");
+T_tot = data.T;
+
+
+plot(lmd*1e9,T_tot, "wavelength/nm", "transmission", "", "color=black");
+holdon;
+plot(lmd*1e9,T1, "wavelength/nm", "transmission", "", "color=blue");
+plot(lmd*1e9,T2, "wavelength/nm", "transmission", "", "color=red");
+legend("total", "y->LCP", "y->RCP");
+
+
+
+
+
+
+
+
+
+
+
+
+

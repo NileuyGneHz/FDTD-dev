@@ -1,0 +1,56 @@
+# skills.yaml — which skill to load, when, and what it hands to the next stage.
+# Paths are relative to this agent directory.
+# 2026-11-06: skills renamed with the fdtd- prefix; ids and paths updated to match.
+
+skills:
+  - id: fdtd-paper-parameter-extraction
+    path: ../../skills/fdtd-paper-parameter-extraction
+    stage: 1
+    load_when:
+      - starting from a paper PDF or a new package with no spec yet
+      - a reproduction is off and the inputs themselves are in doubt
+      - asked "what did this paper actually simulate?"
+    consumes: paper PDF
+    produces: spec_<id>.json  (+ assumptions[], missing[])
+    exit_criteria:
+      - validate_spec.py --strict exits 0
+      - targets[] has at least two quantities
+      - every material carries a cite
+    hands_to: fdtd-lumerical-unitcell-simulation
+
+  - id: fdtd-lumerical-unitcell-simulation
+    path: ../../skills/fdtd-lumerical-unitcell-simulation
+    stage: 2
+    load_when:
+      - a validated spec exists and a spectrum is needed
+      - a simulated curve disagrees with the paper
+      - a result is non-physical (A above unity, negative R)
+      - a geometry or material sweep is required
+    consumes: spec_<id>.json
+    produces: point_XX_*.csv, summary.csv, <project>.fsp, _p0.log
+    exit_criteria:
+      - final Auto Shutoff below the configured threshold
+      - mesh refined once with the answer moving less than the target tolerance
+    hands_to: report writing (assets/report_template.md)
+
+  - id: fdtd-package-workspace
+    path: ../../skills/fdtd-package-workspace
+    stage: 0
+    load_when:
+      - locating a task by package ID
+      - creating a new package from the template
+      - running the packaging self-check
+      - writing or refreshing a package README
+    consumes: package ID
+    produces: package layout / README / index updates
+    note: not every task needs this; only when the package itself is being created or repaired
+
+load_order: [fdtd-package-workspace, fdtd-paper-parameter-extraction, fdtd-lumerical-unitcell-simulation]
+
+rules:
+  - Never load stage 2 before stage 1 has produced a validated spec, unless the user explicitly
+    supplies one.
+  - Never load all three "just in case" — each carries a different decision model and they compete
+    for attention.
+  - If a skill and memory disagree, trust the measured evidence in memory/known-issues.md and fix
+    the skill in the same turn.

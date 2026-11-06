@@ -1,0 +1,66 @@
+# ==============================================================================
+#  .gitattributes -- FDTD_WS 工作空间
+#  作用：1) 统一换行符，避免多人协作时整文件 diff
+#        2) 明确标记二进制，防止 git 做换行转换而静默损坏文件
+#        3) 可选：启用 Git LFS 备份大 .fsp（见文末）
+#  最后更新：2026-10-01
+# ==============================================================================
+
+# 默认：文本文件在仓库内统一用 LF 存储，工作区按本机习惯检出
+* text=auto
+
+# ------------------------------------------------------------------------------
+#  二进制文件 -- 必须显式声明
+#  .fsp 是 Lumerical 工程（二进制容器），若被当作文本做 CRLF 转换会直接损坏。
+# ------------------------------------------------------------------------------
+*.fsp    binary
+*.lms    binary
+*.ldf    binary
+*.ldev   binary
+*.mat    binary
+*.pdf    binary
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.mp4    binary
+*.avi    binary
+*.mkv    binary
+*.rar    binary
+*.zip    binary
+*.7z     binary
+
+# ------------------------------------------------------------------------------
+#  文本文件
+# ------------------------------------------------------------------------------
+*.py     text
+*.lsf    text
+*.md     text
+*.json   text
+*.csv    text
+*.log    text
+.gitignore        text
+.gitattributes    text
+
+# 让 GitHub 语言统计把 .lsf 归到 Python，而不是"其他"
+*.lsf    linguist-language=Python
+*.lsf    linguist-detectable=true
+
+
+# ==============================================================================
+#  可选：Git LFS（Large File Storage）
+#  用途：把 >100 MB 的 .fsp 也能备份到 GitHub。
+#  代价：启用后克隆方必须安装 git-lfs，否则拿到的只是指针文本。
+#        GitHub 免费额度 1 GB 存储 / 1 GB 月流量。
+#        本项目大文件 331.8 + 79.6 = 411 MB，装得下但接近上限。
+#
+#  启用步骤（三步，顺序不能反）：
+#    1) git lfs install
+#    2) git lfs track "*.fsp"          <- 这会自动往本文件追加 filter 行
+#    3) 编辑 .gitignore，删掉第 2 节里那条
+#       packages/P01_Absorber_042/fsp/infrared_perfect_absorber.fsp
+#     然后 git add -A && git commit && git push
+#
+#  若不用 LFS，保持下面两行注释状态即可（当前状态）。
+# ==============================================================================
+# *.fsp filter=lfs diff=lfs merge=lfs -text

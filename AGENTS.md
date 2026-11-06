@@ -83,7 +83,11 @@
 ## 8. 索引
 
 - 目录契约全文：`docs/constitution/workspace-layout.md`
+- 技术正文（Lumerical v251 八章）：`docs/constitution/field-manual.md`
+- 协作章程（原 `agent.md`）：`docs/constitution/collaboration-charter.md`
 - 脚本归属与 CLI：`docs/constitution/script-contract.md`
 - 命名表：`docs/constitution/naming.md`
+- 归档单元契约：`docs/constitution/archive-contract.md`
 - 双宿主风险：`docs/constitution/host-integration.md`
+- WorkBuddy 发现规则（源码级）：`docs/constitution/workbuddy-skill-rules.md`
 - 技能总表：`skills/INDEX.md` · 角色总表：`agents/INDEX.md`

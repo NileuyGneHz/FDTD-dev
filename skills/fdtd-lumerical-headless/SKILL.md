@@ -1,4 +1,4 @@
----
+﻿---
 name: fdtd-lumerical-headless
 description: >
   用 lumapi 无界面构建/验证 Ansys Lumerical FDTD 脚本（.lsf）与工程（.fsp）：
@@ -16,7 +16,7 @@ updated: 2026-11-06
 ## 概述
 
 用 `lumapi` 在无界面模式下建、改、跑、读 FDTD 模型；本文件只放**进入后必须立刻知道**的规则，
-完整正文与八章结构在 `F:\Lumercial_WS\FDTD_WS\SKILL.md`（含 §0 按症状索引，约 1250 行）。
+完整正文与八章结构在 `F:\Lumercial_WS\docs/constitution/field-manual.md`（含 §0 按症状索引，约 1250 行）。
 
 ## CRITICAL（违反即停止）
 
@@ -89,8 +89,8 @@ f.run()
 
 | 文件 | 何时读 |
 |---|---|
-| `FDTD_WS\SKILL.md` | **动手前**读一次，八章 + §0 症状索引，唯一正文 |
-| `FDTD_WS\agent.md` | 需要协作章程 / 铁律 / 标准循环时 |
+| `docs/constitution/field-manual.md` | **动手前**读一次，八章 + §0 症状索引，唯一正文 |
+| `docs/constitution/collaboration-charter.md` | 需要协作章程 / 铁律 / 标准循环时 |
 | `FDTD_WS\_shared\lumapi_common.py` | 需要已验过的会话/校验函数（setup_env / assert_ran / n_at）时 |
 | `FDTD_WS\packages\PACKAGES.md` | 按包 ID 定位论文时 |
 | `FDTD_WS\_scratch\archive\SKILL_old_user_level.bak-20260930.md` | 只在回溯旧版结论时 |

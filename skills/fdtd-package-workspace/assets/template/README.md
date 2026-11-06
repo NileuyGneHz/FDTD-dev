@@ -1,4 +1,4 @@
-# <包名> — <一句话主题>
+﻿# <包名> — <一句话主题>
 
 > **模板**：复制 `_TEMPLATE/` 整个文件夹来新建包。填完下面所有 `<>` 占位符，
 > 删掉不适用的行，**不要留空章节**。本文件是 agent 接管本包时的第一份读物。
@@ -20,11 +20,11 @@
 
 ```bash
 # 1. 读铁律（若不确定，或本包有特殊坑）
-#    见 ../../agent.md §4
+#    见 ../../docs/constitution/collaboration-charter.md §4
 # 2. 跑自检，确认本包完整
 py ../../tools/check_packages.py --pkg <P0N>
 # 3. 跑之前必须过 ASCII 闸门（GPU 引擎硬要求）
-#    见 ../../agent.md §4-B
+#    见 ../../docs/constitution/collaboration-charter.md §4-B
 ```
 
 ---
@@ -52,7 +52,7 @@ py ../../tools/check_packages.py --pkg <P0N>
 ## 2. 关键参数（照抄论文，不要凭印象）
 
 > ⚠️ 材料数据源必须写明是哪一套（Siefke / Palik / Devore / 论文自定义），
-> 四套差 ~15%，混用结果对不上。见 `../../SKILL.md` §3.7。
+> 四套差 ~15%，混用结果对不上。见 `../../docs/constitution/field-manual.md` §3.7。
 
 | 参数 | 值 | 来源 |
 |---|---|---|
@@ -81,7 +81,7 @@ py ../../tools/check_packages.py --pkg <P0N>
 | `<xxx_p0.log>` | `<引擎日志，用于判"算没算">` | `<实跑生成>` |
 
 > ⚠️ **命名规则**：`.fsp` 文件名只用 ASCII（字母/数字/下划线）。
-> 中文名会导致 GPU 引擎崩溃（`SKILL.md` §6.2）。
+> 中文名会导致 GPU 引擎崩溃（`field-manual.md` §6.2）。
 > 课程/论文原始工程若含中文名，写入本包时**改名并登记新旧对照**。
 
 ### `scripts\` — 本包专用脚本

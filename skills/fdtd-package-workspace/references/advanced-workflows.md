@@ -1,6 +1,6 @@
-# Advanced workflows
+﻿# Advanced workflows
 
-> Loaded on demand from `SKILL.md`. These are low-frequency procedures: read this file only when the
+> Loaded on demand from `field-manual.md`. These are low-frequency procedures: read this file only when the
 > task actually matches one of the four workflows below.
 >
 > Contents: D (batch migration) · E (restructure a long doc) · F (translate a long doc) ·
@@ -55,7 +55,7 @@ A complete implementation already exists in `scripts/migrate_classes_to_packages
 
 ## Workflow E: restructure a "patchwork" long document (without losing content)
 
-Pitfall-log documents (like the main `SKILL.md`) tend to grow into an append-only body of
+Pitfall-log documents (like the main `field-manual.md`) tend to grow into an append-only body of
 "§一·补一 / §一·补二 …" sections: **the content is all correct, but one topic is scattered across
 several places**, and newcomers can only navigate via the index.
 The right way to restructure is **machine-assisted relocation, not hand-copying**:
@@ -111,7 +111,7 @@ or *only with the original retained*.
    - the symptom/index table's targets all still exist
    Before/after file sizes and line counts are a weak signal; the number list is the strong one.
 6. **Also check the cross-document links.** Any index/map file that lists documents
-   (`README.md`, `agent.md`, the package `README.md`) must be updated for the new file
+   (`README.md`, the collaboration charter, the package `README.md`) must be updated for the new file
    and for the changed language, or the map goes stale immediately.
 7. **When fixing a dangling reference, say so.** If the source had a broken reference
    (e.g. a "see (2)" pointing at nothing), translate it into a **valid** one and flag the change

@@ -42,16 +42,22 @@ from pathlib import Path
 
 # ---- 配置 ----------------------------------------------------------------
 
-# packages 目录 = 本脚本所在目录的上一级 / packages
+try:  # Windows 控制台默认 cp1252，中文输出会崩
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except Exception:
+    pass
+
+# 归档单元根 = 本脚本所在目录的上一级 / cases
 TOOLS_DIR = Path(__file__).resolve().parent
 WS_ROOT = TOOLS_DIR.parent
-PKG_ROOT = WS_ROOT / "packages"
+PKG_ROOT = WS_ROOT / "cases"
 
 # 包目录命名：P01_xxx / P10_xxx
 PKG_NAME_RE = re.compile(r"^P\d{2}_[A-Za-z0-9_]+$")
 
 # 标准子目录（缺了给 WARN，不算 ERROR）
-SUBDIRS = ["paper", "fsp", "scripts", "results", "notes"]
+SUBDIRS = ["paper", "model", "results", "notes"]  # config 是可选目录，单独计数
 
 # README 里不允许残留的占位符
 PLACEHOLDER_RE = re.compile(r"<[^<>\n]{1,60}>")
@@ -155,8 +161,8 @@ def check_one_pkg(pkg_dir: Path) -> list[Issue]:
         else:
             counts[sub] = len(files)
 
-        # ASCII 检查（只对 fsp / scripts —— 这两个目录会进仿真路径）
-        if sub in ("fsp", "scripts"):
+        # ASCII 检查（只对 model —— 这个目录会进仿真路径）
+        if sub in ("model",):
             bad = [f for f in files if not is_ascii(f.name)]
             for f in bad:
                 rel = f.relative_to(pkg_dir)
@@ -168,8 +174,12 @@ def check_one_pkg(pkg_dir: Path) -> list[Issue]:
                     )
                 )
 
+    # 3.5) config 可选：有就计数，没有不算问题
+    cfg_dir = pkg_dir / "config"
+    counts["config"] = len([p for p in cfg_dir.iterdir()]) if cfg_dir.is_dir() else 0
+
     # 4) 是否有 .fsp
-    fsp_dir = pkg_dir / "fsp"
+    fsp_dir = pkg_dir / "model"
     fsp_files = list(fsp_dir.rglob("*.fsp")) if fsp_dir.is_dir() else []
     has_fsp = len(fsp_files) > 0
 
@@ -178,8 +188,8 @@ def check_one_pkg(pkg_dir: Path) -> list[Issue]:
         issues.append(Issue("WARN", name, "paper\\ 为空（论文未归档）"))
 
     # 6) 新包特征
-    if counts.get("scripts", 0) == 0 and counts.get("results", 0) == 0 and not has_fsp:
-        issues.append(Issue("WARN", name, "scripts\\ 与 results\\ 均为空且无 .fsp（新包？）"))
+    if counts.get("config", 0) == 0 and counts.get("results", 0) == 0 and not has_fsp:
+        issues.append(Issue("WARN", name, "config\\ 与 results\\ 均为空且无 .fsp（新包？）"))
 
     # 7) 有 fsp 但没 _p0.log —— 可能从未实跑
     if has_fsp:
@@ -213,7 +223,7 @@ def main() -> int:
     args = ap.parse_args()
 
     if not PKG_ROOT.is_dir():
-        print(f"[ERROR] 找不到 packages 目录: {PKG_ROOT}", file=sys.stderr)
+        print(f"[ERROR] 找不到 cases 目录: {PKG_ROOT}", file=sys.stderr)
         return 1
 
     pkg_dirs = sorted(
@@ -239,8 +249,7 @@ def main() -> int:
         print(
             json.dumps(
                 {
-                    "packages": [d.name for d in pkg_dirs],
-                    "errors": len(errors),
+                    "packages": [d.name for d in pkg_dirs],                    "errors": len(errors),
                     "warnings": len(warns),
                     "issues": [i.as_dict() for i in all_issues],
                 },

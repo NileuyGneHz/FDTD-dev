@@ -12,11 +12,11 @@
 | 3 | L1/L2 文档（product-context、constitution 六篇） | 完成 |
 | 4 | 模块级 `AGENTS.md`（cases / projects / library / skills / agents / tools / defects / journal / iterations / tasks / specs / plans / api） | 完成 |
 | 5 | `skills/INDEX.md` 与 `agents/INDEX.md` | 完成 |
-| 6 | `git init` + `.gitignore`（含 junction 排除） | **未开始** |
-| 7 | `tools/skills-wire.py`、`skills-doctor.py`、`check_scripts.py` | **未开始** |
-| 8 | `packages/` → `cases/` 迁移（含 `.lsf` 归位 `model/`） | **未开始** |
-| 9 | 根 `SKILL.md` → `docs/constitution/field-manual.md` 并改指针 | **未开始** |
-| 10 | `agent.md` → `AGENTS.md` 合并 | **未开始** |
+| 6 | `git init` + `.gitignore`（含 junction 排除） | 完成 |
+| 7 | `tools/skills-wire.py`、`skills-doctor.py`、`check_scripts.py` | 完成（doctor ALL GREEN） |
+| 8 | `packages/` → `cases/` 迁移（含 `.lsf` 归位 `model/`） | 完成 |
+| 9 | 根 `SKILL.md` → `docs/constitution/field-manual.md` 并改指针 | 完成 |
+| 10 | `agent.md` → `docs/constitution/collaboration-charter.md`，根契约由 `AGENTS.md` 承担 | 完成 |
 
 ## 回顾
 

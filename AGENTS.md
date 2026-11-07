@@ -5,8 +5,8 @@
 
 ## 0. 一句话
 
-面向超表面科研人员的 Lumerical FDTD 工作区：用 DSH 与 WorkBuddy 两个宿主，
-把「读论文 → 提参数 → 建模 → 跑谱 → 判偏差 → 出图」固化成可复现、可审计的流水线。
+面向超表面科研人员的 Lumerical FDTD 工作区：**人定方向、材料与几何结构，agent 在锁定空间内
+调参闭环，直到产出达标结果**；论文复现用于校准模型。同一套技能由 DSH 与 WorkBuddy 接管。
 
 ## 1. 起手必读（按顺序，别跳）
 
@@ -70,15 +70,16 @@
 - 该单元 `README.md` 的 §0 验收条件全部满足
 - `python tools/check_scripts.py` 通过（包内无 `.py`）
 - `python tools/check_packages.py` 通过（论文 ↔ `.fsp` 一一对应）
-- 若改了技能：`python tools/skills-doctor.py` 报 `ALL GREEN`
+- 若改了技能：`python tools/check_skill_contract.py` 与 `python tools/skills-doctor.py` 双 `ALL GREEN`
+- 若做了复现：`python tools/check_reproduction.py --case <ID>` 报 `ALL GREEN`，且 `--self-test` 通过
 - `journal/<date>.md` 写了交接
 
 ## 7. 分工
 
-- **PM（人）**：`docs/features/specs/`、`docs/product-context/`、验收标准
+- **人（研究员）**：定方向、材料、结构族、目标指标与容差；锁定不可变项；最终裁决
 - **Engineer（人）**：`library/`、`tools/`、`skills/*/scripts/`
-- **AI Agent**：按 `skills/` 与 `agents/` 的编排执行，产出落 `cases/` 或 `projects/`
-- **人做最终裁决**：数值是否可信、图是否可发表——AI 只给证据，不下结论
+- **AI Agent**：在锁定空间内调参、跑 FDTD、记录每轮证据，产出落 `cases/` 或 `projects/`
+- **红线**：agent 不改锁定项、不隐瞒失败轮次、不替人下"物理正确 / 可发表"的结论
 
 ## 8. 索引
 
@@ -86,6 +87,8 @@
 - 技术正文（Lumerical v251 八章）：`docs/constitution/field-manual.md`
 - 协作章程（原 `agent.md`）：`docs/constitution/collaboration-charter.md`
 - 脚本归属与 CLI：`docs/constitution/script-contract.md`
+- 技能变更门槛（新增/修改/回归/禁止）：`docs/constitution/skill-change-contract.md`
+- 复现约束（口径 / 证据 / 训练语料）：`docs/constitution/reproduction-contract.md`
 - 命名表：`docs/constitution/naming.md`
 - 归档单元契约：`docs/constitution/archive-contract.md`
 - 双宿主风险：`docs/constitution/host-integration.md`

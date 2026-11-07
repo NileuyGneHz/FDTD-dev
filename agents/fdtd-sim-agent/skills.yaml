@@ -18,6 +18,50 @@ skills:
       - every material carries a cite
     hands_to: fdtd-lumerical-unitcell-simulation
 
+  - id: fdtd-lumerical-fsp-introspection
+    path: ../../skills/fdtd-lumerical-fsp-introspection
+    stage: 1.5
+    load_when:
+      - the package ships a course or paper reference .fsp and its settings are in doubt
+      - two projects give different numbers and you need to know which one converged
+      - asked "what did the reference project actually simulate?"
+    consumes: existing .fsp (+ optional spec_<id>.json)
+    produces: manifest.json, spectra.json, diff.json, summary.json
+    exit_criteria:
+      - every inspected project has layoutmode + a convergence verdict from _p0.log
+      - functional_layers_match is reported before any layer-definition claim is made
+    hands_to: fdtd-lumerical-unitcell-simulation
+    note: on-demand only; do not add to load_order unless a reference project exists
+
+  - id: fdtd-lumerical-session-control
+    path: ../../skills/fdtd-lumerical-session-control
+    stage: X
+    load_when:
+      - Design mode needs one more iteration on an already-built .fsp
+      - parameters must be injected through the search_space whitelist
+      - a per-iteration audit trail (params / _p0.log / raw results) is required
+    consumes: existing .fsp + one parameter set from fdtd-lumerical-design-loop
+    produces: iteration_NNN.fsp, iteration_NNN.json, _p0.log
+    exit_criteria:
+      - verify_and_run three checks passed (layoutmode / _p0.log / Completed)
+      - applied[] lists every setnamed call that actually happened
+    hands_to: fdtd-lumerical-design-loop
+    note: on-demand only; do not add to load_order; Reproduce mode must refuse non-empty params
+
+  - id: fdtd-lumerical-design-loop
+    path: ../../skills/fdtd-lumerical-design-loop
+    stage: X
+    load_when:
+      - Design mode needs the next parameter set or a target verdict
+      - must prove infeasibility inside the given search_space
+    consumes: L1 spec (targets / locked / search_space) + iteration_NNN.json results
+    produces: next_params.json, search_log.csv, fom_curve.csv, verdict.json
+    exit_criteria:
+      - verdict is one of PASS / INFEASIBLE / NEEDS_HUMAN / CONTINUE
+      - INFEASIBLE carries best_fom + best_params boundary evidence
+    hands_to: fdtd-lumerical-session-control
+    note: on-demand only; do not add to load_order; no adjoint / topology optimization (L1 non-goal)
+
   - id: fdtd-lumerical-unitcell-simulation
     path: ../../skills/fdtd-lumerical-unitcell-simulation
     stage: 2
@@ -52,5 +96,12 @@ rules:
     supplies one.
   - Never load all three "just in case" — each carries a different decision model and they compete
     for attention.
+  - Load fdtd-lumerical-fsp-introspection (stage 1.5) only when a reference .fsp actually exists;
+    it is deliberately absent from load_order because most packages start from a PDF only.
   - If a skill and memory disagree, trust the measured evidence in memory/known-issues.md and fix
     the skill in the same turn.
+  - The two stage-X skills (fdtd-lumerical-design-loop, fdtd-lumerical-session-control) implement
+    the Design-mode loop in AGENT.md 3.2. Load them only in Design mode and only when an .fsp already
+    exists; never add them to load_order. Reproduce mode must never inject parameters.
+  - The X loop decides parameters and executes iterations; it does not build geometry. Building a
+    unit cell from a spec remains stage 2 (fdtd-lumerical-unitcell-simulation).

@@ -1,0 +1,31 @@
+{
+  "mode": "Design",
+  "targets": [
+    {"metric": "T", "min": 0.90},
+    {"metric": "dphi_deg_mod360", "kind": "phase", "value": 180.0, "tol_deg": 5.0}
+  ],
+  "locked": {
+    "materials": ["Si (Silicon) - Palik"],
+    "topology": "nanobrick on glass",
+    "layer_stack": "fixed by human"
+  },
+  "search_space": {
+    "c": {"min": 8.0e-7, "max": 9.0e-7, "step": 1.0e-8, "unit": "m"}
+  },
+  "strategy": {
+    "kind": "coordinate_descent",
+    "seed": 20261107,
+    "samples": 8,
+    "max_grid_points": 64
+  },
+  "budget": {
+    "max_runs": 20,
+    "stale_limit": 5,
+    "max_wall_minutes": 90
+  },
+  "observations": [],
+  "observation": {
+    "params": {"c": 8.5e-7},
+    "metrics": {"T": 0.88, "dphi_deg_mod360": 170.0}
+  }
+}

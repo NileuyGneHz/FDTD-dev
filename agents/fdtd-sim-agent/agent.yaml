@@ -2,21 +2,23 @@
 # Behaviour rules live in AGENT.md; this file only declares what the agent IS and MAY DO.
 
 name: fdtd-sim-agent
-version: 0.1.0
+version: 0.2.0
 entrypoint: AGENT.md
 
 description: >
-  Reproduces a published unit-cell FDTD result end to end: extracts the paper's parameters into a
-  validated model spec, builds and sweeps the model in Ansys Lumerical, audits convergence from the
-  engine log, and writes a reproduction report that separates numerical error from a real
-  disagreement with the publication.
+  Works in two modes. Reproduce: extracts a paper's parameters into a validated model spec, builds
+  and sweeps the model in Ansys Lumerical, audits convergence from the engine log, and writes a
+  report separating numerical error from a real disagreement. Design: given a human-locked material
+  and geometry plus a target metric, tunes only inside the declared search space until the target is
+  met or proven unreachable, keeping a per-iteration trail.
 
 domain: computational electromagnetics / metasurface unit cells
 toolchain: Ansys Lumerical 2025 R1 (v251) driven headlessly through lumapi
 
 workspace:
   root: ../..
-  packages: ../../packages
+  cases: ../../cases
+  projects: ../../projects
   skills: ../../skills
   scratch: ../../_scratch          # throwaway output only; never a deliverable
 
@@ -42,14 +44,18 @@ capabilities:
   - sweep one or more parameters and export per-point R/T/A spectra
   - audit convergence from the FDTD engine log
   - diagnose a mismatch against the publication and write a report
+  - tune parameters inside a human-locked search space toward a target metric
+  - stop with boundary evidence when the target is unreachable
 
 limits:
   # hard stops: the agent must refuse rather than guess
   require_valid_spec: true          # validate_spec.py --strict must exit 0 before any run
   require_convergence_before_report: true
+  require_per_iteration_trail: true       # params + objective + _p0.log + stop reason
   never_edit_foreign_fsp: true
-  never_invent_parameters: true     # unknown values go to spec.missing, not to a guess
-  never_tune_to_match_target: true  # fitting geometry to one number is not reproduction
+  never_invent_parameters: true           # unknown values go to spec.missing, not to a guess
+  never_tune_to_match_publication: true   # reproduce mode: fitting a curve is not reproduction
+  never_edit_locked_materials_or_topology: true  # design mode: out-of-space edits stop and ask the human
 
   max_simulation_minutes_single_point: 15
   default_mesh_accuracy: 4
@@ -62,3 +68,4 @@ handoff:
 
 change_log:
   - 0.1.0 (2026-11-03): initial split — extraction and building are separate skills joined by a spec
+  - 0.2.0 (2026-11-07): product policy — add design mode with a human-locked search space; reproduce mode keeps the no-tuning rule

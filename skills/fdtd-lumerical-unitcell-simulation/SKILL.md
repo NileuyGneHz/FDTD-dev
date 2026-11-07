@@ -108,15 +108,31 @@ Starting 20985 total iterations
 ⚠️ When grepping this value, include the exponent: `Auto Shutoff: [0-9.eE+-]+`. A pattern of
 `[0-9.]+` truncates `8.80583e-05` to `8.80583` and turns a converged run into a suspicious one.
 
-Measured on the package's reference project (`d2_perfectCross.fsp`, PML x/y, mesh accuracy 8):
-77,813 iterations, final `Auto Shutoff: 0.046734`. **That run never converged**, and it took ~12
-minutes. Its reported 0.82 should not be treated as ground truth.
+P01 ships **two** course projects. Do not merge them into a single "0.82"
+(`defects/D-001`):
+
+| project | x/y BC | iterations | final Auto Shutoff | threshold | verdict |
+|---|---|---|---|---|---|
+| `d2_perfectCross.fsp` | PML | 77,813 | `0.046734` | 1e-5 | ❌ hit the time cap, never converged, no stored spectrum |
+| `infrared_perfect_absorber.fsp` | Periodic | 7,039 | `8.87508e-06` | 1e-5 | ✅ converged |
+
+The converged course project stores `peak A = 0.8196 @ 6.152 µm`; our own converged build gives
+`0.8083 @ 5.85 µm`. At 6 µm they agree to **0.0011**. So ~0.82 is the *stable Lumerical answer*
+for this parameter set, not an artefact of an unfinished run. Before citing any reference
+project, run `fdtd-lumerical-fsp-introspection` and state which project and which run the number
+came from.
 
 ## Workflow
 
+> **Before step 1:** if the package ships a reference `.fsp`, calibrate first — run
+> `fdtd-lumerical-fsp-introspection` to read its layer positions, BCs, mesh, source and stored
+> spectrum, and confirm convergence from `_p0.log`. P01's two course projects were conflated
+> precisely because this step was skipped (`defects/D-001`).
+
 1. **Extract the paper's numbers first.** Geometry, layer thicknesses, and the *stated* material
    model with units. A parameter you cannot find is a red flag — mark it, do not invent it.
-2. **Write the parameter block into a config JSON** (`packages\P0N_...\scripts\sweep_<id>.json`).
+2. **Write the parameter block into a config JSON** (`cases/P0N_.../config/spec_<id>.json`
+   or `projects/R0N_.../config/`).
 3. **Dry-run** to confirm the plan: `--dry-run` prints the points without opening a simulation.
 4. **Build + run** with `scripts/run_fdtd_sweep.py` (below). It saves the `.fsp` before running so
    the engine log exists.
@@ -125,15 +141,24 @@ minutes. Its reported 0.82 should not be treated as ground truth.
    If it does, the mesh is finished; stop refining.
 7. **Sweep the one knob that controls the resonance** (spacer thickness, feature length, period) to
    see whether the paper's number is reachable at all with this material set.
-8. **Write the report** from `assets/report_template.md`, into `packages\P0N_...\results\`.
+8. **Write the report** from `assets/report_template.md`, into the package's `results/`
+   (regression output belongs in `_scratch/regress/`, never back into read-only `cases/`).
 
 ## Script: `scripts/run_fdtd_sweep.py`
 
 ```bash
 PY="C:/Users/saber/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
-"$PY" scripts/run_fdtd_sweep.py --config sweep_p01.json --dry-run
-"$PY" scripts/run_fdtd_sweep.py --config sweep_p01.json --out results/repro_p01
+S="skills/fdtd-lumerical-unitcell-simulation/scripts/run_fdtd_sweep.py"
+"$PY" "$S" --spec cases/P01_Absorber_042/config/spec_p01.json \
+  --out _scratch/regress/p01-20261107/baseline --dry-run
+"$PY" "$S" --spec cases/P01_Absorber_042/config/spec_p01.json \
+  --out _scratch/regress/p01-20261107/baseline
 ```
+
+The flag is **`--spec`**, not `--config`. **Always pass `--out` explicitly**: the default output
+directory is derived from the spec's location, so a spec inside read-only `cases/` silently
+writes into `cases/.../config/P01_out/` (`defects/D-002`). Regression output goes to
+`_scratch/regress/`.
 
 - Builds the whole stack from parameters — no template `.fsp` required, nothing hidden.
 - Emits one CSV per sweep point (`lam_um,R,T,A`) plus `summary.csv`
@@ -169,10 +194,14 @@ reported **97% absorption at 6.0 µm**.
 | Periodic, mesh acc 4 + override 30/20 nm | **0.808** | 5.85 µm | ✅ `8.8e-5` |
 | Periodic, mesh acc 6 + override 15/10 nm | **0.801** | 5.75 µm | ✅ |
 | PML on x/y (same everything else) | 1.111 | 8.50 µm | non-physical |
-| Package reference `d2_perfectCross.fsp` (PML, acc 8) | ~0.82 | 6.15 µm | ❌ ended at `0.047` |
+| Course `d2_perfectCross.fsp` (PML, acc 8) | — | — | ❌ never converged (`0.046734`), no stored spectrum |
+| Course `infrared_perfect_absorber.fsp` (Periodic, acc 8) | **0.8196** | 6.15 µm | ✅ `8.875e-6` |
+| Rebuild using that course project's settings | **0.8177** | 6.15 µm | ✅ `9.53e-6` |
 
-The two converged runs agree to 0.007, so the mesh is finished and ~0.80 is what this parameter set
-gives. Refining further cannot close a 0.16 gap.
+The two converged builds agree to 0.007, so the mesh is finished and ~0.81 is what this parameter
+set gives in Lumerical. The course project and the rebuild made from its own settings agree to
+**0.0018 at the same peak wavelength**, so the reverse-engineered settings are correct too.
+Refining the mesh further cannot close the gap to the paper's 0.97.
 
 **Step 2 — is the paper's number reachable at all?** Sweep the one knob that sets the resonance
 condition, the spacer thickness:
@@ -182,16 +211,25 @@ condition, the spacer thickness:
 | peak A | **0.962** | 0.913 | **0.808** | 0.716 | 0.673 |
 | peak λ | 5.85 | 5.90 | 5.85 | 5.90 | 6.05 |
 
-**Reading.** 96% is reachable — the model is sound — but it happens at `ts ≈ 120 nm`, not at the
-paper's 185 nm. The magnetic resonance of a MIM stack is set by the round-trip phase in the spacer
-(`2·n·ts·k₀ ≈ π`); a 65 nm shift at n = 1.51 is a phase error of only ≈0.2 rad. That is the size of
-a definition difference, not a modelling error: `t` measured to the mid-plane of the 100 nm cross
-gives 135 nm, and measured from the top of the ground plane gives our 185 nm. **Confirm with the
-author which surface `t` is measured from before calling this a reproduction failure.**
+**Reading — corrected 2026-11-07 (`defects/D-001`).** The "spacer thickness is measured from a
+different surface" hypothesis is **falsified**. Reverse-engineering both course `.fsp` projects
+shows Al₂O₃ at `[-185, 0] nm`, ground plane `[-285, -185] nm`, cross `[0, 100] nm` — exactly the
+layer positions in our spec. `185 nm` is ground-plane-top → cross-bottom. `getindex` also
+reproduces the paper's Drude `(n,k)` to the last digit at 4 / 6 / 8 / 10 µm, so the material
+implementation is not the culprit either.
 
-**What not to do**: do not retune `l`, `w`, `a` and `ts` together until the peak reads 0.97 at 6.0 µm.
-Fitting four parameters to one number yields a model that reproduces one figure and predicts nothing.
-Change one knob, state the offset, and ask.
+What differs is the **numerical setup**, not the geometry: the course project uses mesh accuracy 8,
+a 24 nm override, shutoff 1e-5, 1 ps, and 3.5–11 µm / 100 points. Rebuilding with those settings
+reproduces its stored spectrum to 0.0018 (`0.8177` vs `0.8196`, both at 6.152 µm), and all three
+independent runs agree at 6 µm to within 0.0027.
+
+The paper's 0.97 comes from **CST Microwave Studio 2009** (the experimental value is also 97%),
+not from Lumerical. Report ~0.82 as the Lumerical result and state the solver gap explicitly.
+
+**What not to do**: do not retune `l`, `w`, `a` and `ts` together until the peak reads 0.97 at
+6.0 µm — and do not move `ts` to 120 nm just because that produces 0.962. Fitting parameters to
+one number yields a model that reproduces one figure and predicts nothing. Change one knob,
+state the offset, and say what it means.
 
 ## Known limitation: phase is not extracted yet
 

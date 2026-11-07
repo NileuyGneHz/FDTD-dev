@@ -13,6 +13,8 @@
 | `path-conventions.md` | 路径怎么写、什么绝对不能出现 | `tools/check_packages.py` |
 | `naming.md` | 包 / 技能 / 角色 / 缺陷 / 任务怎么编号 | `tools/skills-doctor.py` |
 | `script-contract.md` | 脚本放哪、怎么调、CLI 长什么样 | `tools/check_scripts.py` |
+| `skill-change-contract.md` | 技能怎么加、怎么改、什么禁止、怎么回归 | `tools/check_skill_contract.py` |
+| `reproduction-contract.md` | 复现怎么跑、差异怎么判、经验怎么变成训练语料 | `tools/check_reproduction.py` |
 | `archive-contract.md` | 一个归档单元必须有什么 | `tools/check_packages.py` |
 | `host-integration.md` | DSH / WorkBuddy 怎么发现技能 | `tools/skills-doctor.py` |
 

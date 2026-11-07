@@ -34,7 +34,9 @@
 3. **每个 `references/` 文件都必须在正文被点名**，并写清"何时读"；否则 Agent 看不见它。
 4. **脚本必须遵守 CLI 契约**（`--config / --out / --dry-run / --json`）。
 5. **`_TEMPLATE/` 永不挂进宿主入口**。
-6. 改技能 = 改契约。改完同轮跑 `skills-doctor.py`，并在 `journal/` 记一笔。
+6. **改技能 = 改契约**。能不能改、改到什么程度、要什么证据，由
+   `docs/constitution/skill-change-contract.md` 裁决；本文件的「五步」只是操作路径。
+   改完同轮跑 `check_skill_contract.py` + `skills-doctor.py`，并在 `journal/` 记一笔。
 
 ## stage
 

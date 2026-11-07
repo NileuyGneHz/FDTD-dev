@@ -13,6 +13,8 @@
 | `check_git_limits.py` | 单文件 > 100 MB、总体积 | `git push` 前 |
 | `skills-wire.py` | 重建 `.agents/skills` 与 `.workbuddy/skills` 的 junction | 增删技能后 |
 | `skills-doctor.py` | 六项宿主接入检查 | 增删技能后 / 换机器后 |
+| `check_skill_contract.py` | 技能内容契约 K1–K14（frontmatter / 引用可达 / INDEX 登记 / CLI / 编排 path / pycache） | 改任何技能后 |
+| `check_reproduction.py` | 复现卡 R1–R12（口径 / 收敛数值 / 同输入回归 / 输出隔离 / 训练条目），自带 `--self-test` 负对照 | 每次复现交付前；改本脚本后 |
 
 ## 约束
 

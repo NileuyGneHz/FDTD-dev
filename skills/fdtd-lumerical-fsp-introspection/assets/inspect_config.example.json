@@ -1,0 +1,11 @@
+{
+  "_comment": "All relative paths are resolved against the repository root (the workspace directory containing skills/), never against cwd. Never point --out inside cases/.",
+  "fsp": [
+    "cases/P01_Absorber_042/model/infrared_perfect_absorber.fsp",
+    "cases/P01_Absorber_042/model/d2_perfectCross.fsp",
+    "cases/P01_Absorber_042/results/repro_p01/point_00_base.fsp"
+  ],
+  "mode": "both",
+  "full_props": false,
+  "reference_spec": "cases/P01_Absorber_042/config/spec_p01.json"
+}

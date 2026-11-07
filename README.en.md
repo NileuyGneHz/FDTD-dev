@@ -1,9 +1,19 @@
 # FDTD_WS — Metasurface FDTD Research Workspace
 
-> A local workspace for metasurface researchers: turn "read paper → extract parameters → build model →
-> sweep → judge deviation → plot" into a reproducible, auditable pipeline that **DSH** and
-> **WorkBuddy** can both drive through the same skill library.
-> **Windows only** (Lumerical ships on Windows).
+> A local workspace for metasurface researchers: **the researcher sets the direction, materials and
+> geometry; the agent tunes parameters inside that locked design space with Lumerical FDTD until the
+> target is met.** Paper reproduction is how we calibrate the model, not the end product.
+> The same skill library is shared by **DSH** and **WorkBuddy**. **Windows only** (Lumerical ships on Windows).
+
+## Product policy
+
+1. **Researcher sets the direction** — target metrics (R/T/A, phase, efficiency, bandwidth) with tolerances.
+2. **Researcher sets materials and geometry** — stack, materials, topology, period; may iterate or go inverse.
+3. **Agent tunes** — only inside the locked search space, runs FDTD, stops when the target is hit or proven unreachable.
+4. **Researcher judges** — whether the numbers are trustworthy and publishable; the agent only supplies evidence.
+
+> Reproduce and Design are two separate modes: reproduction forbids tuning to match a paper,
+> design allows optimization inside the locked space. See [`docs/product-context/README.md`](docs/product-context/README.md).
 
 ## Read in this order
 

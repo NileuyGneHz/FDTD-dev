@@ -1,0 +1,27 @@
+{
+  "mode": "Design",
+  "iteration": 1,
+  "base_fsp": "cases/P02_PolarizationControl_045/model/fig3_2.fsp",
+  "targets": [
+    {"metric": "T", "min": 0.90},
+    {"metric": "dphi_deg_mod360", "kind": "phase", "value": 180.0, "tol_deg": 5.0}
+  ],
+  "locked": {
+    "materials": ["Si (Silicon) - Palik"],
+    "topology": "nanobrick on glass",
+    "layer_stack": "fixed by human"
+  },
+  "search_space": {
+    "c": {"min": 8.0e-7, "max": 9.0e-7, "step": 1.0e-8, "unit": "m"}
+  },
+  "params": {"c": 8.5e-7},
+  "parameter_map": {
+    "c": [{"object": "nanobrick", "property": "x span"}]
+  },
+  "extract": {
+    "T": {"monitor": "T", "result": "T"},
+    "R": {"monitor": "R", "result": "T"}
+  },
+  "max_array_items": 2000,
+  "max_retries": 3
+}

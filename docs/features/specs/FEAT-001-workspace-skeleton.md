@@ -54,7 +54,7 @@ DSH 靠向上找 `.git` 定项目根，WorkBuddy 只认 `cwd`。没有一套统�
 | A | ✅ | `check_packages.py` ERROR=0（WARN=34 为 `_p0.log` 缺失，已登记为 C 档遗留） |
 | B | ✅ | `check_scripts.py` OK；`check_skill_contract.py` ALL GREEN（OK 129 / WARN 0） |
 | C | ✅ | `skills-doctor.py` ALL GREEN，两处入口各 13 条 |
-| D | ⚠️ 部分 | `check_git_limits.py` ERROR=0；但工作区有 46 改 / 2 删 / 110 未跟踪，**尚未提交** |
+| D | ✅ | `check_git_limits.py` ERROR=0；工作区干净（`git status` 零改动），本次 9 个 commit 已全部落地 |
 | E | ⏳ 待人工 | 需真人从零开一次会话验证 |
 
 D 节未完成的原因是「改动尚未提交」——不是结构缺陷。

@@ -1,0 +1,18 @@
+{
+  "exp": "EXP-20",
+  "verdict": "pass",
+  "metrics": {
+    "fdtd_dimension": "2D",
+    "axis_used": "y"
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "P09 是 2D 工程（堆栈沿 y），旧逻辑只按 z 取位置 → derived=null；现在据 dimension / injection axis 推轴"
+  },
+  "artifacts": [
+    "skills/fdtd-lumerical-fsp-introspection/scripts/inspect_fsp.py",
+    "_scratch\\regress\\2026-11-09\\EXP-13"
+  ],
+  "ran_at": "2026-11-09T17:05:00+08:00",
+  "wall_s": 20
+}

@@ -1,0 +1,45 @@
+{
+  "exp": "EXP-51",
+  "verdict": "pass",
+  "metrics": {
+    "results_layout_fail_before": 49,
+    "results_layout_fail_after": 0,
+    "acceptance_fail_before": 4,
+    "acceptance_fail_after": 0,
+    "files_moved": 45,
+    "dirs_moved": 4,
+    "packages_with_index_json": 3,
+    "acceptance_items_total": 30,
+    "acceptance_pass": 16,
+    "acceptance_fail": 6,
+    "acceptance_na": 8,
+    "p01_peak_absorption_measured": 0.8069,
+    "p02_dphi_hwp_measured_deg": 211.13,
+    "p03_pcr_peak_measured_pct": 99.999,
+    "p04_theta_r_measured_deg": 45.07,
+    "cases_still_skipped": 6
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "同一对门禁跑在搬运前的树上确实红：check_results_layout FAIL=49（P02 20 + P03 8 + P04 17 个散文件，加 4 个非日期子目录），check_acceptance FAIL=4（P01-P04 有报告无 acceptance.json）。两个门禁各自的 --self-test 负例也都过：缺 index.json 被抓、缺 source 出处定位被抓、N/A 无原因被抓、卡-表 quantity 不一致被抓。搬运后同一命令 FAIL=0/0。"
+  },
+  "notes": {
+    "date_choice": "三包的散文件 mtime 全部是 2026-11-09（实测分布：P02 20/20、P03 8/8、P04 17/17），因此三包各自只有一个日期目录 2026-11-09，不存在把不同批次混进同一天的问题。",
+    "p04_subdirs": "logs/（7 个 _p0.log，收敛证据）、scripts/（6 个分析脚本）、run_thi00_gpu/（h5）整体并入 2026-11-09/；误命名的 P04_AnomalousReflection_047_repro/ 只有一个 h5，提出到日期目录后删空目录。index.json 的 artifacts 记 21 个，subdirs 另记。",
+    "acceptance_source": "30 项全部来自各包自己的 repro_report.md 的验收表，未新造数字。定量项照抄 measured/tolerance，定性项一律 N/A 并写 unmeasured_reason（不写 measured），避免「测了但不合格」与「没测」混为一谈。",
+    "prototype_deprecation": "两份原型（results/P04/.../scripts/field_map_and_decay.py、_scratch/regress/2026-11-08/P05/analyze_p05.py）加了 DEPRECATED 抬头指向 skills/fdtd-lumerical-field-map，文件保留以对应当时结果，不再演进。",
+    "left_open": "P05/P06/P07/P08/P09/P10 仍无 docs/<Pkg>/repro_report.md，所以 check_acceptance 继续 SKIP 它们。P05/P06/P07/P09 的 136 个 json/csv 仍在 _scratch，未搬动——搬它们必须同时写报告与验收表，否则只是把「无账」换个位置。这需要逐包重建结论，不在本实验范围内。"
+  },
+  "artifacts": [
+    "results/P02_PolarizationControl_045/2026-11-09/index.json",
+    "results/P03_HWP_Ding2015/2026-11-09/index.json",
+    "results/P04_AnomalousReflection_047/2026-11-09/index.json",
+    "cases/P01_Absorber_042/config/acceptance.json",
+    "cases/P02_PolarizationControl_045/config/acceptance.json",
+    "cases/P03_HWP_Ding2015/config/acceptance.json",
+    "cases/P04_AnomalousReflection_047/config/acceptance.json",
+    "_scratch/regress/2026-11-10/EXP-51/migrate_and_accept.py"
+  ],
+  "ran_at": "2026-11-10T23:20:00+08:00",
+  "wall_s": 6
+}

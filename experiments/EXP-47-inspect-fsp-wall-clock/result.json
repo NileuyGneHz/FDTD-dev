@@ -1,0 +1,34 @@
+{
+  "exp": "EXP-47",
+  "verdict": "pass",
+  "metrics": {
+    "fig5_wall_s": 1.7,
+    "fig5_wall_s_before": 273.0,
+    "target_s": 30,
+    "speedup": 160.0,
+    "selectall_s": 0.02,
+    "selectall_objects": 7,
+    "getchildren_s_on_array_group": 255.79,
+    "group_children": 4500,
+    "monitors_identical_to_slow_path": true,
+    "tree_diffs_P01": 0,
+    "tree_diffs_P05": 0,
+    "tree_diffs_P06": 8,
+    "tree_diff_explanation": "P06 的 8 处差异全部是「把没查说出来」：duplicate_* 换成 duplicates_unchecked/children_are_array，n_children 4500 -> n_children_declared 30",
+    "spectra_equal_P01_P05_P06_P09": true,
+    "p01_peak_A": 0.8196016447349421,
+    "negative_controls_rejected": "3/3"
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "A) P06 阵列组 -> children_collapsed + duplicates_unchecked + children_are_array + n_children_declared=30；B) P05 的 21 个同名 rectangle 仍报 duplicate_name=['rectangle'] 且 n_children=21（EXP-14 证据没被这次优化删掉）；C) 阵列组的 getChildren 调用次数=0（monkeypatch 计数）"
+  },
+  "artifacts": [
+    "_scratch/regress/2026-11-10/EXP-47/probe_timing.json",
+    "_scratch/regress/2026-11-10/EXP-47/probe_lsf_selectinside.json",
+    "_scratch/regress/2026-11-10/EXP-47/neg_controls.json",
+    "skills/fdtd-lumerical-fsp-introspection/scripts/inspect_fsp.py"
+  ],
+  "ran_at": "2026-11-10T18:10:00+08:00",
+  "wall_s": 1.7
+}

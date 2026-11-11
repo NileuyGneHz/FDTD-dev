@@ -1,0 +1,23 @@
+{
+  "exp": "EXP-15",
+  "verdict": "fail",
+  "metrics": {
+    "wall_s": 273.0,
+    "target_s": 30,
+    "max_objects": 800,
+    "max_depth": 3,
+    "group_collapsed": true,
+    "leaf_objects": 4500
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "P06 fig5 的 30x30 组已折叠（只读 number/period），但整轮仍 273 s —— 瓶颈不是递归而是 selectall()+getAllSelectedObjects() 对 4500 个对象建包装。判据 <30 s 未达成，如实记 fail，优化留待后续"
+  },
+  "artifacts": [
+    "skills/fdtd-lumerical-fsp-introspection/scripts/inspect_fsp.py",
+    "_scratch\\regress\\2026-11-09\\EXP-13"
+  ],
+  "ran_at": "2026-11-09T17:05:00+08:00",
+  "wall_s": 273,
+  "defect": "D-007"
+}

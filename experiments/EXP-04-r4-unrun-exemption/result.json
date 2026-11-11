@@ -1,0 +1,18 @@
+{
+  "exp": "EXP-04",
+  "verdict": "pass",
+  "metrics": {
+    "unrun_without_log": "OK",
+    "unrun_with_log": "caught",
+    "unrun_without_evidence": "caught"
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "后两组负对照全部被抓；若任一组放行，豁免即可被伪造"
+  },
+  "artifacts": [
+    "tools/check_reproduction.py"
+  ],
+  "ran_at": "2026-11-09T16:10:00+08:00",
+  "wall_s": 2.0
+}

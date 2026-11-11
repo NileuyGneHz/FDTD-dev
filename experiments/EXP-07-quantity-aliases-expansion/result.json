@@ -1,0 +1,17 @@
+{
+  "exp": "EXP-07",
+  "verdict": "pass",
+  "metrics": {
+    "families_present": "6/6",
+    "typo_rejected": true
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "错拼名不被静默接受（否则会把「没测到」当成「测到了」）"
+  },
+  "artifacts": [
+    "tools/check_reproduction.py"
+  ],
+  "ran_at": "2026-11-09T16:10:00+08:00",
+  "wall_s": 2.0
+}

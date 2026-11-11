@@ -1,0 +1,18 @@
+{
+  "exp": "EXP-16",
+  "verdict": "pass",
+  "metrics": {
+    "issue": "layoutmode 未读取（本模式未采样结构）：不对「是否已保存结果」下结论",
+    "layoutmode": null
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "旧版在 mode=spectra（不采结构）时仍断言「工程处于 layout 模式未保存」，同一份输出里 spectra_status 却是 ok；现在改说「未读取」"
+  },
+  "artifacts": [
+    "skills/fdtd-lumerical-fsp-introspection/scripts/inspect_fsp.py",
+    "_scratch\\regress\\2026-11-09\\EXP-13"
+  ],
+  "ran_at": "2026-11-09T17:05:00+08:00",
+  "wall_s": 20
+}

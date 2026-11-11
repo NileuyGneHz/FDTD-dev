@@ -1,0 +1,17 @@
+{
+  "exp": "EXP-53",
+  "verdict": "pass",
+  "metrics": {
+    "dx_img_um": 0.07227,
+    "support_fraction": 0.09399,
+    "n_inner": 256,
+    "n_canvas": 512,
+    "pad": 2,
+    "refused_inputs": 3,
+    "exit_code": 2
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "alpha png / 负值强度 / 空 npz 三份输入全部 exit 2"
+  }
+}

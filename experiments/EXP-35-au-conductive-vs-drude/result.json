@@ -1,0 +1,17 @@
+{
+  "exp": "EXP-35",
+  "verdict": "fail",
+  "defect": "D-009",
+  "metrics": {
+    "executed": false,
+    "cost_not_spent": "11 min"
+  },
+  "negative_control": {
+    "failed": false,
+    "detail": "未执行：没有可跑的负对照（见 defects/D-009）"
+  },
+  "artifacts": [
+    "defects/D-009-round1-deferred-long-runs.md"
+  ],
+  "ran_at": "2026-11-09T17:20:00+08:00"
+}

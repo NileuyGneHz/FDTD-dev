@@ -1,0 +1,17 @@
+{
+  "exp": "EXP-11",
+  "verdict": "pass",
+  "metrics": {
+    "required_present": "4/4",
+    "new_fields_present": "4/4"
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "错拼字段名 measued_columns 不在表中，检查不是子串包含式"
+  },
+  "artifacts": [
+    "docs/constitution/reproduction-contract.md"
+  ],
+  "ran_at": "2026-11-09T16:15:00+08:00",
+  "wall_s": 0.2
+}

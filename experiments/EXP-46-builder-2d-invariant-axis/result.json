@@ -1,0 +1,35 @@
+{
+  "exp": "EXP-46",
+  "verdict": "pass",
+  "metrics": {
+    "build_layoutmode": 1.0,
+    "build_solves": 0,
+    "build_wall_s": 6.5,
+    "check_properties": 27,
+    "check_mismatches": 0,
+    "fdtd_axis": "y",
+    "fdtd_span_range_um": [-7.0, 15.0],
+    "reference_fields_compared": 14,
+    "reference_fields_identical": 12,
+    "reference_diffs": "source.x span 4e-6->2e-6、R.x span 1e-5->2e-6（基准比 2 um 周期胞更宽；builder 用晶格周期，物理等价性留给 EXP-34 判定）",
+    "regress_3d_objects": 10,
+    "regress_3d_diffs": 0,
+    "negative_controls_rejected": "3/3"
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "A) 2D + propagation_axis=z -> ValueError；B) 2D 里写 'z min bc' -> 引擎报 inactive（复现 D-008 原文，证明旧代码路径必炸）；C) 2D 里 z 法向 2drect -> ValueError，而同一张面在 3D 里正常建出（证明不是误伤）"
+  },
+  "artifacts": [
+    "_scratch/regress/2026-11-10/EXP-46/probe_2d_api.json",
+    "_scratch/regress/2026-11-10/EXP-46/probe_2d_monitors.json",
+    "_scratch/regress/2026-11-10/EXP-46/reference_p09.json",
+    "_scratch/regress/2026-11-10/EXP-46/neg_controls.json",
+    "_scratch/regress/2026-11-10/EXP-46/compare_2d_reference.json",
+    "_scratch/regress/2026-11-10/EXP-46/build/p09_2d.fsp",
+    "_scratch/regress/2026-11-10/EXP-46/p09_2d_spec.json",
+    "_shared/fsp_build.py"
+  ],
+  "ran_at": "2026-11-10T17:05:00+08:00",
+  "wall_s": 6.5
+}

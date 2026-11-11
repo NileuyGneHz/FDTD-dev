@@ -1,0 +1,18 @@
+{
+  "exp": "EXP-10",
+  "verdict": "pass",
+  "metrics": {
+    "p01_gap_ok": true,
+    "tight_gap_rejected": true,
+    "min_gap_um": 0.3
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "below=0.15 µm 被拒（P07 的 T=-0.80 场景）"
+  },
+  "artifacts": [
+    "skills/fdtd-lumerical-unitcell-simulation/scripts/run_fdtd_sweep.py"
+  ],
+  "ran_at": "2026-11-09T16:10:00+08:00",
+  "wall_s": 2.0
+}

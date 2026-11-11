@@ -1,0 +1,23 @@
+{
+  "exp": "EXP-19",
+  "verdict": "pass",
+  "metrics": {
+    "materials": [
+      "user_Au",
+      "user_Gra2"
+    ],
+    "au_type": "Conductive 3D",
+    "au_sigma": 40000000.0,
+    "gra_type": "Sampled 2D data"
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "getmaterial() 返回字符数组未 join 时整张表丢失；现在 user_Au 带 type=Conductive 3D、σ=4e7，user_Gra2 标 Sampled 2D data"
+  },
+  "artifacts": [
+    "skills/fdtd-lumerical-fsp-introspection/scripts/inspect_fsp.py",
+    "_scratch\\regress\\2026-11-09\\EXP-13"
+  ],
+  "ran_at": "2026-11-09T17:05:00+08:00",
+  "wall_s": 20
+}

@@ -1,0 +1,18 @@
+{
+  "exp": "EXP-08",
+  "verdict": "pass",
+  "metrics": {
+    "clean_exit": 0,
+    "placeholder_exit": 1,
+    "cases": "1 正 1 负"
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "含 PLACEHOLDER 的 spec 被判失败（方向反转）"
+  },
+  "artifacts": [
+    "skills/fdtd-paper-parameter-extraction/scripts/validate_spec.py"
+  ],
+  "ran_at": "2026-11-09T16:10:00+08:00",
+  "wall_s": 2.0
+}

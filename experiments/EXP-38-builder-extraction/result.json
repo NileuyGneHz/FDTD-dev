@@ -1,0 +1,27 @@
+{
+  "exp": "EXP-38",
+  "verdict": "pass",
+  "metrics": {
+    "objects_before": 11,
+    "objects_after": 11,
+    "field_level_diffs": 0,
+    "materials_equal": true,
+    "fsp_bytes_before": 474963,
+    "fsp_bytes_after": 474963,
+    "sweep_lines_before": 451,
+    "sweep_lines_after": 209,
+    "sweep_still_contains_builder_body": false,
+    "build_wall_s": 6.5,
+    "layoutmode_built": 1.0,
+    "p0_log_absent_when_not_run": true
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "把 _shared/fsp_build.py 移走后经 run_fdtd_sweep 导入 -> ImportError: _shared/fsp_build.py not found"
+  },
+  "artifacts": [
+    "python _scratch/regress/2026-11-09/EXP-38/build_probe.py --spec cases/P01_Absorber_042/config/spec_p01.json --out _scratch/regress/2026-11-09/EXP-38/after --impl shared",
+    "python skills/fdtd-lumerical-unitcell-simulation/scripts/run_fdtd_sweep.py --spec cases/P01_Absorber_042/config/spec_p01.json --out _scratch/regress/2026-11-09/EXP-26/run --dry-run"
+  ],
+  "ran_at": "2026-11-09T16:20:00+08:00"
+}

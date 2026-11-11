@@ -1,0 +1,24 @@
+{
+  "exp": "EXP-43",
+  "verdict": "pass",
+  "metrics": {
+    "good_exit": 0,
+    "good_output": "{\"checked\": 34, \"mismatches\": 0}",
+    "bad_exit": 1,
+    "bad_output": "{\"checked\": 34, \"mismatches\": 2}",
+    "mismatch_fields": [
+      "cross_x x span",
+      "cross_y y span"
+    ],
+    "expected_value": 1.87e-06,
+    "actual_value": 1.7e-06
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "原 spec 对同一 .fsp -> checked=34, mismatches=0, exit 0"
+  },
+  "artifacts": [
+    "python skills/fdtd-lumerical-fsp-build/scripts/build_fsp.py --spec _scratch/regress/2026-11-09/EXP-43/spec_bad.json --only-check _scratch/regress/2026-11-09/EXP-39/p01.fsp --out _scratch/regress/2026-11-09/EXP-43 --json"
+  ],
+  "ran_at": "2026-11-09T17:20:00+08:00"
+}

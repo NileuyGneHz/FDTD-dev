@@ -1,0 +1,20 @@
+{
+  "exp": "EXP-23",
+  "verdict": "pass",
+  "metrics": {
+    "cwd_repo_relative": "SUCCEEDED",
+    "cwd_parent_relative": "LumApiError: You may not have permission to write to this directory",
+    "absolute_after_chdir": "SUCCEEDED",
+    "stray_file_in_parent": false,
+    "error_message_reproduced_verbatim": true
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "cwd=上级目录时用相对路径 save（未绝对化） -> LumApiError: 'Failed to save _scratch\\regress\\...\\rel2.fsp. You may not have permission to write to this directory.'"
+  },
+  "artifacts": [
+    "python _scratch/regress/2026-11-09/EXP-23/probe_relpath.py",
+    "python _scratch/regress/2026-11-09/EXP-23/probe_cwd.py"
+  ],
+  "ran_at": "2026-11-09T16:20:00+08:00"
+}

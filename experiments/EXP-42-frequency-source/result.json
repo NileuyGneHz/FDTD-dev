@@ -1,0 +1,25 @@
+{
+  "exp": "EXP-42",
+  "verdict": "pass",
+  "metrics": {
+    "f_start_thz": 3.0,
+    "f_stop_thz": 8.0,
+    "abs_err_pct": [
+      0.0,
+      0.0
+    ],
+    "dimension": "3D",
+    "wavelength_range_um": [
+      37.474,
+      99.931
+    ]
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "dimension=2D 的同一份 spec -> setnamed 'z min bc' → property is inactive（z 是 2D 的不变轴），已记 D-008"
+  },
+  "artifacts": [
+    "python _scratch/regress/2026-11-09/EXP-40/verify_40_41_42.py"
+  ],
+  "ran_at": "2026-11-09T17:20:00+08:00"
+}

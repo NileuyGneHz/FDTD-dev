@@ -1,0 +1,17 @@
+{
+  "exp": "EXP-59",
+  "verdict": "pass",
+  "metrics": {
+    "positive_control_fourier": 0.0,
+    "positive_control_as": 0.00386,
+    "lens_intensity_rmse": 0.0323,
+    "lens_eta": 0.884,
+    "phase_vs_analytic_rad": 1.187,
+    "mutant_no_sqrt_fourier": 0.311,
+    "mutant_no_sqrt_as": 0.349
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "变异 M2（删 sqrt）→ 正对照 0.311/0.349 并 FAIL"
+  }
+}

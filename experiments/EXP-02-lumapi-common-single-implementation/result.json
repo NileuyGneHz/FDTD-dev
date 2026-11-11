@@ -1,0 +1,21 @@
+{
+  "exp": "EXP-02",
+  "verdict": "pass",
+  "metrics": {
+    "shared_defs": 1,
+    "shim_defs": 0,
+    "funcs_bound": "7/7",
+    "n_sessions": 0
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "把 _shared/lumapi_common.py 改名为 .bak 后导入壳 → 必须 ImportError；实际已抛出"
+  },
+  "artifacts": [
+    "skills/fdtd-package-workspace/scripts/lumapi_common.py",
+    "_shared/lumapi_common.py",
+    "skills/fdtd-lumerical-session-control/scripts/session_control.py"
+  ],
+  "ran_at": "2026-11-09T16:10:00+08:00",
+  "wall_s": 2.0
+}

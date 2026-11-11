@@ -1,0 +1,27 @@
+{
+  "exp": "EXP-44",
+  "verdict": "pass",
+  "metrics": {
+    "kinds_ok": 6,
+    "bytes": {
+      "stack": 21820,
+      "spectra": 61416,
+      "phase": 42471,
+      "field": 51822,
+      "fom": 53716,
+      "compare": 59363
+    },
+    "all_non_empty": true,
+    "missing_column_exit": 2,
+    "missing_column_draws_nothing": true,
+    "missing_column_message": "缺少列 lam_um；实际列 = A, R, T"
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "删掉 csv 的 lam_um 列 -> exit 2，输出「缺少列 lam_um；实际列 = A, R, T」，未生成 png"
+  },
+  "artifacts": [
+    "python _scratch/regress/2026-11-09/EXP-44/test_figures.py"
+  ],
+  "ran_at": "2026-11-09T17:20:00+08:00"
+}

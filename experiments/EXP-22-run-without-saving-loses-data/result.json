@@ -1,0 +1,24 @@
+{
+  "exp": "EXP-22",
+  "verdict": "pass",
+  "metrics": {
+    "A_no_resave_layoutmode": 0.0,
+    "A_no_resave_points": 5,
+    "A_no_resave_min": -0.06865909296620877,
+    "A_no_resave_max": -0.006105445579138593,
+    "B_resave_layoutmode": 0.0,
+    "B_resave_points": 5,
+    "B_resave_min": -0.06865909296620877,
+    "B_resave_max": -0.006105445579138593,
+    "identical": true,
+    "verdict_on_claim": "refuted"
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "B（close 前再 save 一次） -> 两者逐位相同（n=5, min/max 一致）-> A 没有丢数据"
+  },
+  "artifacts": [
+    "python _scratch/regress/2026-11-09/EXP-22/probe_false_pass.py"
+  ],
+  "ran_at": "2026-11-09T16:45:00+08:00"
+}

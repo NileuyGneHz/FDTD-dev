@@ -1,0 +1,19 @@
+{
+  "exp": "EXP-01",
+  "verdict": "pass",
+  "metrics": {
+    "positives_passed": "1/1",
+    "negatives_caught": "4/4",
+    "cases": "verdict_fail / empty_metrics / no_negative_control / no_design"
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "4 个坏记录全部被抓，且报错指出具体原因（verdict=fail / metrics 为空 / negative_control.failed 非 true / design.md 无负对照）"
+  },
+  "artifacts": [
+    "tools/check_experiments.py",
+    "experiments/AGENTS.md"
+  ],
+  "ran_at": "2026-11-09T15:30:00+08:00",
+  "wall_s": 0.4
+}

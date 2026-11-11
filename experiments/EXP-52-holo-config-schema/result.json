@@ -1,0 +1,18 @@
+{
+  "exp": "EXP-52",
+  "verdict": "pass",
+  "metrics": {
+    "validated_fields": 12,
+    "refused_configs": 3,
+    "exit_code": 2,
+    "messages": [
+      "grid 缺字段 'n'",
+      "target 缺字段 'path'",
+      "signal.rect 必须是 [x0,x1,y0,y1]"
+    ]
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "缺字段/非法 rect 的三份 config 全部被 GSError 拒绝（exit 2）"
+  }
+}

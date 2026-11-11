@@ -1,0 +1,20 @@
+{
+  "exp": "EXP-45",
+  "verdict": "pass",
+  "metrics": {
+    "base_peak": 0.8069379708102874,
+    "csv_peak": 0.8069379708102874,
+    "consistent": true,
+    "perturbed_peak": 0.8472848693508018,
+    "expected_perturbed": 0.8472848693508018,
+    "follows_data": true
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "把输入整体乘 1.05 -> 0.8069379708 → 0.8472848694，严格跟随"
+  },
+  "artifacts": [
+    "python _scratch/regress/2026-11-09/EXP-44/test_figures.py"
+  ],
+  "ran_at": "2026-11-09T17:20:00+08:00"
+}

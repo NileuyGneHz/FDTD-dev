@@ -1,0 +1,17 @@
+{
+  "exp": "EXP-06",
+  "verdict": "pass",
+  "metrics": {
+    "interpreter_ignored": true,
+    "data_path_flagged": true
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "数据绝对路径仍被抓 —— 否则等于把整条 R12 关掉"
+  },
+  "artifacts": [
+    "tools/check_reproduction.py"
+  ],
+  "ran_at": "2026-11-09T16:10:00+08:00",
+  "wall_s": 2.0
+}

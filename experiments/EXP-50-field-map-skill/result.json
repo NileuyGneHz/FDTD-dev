@@ -1,0 +1,53 @@
+{
+  "exp": "EXP-50",
+  "verdict": "pass",
+  "metrics": {
+    "checks_total": 9,
+    "checks_passed": 9,
+    "self_test_analytic_truths": 9,
+    "self_test_passed": 9,
+    "p05_rcp_z_focus_um": 9.3,
+    "p05_rcp_z_focus_target_um": 9.3,
+    "p05_rcp_focus_gain": 5.21,
+    "p05_rcp_fwhm_um": 0.812,
+    "p05_rcp_phase_slope_signed": -1.047,
+    "p05_rcp_phase_slope_abs": 1.047,
+    "p05_rcp_phase_fit_rms_rad": 0.1223,
+    "p05_rcp_phase_swing_over_2pi": 1.0639,
+    "p05_rcp_cross_channel": "c_minus",
+    "synthetic_gauss_fwhm_err_um": 0.0003,
+    "synthetic_lens_focus_err_um": 0.0,
+    "synthetic_oam_l3_err": 7e-05,
+    "synthetic_oam_lm2_err": 5e-05,
+    "synthetic_kspace_kx_err": 1e-06,
+    "fsp_vs_npz_z_focus_dz_um": 0.0,
+    "lcp_z_focus_um": 1.05,
+    "lcp_has_real_focus": false,
+    "lcp_off_axis_ratio": 0.034,
+    "skill_lines": 842
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "四条，全部按预期失败：①只给背景组（几何全 disabled）RCP-bk → has_real_focus=false、gain=1.00（没有结构就没有焦点）；②不做偏振分解（|E|^2）→ z=1.50、has_real_focus=false，而不是 9.30，证明圆偏振基是必需的；③合成 E(nx,1,nz,3,3) 不给 --wavelength-um → FieldError 退出，不静默取第 0 个频点；④--design-kind none 套在设计相位上 → fit_slope 显式 null 而非 0，且加权离散度大。另有一条不是负对照但同样揭露问题：合成『只加相位掩模』的场 E(x,z)=mask(x) 的轴上强度沿 z 恒定，本实现返回 z_focus=z_start —— 第一版测试就是这么写的，它失败得对，说明 focus 指标不会凭空造出焦点。"
+  },
+  "notes": {
+    "lcp_discrepancy": "旧 summary_metrics.json 记录 LCP focus_z=4.85 @x=2.411；本批 dump（2026-11-10 重跑，wall 2757 s）轴上无焦，二维 |E|^2 峰在 z=14.45/x=-1.37 且仅 0.064，off_axis_ratio=0.034（连离轴焦都没有）。两者不是同一份数据，未据此下任何结论，也未把它写成判据。",
+    "fwhm_definition_change": "旧原型取最外层半高交点，旁瓣超过半高时会虚高；新实现从峰值向两侧走、取第一次跌破半高处的线内插值。合成高斯 σ=1.2 µm 的 FWHM 与 2.3548σ 差 0.0003 µm。",
+    "phase_weighting": "旧原型不加权，暗边缘的相位噪声会决定斜率：同一合成数据无权重得 -0.743，加 |E|^2 权重得 -1.000。",
+    "kspace_quantisation": "旧原型用裸 FFT，10 µm 窗口把 kx 量化到 0.074 k0/格，比判据容差还大；改为 ×16 零填充 + 抛物插值后 20° 入射测得 0.342019（真值 0.342020）。",
+    "adjacent_fix": "D-015：session_control 的 npz dump 与 field_map 的 _numeric 都写 `dtype.kind in \"fiub\"`，把复数 E 当对象句柄丢掉，dump 仍报成功。已改 `fiubc` 并在 read_monitors 里加『数组为空即报错』。修复前 --fsp 路径直接抛 FieldError，修复后与 npz 路径 z_focus 差 0.0。"
+  },
+  "artifacts": [
+    "skills/fdtd-lumerical-field-map/SKILL.md",
+    "skills/fdtd-lumerical-field-map/scripts/field_map.py",
+    "skills/fdtd-lumerical-field-map/references/metrics.md",
+    "skills/fdtd-lumerical-session-control/scripts/session_control.py",
+    "skills/INDEX.md",
+    "agents/fdtd-sim-agent/skills.yaml",
+    "defects/D-015-npz-dump-drops-complex-fields.md",
+    "_scratch/regress/2026-11-10/EXP-50/run_checks.py",
+    "_scratch/regress/2026-11-10/EXP-50/checks.json"
+  ],
+  "ran_at": "2026-11-10T22:53:00+08:00",
+  "wall_s": 19
+}

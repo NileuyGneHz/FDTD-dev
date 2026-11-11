@@ -1,0 +1,29 @@
+{
+  "exp": "EXP-48",
+  "verdict": "pass",
+  "metrics": {
+    "A_const_n2_reads": 2.0,
+    "B_sampled_eps4_reads_n": 2.0,
+    "C_sampled_nk_engine": [2.000000234758903, 0.10000004784326792],
+    "C_sampled_nk_analytic": [2.0, 0.1],
+    "C_graphene_engine_k_3p6_5_8THz": [51.0964, 36.6879, 22.7216],
+    "C_graphene_analytic_k_3p6_5_8THz": [51.0961, 36.6878, 22.7218],
+    "C_graphene_max_rel_err": 9.691106992891957e-06,
+    "neg_old_engine_k": [5.0545, 4.283, 3.3706],
+    "neg_old_rel_err": 0.9010784434816224,
+    "p09_2d_A_at_3p6THz_before_fix": 0.010451669760562325,
+    "p09_2d_A_at_3p6THz_after_fix": 0.009087435747238916
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "旧写法（把 n+ik 直接灌进 sampled data）在同一判据点 k 读出 5.05/4.28/3.37，与解析 51.10/36.69/22.72 差 90%，判据必须 fail —— 证明这条判据真的区分语义，而不是只看形状"
+  },
+  "artifacts": [
+    "_scratch/regress/2026-11-10/EXP-48/probe_epsilon.json",
+    "_scratch/regress/2026-11-10/EXP-48/probe_epsilon.py",
+    "_shared/fsp_build.py",
+    "defects/D-013-sampled-data-is-permittivity-not-nk.md"
+  ],
+  "ran_at": "2026-11-10T19:20:00+08:00",
+  "wall_s": 12.0
+}

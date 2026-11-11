@@ -1,0 +1,18 @@
+{
+  "exp": "EXP-54",
+  "verdict": "pass",
+  "metrics": {
+    "rows": 15,
+    "passed": 15,
+    "parseval_roundtrip": 3.73e-16,
+    "delta_leak": 0.0,
+    "focus_px_error": 0.735,
+    "quant_sinc_dev_max": 1.42e-10,
+    "pad_window_leak": 0.00031,
+    "grid_symmetry": 1.78e-15
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "变异 M1（白名单去掉 'c'）→ 复数字段被 GSError 拒绝，自检中止"
+  }
+}

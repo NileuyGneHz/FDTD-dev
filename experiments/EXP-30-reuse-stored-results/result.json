@@ -1,0 +1,20 @@
+{
+  "exp": "EXP-30",
+  "verdict": "pass",
+  "metrics": {
+    "reused_stored": 1,
+    "layoutmode_at_load": 0.0,
+    "elapsed_s": 6.6,
+    "previous_cost_s": 4200,
+    "speedup": 636,
+    "assert_ran": "not run: reused stored results"
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "cfg 里加 force=true -> dry-run 的 reuse_if_stored 随 force 变为 false；实跑走 verify_and_run 分支"
+  },
+  "artifacts": [
+    "python skills/fdtd-lumerical-session-control/scripts/session_control.py --config _scratch/regress/2026-11-09/sc_reuse_npz.json --out _scratch/regress/2026-11-09/EXP-30/out --json"
+  ],
+  "ran_at": "2026-11-09T16:20:00+08:00"
+}

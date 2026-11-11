@@ -1,0 +1,35 @@
+{
+  "exp": "EXP-34",
+  "verdict": "fail",
+  "metrics": {
+    "sheet_peak_A": 0.9999842424810456,
+    "sheet_peak_f_THz": 3.5110220440881763,
+    "box_peak_A_eps_fixed_coarse": 0.05114322249917791,
+    "box_peak_f_THz_eps_fixed_coarse": 7.098992294013041,
+    "box_A_at_3p6THz_eps_fixed_coarse": 0.009087435747238916,
+    "box_A_at_3p6THz_pre_fix": 0.03415226270645202,
+    "d_peak_GHz": 3587.970249924865,
+    "d_peak_A": 0.9488410199818677,
+    "criterion_10GHz": false,
+    "criterion_0p01A": false,
+    "run_wall_s_coarse": 12.9,
+    "run_wall_s_dy0p1nm": 1201.5,
+    "run_1nm_progress_after_49min": 0.0068,
+    "run_1nm_engine_eta_h": 110,
+    "verdict_reason": "1 nm box 在 acc 2 网格里被摊薄（A=0.009），解析 1 nm 则单线程 ETA 110 h；两条路都不可用"
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "同一条判据套在修前（材料错，D-013）的工程上也判 fail（A=0.034，峰 7.12 THz），说明判据能同时抓材料口径错与离散化不足，不是只在一种情形下亮红"
+  },
+  "artifacts": [
+    "_scratch/regress/2026-11-10/EXP-34/result_fixed.json",
+    "_scratch/regress/2026-11-10/EXP-34/result_mesh.json",
+    "_scratch/regress/2026-11-10/EXP-34/build3/p09_mesh1nm_p0.log",
+    "_scratch/regress/2026-11-10/EXP-34/box_spectrum.npz",
+    "_scratch/regress/2026-11-10/EXP-46/build2/p09_2d_fixed.fsp"
+  ],
+  "ran_at": "2026-11-10T18:30:00+08:00",
+  "wall_s": 12.9,
+  "defect": "D-014"
+}

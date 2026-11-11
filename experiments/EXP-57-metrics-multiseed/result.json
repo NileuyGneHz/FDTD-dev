@@ -1,0 +1,19 @@
+{
+  "exp": "EXP-57",
+  "verdict": "pass",
+  "metrics": {
+    "n_seed": 4,
+    "rmse_min": 0.3923,
+    "rmse_max": 0.397,
+    "spread": 0.0047,
+    "eta": 0.9056,
+    "snr_db": 19.66,
+    "relative_l2": 0.39234,
+    "rms_same_field": 0.19617,
+    "ratio": 2.0
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "RMS 口径读 0.196 vs 相对 L2 0.392，混用即两个结论"
+  }
+}

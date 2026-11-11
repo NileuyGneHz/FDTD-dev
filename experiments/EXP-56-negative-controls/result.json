@@ -1,0 +1,15 @@
+{
+  "exp": "EXP-56",
+  "verdict": "pass",
+  "metrics": {
+    "ablation_drift": 0.0,
+    "ablation_iterations": 40,
+    "pad1_dx_img_um": 0.07227,
+    "allowed_um": 0.001,
+    "exit_code": 2
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "消融收敛为 0；pad=1 欠采样被 exit 2 拒绝"
+  }
+}

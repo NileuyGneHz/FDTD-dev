@@ -1,0 +1,27 @@
+{
+  "exp": "EXP-49",
+  "verdict": "pass",
+  "metrics": {
+    "projects_scanned": 32,
+    "old_banned_wording_hits": 32,
+    "old_unrun_wording_hits": 0,
+    "old_pass": false,
+    "new_banned_wording_hits": 0,
+    "new_unrun_wording_hits": 32,
+    "new_pass": true,
+    "example_before": "非功率监视器 ['T'] 不产生 R/T 谱（按类型排除，不是读失败）",
+    "example_after": "工程未跑过（layoutmode=1.0），1 个监视器的 getresult 都取不到谱：['T']——不是监视器类型问题"
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "同一条断言套在改前的 summary 上：32/32 含「非功率监视器」、0/32 含「未跑过」→ 判 fail。证明断言查的是这件事本身，不是恒真"
+  },
+  "artifacts": [
+    "_scratch/regress/2026-11-10/inspect2021/out/summary.json",
+    "_scratch/regress/2026-11-10/inspect2021/out2/summary.json",
+    "_scratch/regress/2026-11-10/inspect2021/check_wording.json",
+    "skills/fdtd-lumerical-fsp-introspection/scripts/inspect_fsp.py"
+  ],
+  "ran_at": "2026-11-10T22:20:00+08:00",
+  "wall_s": 210
+}

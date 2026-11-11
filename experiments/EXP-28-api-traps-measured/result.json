@@ -1,0 +1,25 @@
+{
+  "exp": "EXP-28",
+  "verdict": "pass",
+  "metrics": {
+    "A_batch_setnamed": "SUCCEEDED",
+    "A_single_setnamed": {
+      "x": "ok",
+      "y": "ok"
+    },
+    "A_rename_then_old_name": "LumApiError: \"in setnamed, no items matching the name 'r1' can be found.\"",
+    "B_frequency_set": "readable | set: \"in setnamed, the requested property 'frequency' is inactive\"",
+    "B_frequency_point_set": "readable | set: \"in setnamed, the requested property 'frequency point' is inactive\"",
+    "B_frequency_start_stop": "可读可写",
+    "B_global_frequency_followed": false,
+    "B_source_centre_hz": 428274940000000.0
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "用 `setnamed(name, {'x':..,'y':..})` 整批写两个合法属性 -> SUCCEEDED，且 x=1e-7 / y=2e-7 都写进去了"
+  },
+  "artifacts": [
+    "python _scratch/regress/2026-11-09/EXP-28/probe_api.py"
+  ],
+  "ran_at": "2026-11-09T17:20:00+08:00"
+}

@@ -1,0 +1,17 @@
+{
+  "exp": "EXP-09",
+  "verdict": "pass",
+  "metrics": {
+    "key_by_quantity": "R/A/T",
+    "out_of_range_rejected": true
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "`T=-0.80, A=1.60`（P07 实测值）被拒绝"
+  },
+  "artifacts": [
+    "skills/fdtd-lumerical-unitcell-simulation/scripts/run_fdtd_sweep.py"
+  ],
+  "ran_at": "2026-11-09T16:10:00+08:00",
+  "wall_s": 2.0
+}

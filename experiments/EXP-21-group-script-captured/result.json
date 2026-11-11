@@ -1,0 +1,19 @@
+{
+  "exp": "EXP-21",
+  "verdict": "pass",
+  "metrics": {
+    "script_chars": 2943,
+    "number": 30.0,
+    "children_collapsed": true
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "P06 的涡旋真值（八个八分圆各一种 V 天线）写在 structure group.script 里；旧版只报「一个 group」，等于没看见"
+  },
+  "artifacts": [
+    "skills/fdtd-lumerical-fsp-introspection/scripts/inspect_fsp.py",
+    "_scratch\\regress\\2026-11-09\\EXP-13"
+  ],
+  "ran_at": "2026-11-09T17:05:00+08:00",
+  "wall_s": 20
+}

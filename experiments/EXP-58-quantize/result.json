@@ -1,0 +1,21 @@
+{
+  "exp": "EXP-58",
+  "verdict": "pass",
+  "metrics": {
+    "strehl_L2": 0.4052,
+    "strehl_L4": 0.8095,
+    "strehl_L8": 0.9497,
+    "bound_L2": 0.4053,
+    "bound_L4": 0.8106,
+    "bound_L8": 0.9496,
+    "theory_ratio_max": 1.0,
+    "eta_ratio_L2": 0.8316,
+    "eta_ratio_L4": 0.8314,
+    "eta_ratio_L8": 0.9546,
+    "eta_ratio_monotone": false
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "eta_support 比 0.8316/0.8314/0.9546 非单调，不能当量化效率"
+  }
+}

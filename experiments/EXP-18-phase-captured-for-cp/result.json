@@ -1,0 +1,24 @@
+{
+  "exp": "EXP-18",
+  "verdict": "pass",
+  "metrics": {
+    "sources": [
+      "source",
+      "source_1"
+    ],
+    "phase_values": [
+      0.0,
+      -90.0
+    ]
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "圆偏振由两个正交 TFSF 源 ±90° 凑出；旧 CORE_PROPS 没有 phase，RCP/LCP 两工程 manifest 一模一样，判不出旋向"
+  },
+  "artifacts": [
+    "skills/fdtd-lumerical-fsp-introspection/scripts/inspect_fsp.py",
+    "_scratch\\regress\\2026-11-09\\EXP-13"
+  ],
+  "ran_at": "2026-11-09T17:05:00+08:00",
+  "wall_s": 20
+}

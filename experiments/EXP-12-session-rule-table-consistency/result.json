@@ -1,0 +1,18 @@
+{
+  "exp": "EXP-12",
+  "verdict": "pass",
+  "metrics": {
+    "script_stale_rule": false,
+    "script_mentions_save_run": true,
+    "skill_stale_rule": false
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "旧的「必须新会话 load」字符串为 False（残留即 FAIL）"
+  },
+  "artifacts": [
+    "skills/fdtd-lumerical-session-control/scripts/session_control.py"
+  ],
+  "ran_at": "2026-11-09T16:10:00+08:00",
+  "wall_s": 2.0
+}

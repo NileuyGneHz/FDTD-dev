@@ -1,0 +1,17 @@
+{
+  "exp": "EXP-03",
+  "verdict": "pass",
+  "metrics": {
+    "same_family": "3/3",
+    "cross_family": "3/3"
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "CST / FMM / COMSOL 三组异族全部被判不同（否则等于把真差异抹平）"
+  },
+  "artifacts": [
+    "tools/check_reproduction.py"
+  ],
+  "ran_at": "2026-11-09T16:10:00+08:00",
+  "wall_s": 2.0
+}

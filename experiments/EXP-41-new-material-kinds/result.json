@@ -1,0 +1,27 @@
+{
+  "exp": "EXP-41",
+  "verdict": "pass",
+  "metrics": {
+    "au_type": "Conductive 3D",
+    "au_conductivity": 40000000.0,
+    "graphene_type": "Sampled 3D data",
+    "graphene_points": 50,
+    "graphene_max_coefficients": 6.0,
+    "graphene_freq_range_thz": [
+      2.9979245800000003,
+      7.9944655466666665
+    ],
+    "material_assignment": {
+      "ground": "Au_cond",
+      "gr_box": "graphene"
+    }
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "把石墨烯材料挂到 2drect 面对象上 -> LumApiError: value supplied is not acceptable for 'material'，builder 现在会包成 ValueError 并指向 D-2 的 1 nm box 路径"
+  },
+  "artifacts": [
+    "python _scratch/regress/2026-11-09/EXP-40/verify_40_41_42.py"
+  ],
+  "ran_at": "2026-11-09T17:20:00+08:00"
+}

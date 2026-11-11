@@ -1,0 +1,23 @@
+{
+  "exp": "EXP-36",
+  "verdict": "pass",
+  "metrics": {
+    "sources": [
+      "P01 spectra",
+      "P02 phase.csv",
+      "field npz",
+      "P01 old vs new"
+    ],
+    "figures": 6,
+    "scripts_needed": 1,
+    "manual_plotting_removed": "none yet (files untouched)"
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "缺 lam_um 的 csv -> exit 2 + 缺少列 lam_um"
+  },
+  "artifacts": [
+    "python _scratch/regress/2026-11-09/EXP-44/test_figures.py"
+  ],
+  "ran_at": "2026-11-09T17:20:00+08:00"
+}

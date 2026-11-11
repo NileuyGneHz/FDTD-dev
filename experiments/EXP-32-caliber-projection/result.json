@@ -1,0 +1,22 @@
+{
+  "exp": "EXP-32",
+  "verdict": "pass",
+  "metrics": {
+    "caliber_keys": 5,
+    "repro_card_keys": [
+      "target",
+      "actual_solver",
+      "numerics_aligned_from"
+    ],
+    "target_quantity_readable": "peak_absorption",
+    "duplicated_typing": 0
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "config 不给 caliber -> caliber=None，repro_card 键不出现"
+  },
+  "artifacts": [
+    "python skills/fdtd-lumerical-session-control/scripts/session_control.py --config _scratch/regress/2026-11-09/sc_reuse_npz.json --out _scratch/regress/2026-11-09/EXP-30/out --json"
+  ],
+  "ran_at": "2026-11-09T16:20:00+08:00"
+}

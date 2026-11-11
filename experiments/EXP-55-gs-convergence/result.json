@@ -1,0 +1,17 @@
+{
+  "exp": "EXP-55",
+  "verdict": "pass",
+  "metrics": {
+    "frame_rmse_first": 1.21277,
+    "frame_rmse_last": 0.39234,
+    "frame_max_rise": -5.857e-05,
+    "frame_iterations": 200,
+    "lens_rmse": 0.0323,
+    "lens_iterations": 300,
+    "lens_stop_reason": "plateau"
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "消融像面约束 → 40 轮 RMSE 漂移精确 0.0，不收敛"
+  }
+}

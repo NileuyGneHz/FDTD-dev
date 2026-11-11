@@ -1,5 +1,5 @@
-# D-002 `run_fdtd_sweep.py` 默认输出目录会写进只读的 `cases/`
-
+﻿# D-002 `run_fdtd_sweep.py` 默认输出目录会写进只读的 `cases/`
+**状态**：`resolved`（默认输出改到 --out，见正文验证段）
 ## 根因
 
 `skills/fdtd-lumerical-unitcell-simulation/scripts/run_fdtd_sweep.py` 的 `main()`：

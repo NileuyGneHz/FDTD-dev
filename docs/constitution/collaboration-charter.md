@@ -1,4 +1,4 @@
----
+﻿---
 title: "agent.md — Lumerical FDTD 工作空间协作章程"
 summary: "AI agent 与人类协作者接入本工作空间时的第一份必读文件：项目目标、资产地图、十三条铁律、协作与仓库纪律"
 read_when:
@@ -66,7 +66,7 @@ P0N_<课题>\
 
 - **包目录名与 `.fsp` 文件名必须纯 ASCII**（中文名 → GPU 引擎崩，§4-B）
 - **论文与 fsp 一一对应**，用 `tools\check_packages.py` 机器校验
-- 单包专用的放包内；**两包以上共用**的放 `_shared\`；仓库级工具放 `tools\`
+- 单包专用的放包内；**两包以上共用**的放 `library\py\`；仓库级工具放 `tools\`
 - 新建包：复制 `packages\_TEMPLATE\` → 改名 → 填 README（模板里已写好各节该填什么）
 
 ---
@@ -96,7 +96,7 @@ FDTD_WS\
 │  ├─ PACKAGES.md         ★ 任务地图（协作入口）
 │  ├─ _TEMPLATE\          新包模板
 │  └─ P01..P10\           10 个课题包（paper / fsp / scripts / results / notes）
-├─ _shared\              跨包共享工具（lumapi_common.py + 说明）
+├─ library\py\           跨包共享模块（lumapi_common.py + fsp_build.py）
 ├─ tools\                自检与体检脚本（check_packages.py 等）
 ├─ _scratch\             临时脚本区（一次性探查/验证脚本，不进库；见 N 条）
 ├─ course_media\         课程视频索引（*.mp4 体积过大，不入库）
@@ -136,7 +136,7 @@ FDTD_WS\
 |---|---|---|
 | `check_packages.py` | `tools\`（仓库内） | ★ 包结构自检：论文齐否 / `.fsp` 是否纯 ASCII / README 是否填完 |
 | `migrate_classes_to_packages.py` | `tools\`（仓库内） | 课程素材 → 包内的搬迁脚本（含中文名转 ASCII 映射，可复用） |
-| `lumapi_common.py` | `_shared\`（仓库内） | ★ 会话/校验封装：`setup_env` `open_fdtd` `verify_and_run` `ascii_gate` `n_at` |
+| `lumapi_common.py` | `library\py\`（仓库内） | ★ 会话/校验封装：`setup_env` `open_fdtd` `verify_and_run` `ascii_gate` `n_at` |
 | `py.bat` | 外部 `scripts\` | 启动器，自动选托管 Python |
 | `z_fix_gpu_res.py` | 外部 `scripts\` | ★ GPU/CPU 资源一键恢复（幂等 + 备份 + 回读校验） |
 | `lumapi_probe.py` / `fsp_strings.py` | 外部 `scripts\` | 对象树探查 / `.fsp` 二进制字符串抽取（材料名唯一获取途径） |
@@ -250,7 +250,7 @@ Python 脚本**只往 UTF-8 文件写结果，不要 `print()` 中文**（重定
   且会话结束后无人清理 —— 累积成 C 盘垃圾。
 - `_scratch\` 是**唯一允许"脏"的目录**，其余目录必须保持整洁。
 - 用完即删；要留档就移入 `_scratch\archive\` 并在 `_scratch\README.md` 登记一行。
-- 有复用价值时**提升**为正式脚本：单包 → 包内 `scripts\`；跨包 → `_shared\`；
+- 有复用价值时**提升**为正式脚本：单包 → 包内 `scripts\`；跨包 → `library\py\`；
   通用大工具 → 外部 `F:\Lumercial_WS\scripts\`（引用不复制）。
 - `.gitignore` 已排除 `_scratch/*`，仅保留其中的 `README.md`。
 
@@ -269,15 +269,15 @@ Python 脚本**只往 UTF-8 文件写结果，不要 `print()` 中文**（重定
 8  验证    assert_ran() 三判据：layoutmode==0 + _p0.log + Completed iterations
 9  判读    结果与论文/文献值比对（不看材料名，看数值）；差异写进包内 README §5
 10 出图    写 csv/png 到包内 results\；不 print 中文（I 条）
-11 归档    脚本 → 包内 scripts\；共享工具 → _shared\；进度 → 包内 README §5
+11 归档    脚本 → 包内 scripts\；共享工具 → library\py\；进度 → 包内 README §5
 12 提交    小步提交，提交信息写清"哪个包 + 改了什么 + 结论"（§6.3）
 ```
 
-**共享工具**（`_shared\lumapi_common.py`）已封装第 6–8 步的坑，优先用它：
+**共享工具**（`library\py\lumapi_common.py`）已封装第 6–8 步的坑，优先用它：
 
 ```python
 import sys
-sys.path.insert(0, r"F:\Lumercial_WS\FDTD_WS\_shared")
+sys.path.insert(0, r"F:\Lumercial_WS\FDTD_WS\library\py")
 from lumapi_common import setup_env, verify_and_run, ascii_gate, n_at
 
 setup_env()
@@ -378,7 +378,7 @@ finally:
 | **某课题的目标 / 参数 / 进度** | `packages\P0N_<课题>\README.md` |
 | **踩坑速查 / 脚本语法 / 报错对策** | **`SKILL.md`**（八章，§0 按症状索引） |
 | 目录结构 / 快速开始 | `README.md`（中文）/ `README.en.md`（English） |
-| 共享工具用法 | `_shared\README.md` |
+| 共享工具用法 | `library\py\README.md` |
 | 包结构自检 | `tools\check_packages.py --pkg P0N` |
 | 新建一个包 | `packages\_TEMPLATE\README.md`（复制整个 `_TEMPLATE\`） |
 | 改文件名 / 迁移素材 | `tools\migrate_classes_to_packages.py`（含改名映射表，可复用） |

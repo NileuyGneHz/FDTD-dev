@@ -1,4 +1,4 @@
----
+﻿---
 name: fdtd-package-workspace
 description: Turn a Lumerical/FDTD research workspace into an agent-collaborative "one topic = one package" layout, or create/take over a topic package inside that layout. Use when you need to build a self-contained reproduction folder for a paper (paper + .fsp + scripts + results), maintain the package index, run the packaging self-check, take over a task by package ID, batch-migrate a course/paper directory into packages, generate per-paper self-check questions, or restructure/translate a long pitfall document without losing content or breaking cross-references. Long procedural workflows (migration, doc restructuring, translation, self-check questions) are bundled in references/advanced-workflows.md and loaded on demand. Includes field-tested self-check and session utilities.
 agent_created: true
@@ -21,19 +21,23 @@ through the README, and keep the structure from rotting with a self-check script
 
 ```
 <workspace>\
-├─ packages\
-│  ├─ PACKAGES.md          ★ master package table (agent entry point)
+├─ cases\                  ★ renamed from packages\ in TASK-002 (2026-11)
+│  ├─ INDEX.md             ★ master case table (agent entry point)
 │  ├─ _TEMPLATE\           copy this when creating a package
 │  └─ P0N_<short_name>\    one package = one paper
 │     ├─ README.md         ★ agent takeover entry point
 │     ├─ paper\            paper PDF + reference material
-│     ├─ fsp\              .fsp projects (filenames MUST be ASCII)
-│     ├─ scripts\          scripts specific to this package
+│     ├─ model\            .fsp projects + .lsf sources (filenames MUST be ASCII)
+│     ├─ config\           spec_<id>.json / sweep_<id>.json (machine-readable inputs)
 │     ├─ results\          data and figures
-│     └─ notes\            notes and troubleshooting records
-├─ _shared\                tools shared across packages
-└─ tools\                  self-check scripts
+│     └─ notes\            notes, repro cards, troubleshooting records
+├─ library\py\             modules shared across cases
+└─ tools\                  repo-level gate scripts
 ```
+
+> The directory is `cases/` (not `packages/`), the project file dir is `model/` (not `fsp/`),
+> and per-case machine inputs live in `config/`. `tools/check_packages.py` is the authority on this
+> layout (`SUBDIRS = ["paper", "model", "results", "notes"]`); read it if a doc disagrees.
 
 ## CRITICAL — three hard constraints
 
@@ -52,7 +56,7 @@ through the README, and keep the structure from rotting with a self-check script
 | Content | Where it goes |
 |---|---|
 | Scripts used by a single package | that package's `scripts\` |
-| Shared by two or more packages | `_shared\` |
+| Shared by two or more packages | `library\py\` |
 | General-purpose large tools (probes, resource fixes, etc.) | stay in the common `scripts\`, **referenced, not copied** (avoids stale copies) |
 
 > ⚠️ **Stale copies are a pitfall we actually hit** (2026-10-01): `assets/template/README.md` and
@@ -72,35 +76,38 @@ through the README, and keep the structure from rotting with a self-check script
 2. **Build the package inventory**: a paper → package ID mapping. Package IDs use `P0N`; directory
    names append a short English name and the origin (e.g. `P03_HWP_Ding2015`, `P01_Absorber_042`).
 3. **Build the skeleton**: copy `assets/template/` (the README template) into every package, and
-   create the five subdirectories `paper/fsp/scripts/results/notes` (the complete directory layout
-   is in `<workspace>\packages\_TEMPLATE\`). Put `.gitkeep` in empty directories so version control
+   create the subdirectories `paper/model/results/notes` plus `config/` (the complete directory
+   layout is in `<workspace>\cases\_TEMPLATE\`). Put `.gitkeep` in empty directories so version control
    preserves them.
    ⚠️ `.gitkeep` breaks the "directory is empty" check — the self-check script must exclude
    placeholder files from its file counts.
-4. **Write `PACKAGES.md`**: the master package table (ID / topic / paper / status / main line)
+4. **Write `INDEX.md`**: the master package table (ID / topic / paper / status / main line)
    + naming rules + self-check commands + an **asset location table** (recording where each file
    currently lives).
    - If you decide to **defer migration**: write "not archived, path recorded only" in the table.
    - If migration is **complete**: change the table to "archived" and note that the originals are
      still in place, read-only.
 5. **Write each package README** (using the template), filling in at least §0 and §1.
-6. **Install the self-check script**: copy `scripts/check_packages.py` to `<workspace>\tools\` and
-   change the path constants at the top.
+6. **Wire the self-check script — do NOT copy it.** The single implementation is
+   `tools/check_packages.py`; `skills/fdtd-package-workspace/scripts/check_packages.py` is a thin
+   forwarder to it. The old "copy it and edit the path constants" advice is exactly what produced
+   two divergent copies that both went dead after `packages/` → `cases/` (found 2026-11-08:
+   the skill copy resolved `<skill>/packages`, which never existed).
 7. **Verify by actually running it**: run once to see the baseline; then **deliberately create a
    file with a Chinese name** as a control, and confirm it gets caught (see below).
 
 ## Workflow B: create a new package
 
 ```bash
-cp -r packages/_TEMPLATE packages/P0N_<short_name>
+cp -r cases/_TEMPLATE cases/P0N_<short_name>
 # Fill in README: §0 (goal / acceptance / entry script), §1 (paper), §2 (parameters)
-# Archive: paper -> paper\, .fsp -> fsp\ (rename to ASCII, record the old->new mapping)
+# Archive: paper -> paper\, .fsp/.lsf -> model\, spec -> config\ (ASCII names; record old->new)
 py tools/check_packages.py --pkg P0N
 ```
 
 ## Workflow C: take over a package (every collaboration)
 
-1. Read `packages\PACKAGES.md` → locate the package ID
+1. Read `cases\INDEX.md` → locate the package ID
 2. Read that package's `README.md` §0 "Agent quick takeover" → get this session's goal /
    acceptance criteria / entry script
 3. Run `py tools/check_packages.py --pkg P0N` to confirm the package is complete
@@ -174,7 +181,7 @@ not have to rewrite them.
 
 ```python
 import sys
-sys.path.insert(0, r"<workspace>\_shared")
+sys.path.insert(0, r"<workspace>\library\py")
 from lumapi_common import setup_env, verify_and_run, assert_ran, ascii_gate, n_at
 
 setup_env()                  # set license + sys.path, import lumapi
@@ -209,7 +216,7 @@ If the target environment is not FDTD, delete this file and drop this section.
 matching `.fsp` in, renaming to ASCII and recording the old→new map → regenerate `PACKAGES.md` →
 run the self-check.
 
-**Result:** `packages\PACKAGES.md` lists every package, the self-check reports paper↔`.fsp` as 1:1,
+**Result:** `cases\INDEX.md` lists every package, the self-check reports paper↔`.fsp` as 1:1,
 and each package README answers §0–§2 without needing the chat log.
 
 ## Troubleshooting
@@ -220,7 +227,7 @@ and each package README answers §0–§2 without needing the chat log.
 | GPU engine returns 1113 / mojibake | package dir or `.fsp` name is non-ASCII | rename to ASCII and record the old→new mapping |
 | README section numbers stop resolving | source file edited, its copy not re-synced | re-sync the copy in the same turn and `diff` it |
 | paths in an inherited README do not exist | READMEs are usually stale | audit the disk first; never trust the described paths |
-| the same script exists in three packages | copied instead of referenced | keep one copy in `_shared\`, reference it |
+| the same script exists in three packages | copied instead of referenced | keep one copy in `library\py\`, reference it |
 
 ## References（load on demand）
 
@@ -228,8 +235,11 @@ Four long, low-frequency procedures live in `references/advanced-workflows.md`. 
 when the task matches one of them; the one-liners below are enough to route.
 
 - **Workflow D — batch-migrate a course/paper directory into packages.** Driven by
-  `scripts/migrate_classes_to_packages.py`: hard-codes the lecture→package map, renames non-ASCII
-  `.fsp` files, and must rename each `_p0.log` alongside (otherwise `assert_ran()` breaks).
+  `tools/migrate_classes_to_packages.py` (**repo-level tool, not shipped with this skill** —
+  a byte-identical copy used to live in `scripts/` and rotted, see D-006): hard-codes the
+  lecture→package map, renames non-ASCII `.fsp` files, and must rename each `_p0.log`
+  alongside (otherwise `assert_ran()` breaks). Run it with
+  `--src <course dir> --out <workspace root> --dry-run` first; nothing is written in dry-run.
 - **Workflow E — restructure a "patchwork" long document** into a clean chapter scheme without
   losing a single line. Machine-assisted relocation, never hand-copying.
 - **Workflow F — translate a long document into another language** while freezing section numbers

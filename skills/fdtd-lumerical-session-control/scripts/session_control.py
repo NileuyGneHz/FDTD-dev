@@ -9,8 +9,9 @@ writes a per-iteration ledger. It does not build geometry and it does not decide
 which parameters come next (that is fdtd-lumerical-design-loop).
 
 Session lifecycle is NOT reimplemented here: setup_env / open_fdtd / ascii_gate /
-verify_and_run are imported from
-fdtd-package-workspace/scripts/lumapi_common.py (single implementation).
+verify_and_run are imported from `library/py/lumapi_common.py` (the single implementation;
+`skills/fdtd-package-workspace/scripts/lumapi_common.py` is now only a forwarder).
+2026-11-11: moved from `_shared/` per workspace-layout.md §10.
 
 CLI contract: --config <json> --out <dir> [--dry-run] [--json]
 Exit codes:   0 ok / 1 diagnosable failure / 2 argument or config error
@@ -36,7 +37,7 @@ ERROR_CATEGORIES = (
     ("bind socket", "transient", "ansyscl 端口 TIME_WAIT；瞬时态，重试即可"),
     ("diverging", "numerical", "场发散；dt stability factor 0.99 -> 0.95 或改 CPU 双精度"),
     ("1113", "path", "路径含非 ASCII；GPU 引擎会崩，改纯 ASCII 路径"),
-    ("layoutmode", "sequence", "必须 save -> 新会话 load -> switchtolayout -> run"),
+    ("layoutmode", "sequence", "必须先 save 再 run（同会话亦可）；未 save 时 run 静默失效"),
     ("Failed to checkout", "license", "许可不可用；先跑 z_fix_license_daemon.cmd"),
     ("Auto Shutoff", "convergence", "未收敛；提高 simulation_time"),
     ("analysis mode", "sequence", "改对象前必须 switchtolayout()"),
@@ -62,6 +63,24 @@ def repo_root() -> Path:
 def in_repo(root: Path, value: str) -> Path:
     p = Path(value)
     return p if p.is_absolute() else (root / p)
+
+
+def assert_writable_out(root: Path, out: Path) -> Path:
+    """Two gates in one place, both learned the hard way.
+
+    ① `--out` must be turned ABSOLUTE before ``f.save()``.  The engine's cwd is not the
+       repo root, so a relative path makes ``save()`` fail with a *permission* message —
+       which sends people hunting for non-ASCII paths (P05 event).  The real cause is cwd.
+    ② `cases/` is the reference corpus and must never be written by a run
+       (same gate as ``run_lsf.py``'s ``config.fsp inside cases/ -> exit 2``).
+    """
+    resolved = out if out.is_absolute() else (root / out)
+    resolved = resolved.resolve()
+    cases = (root / "cases").resolve()
+    if resolved == cases or cases in resolved.parents:
+        raise ConfigError(
+            "--out 落在只读参考语料 cases/ 内：%s。产物请写到 _scratch/ 或其它工作目录" % resolved)
+    return resolved
 
 
 def classify_error(message: str) -> dict:
@@ -119,14 +138,54 @@ def jsonable(value, cap: int = 2000):
     return str(value)
 
 
-def read_monitors(fdtd, extract: dict, cap: int) -> dict:
-    """Raw getresult -> JSON. Physical interpretation belongs to design-loop."""
+def read_monitors(fdtd, extract: dict, cap: int, npz_dir: Path | None = None) -> dict:
+    """Raw getresult -> JSON (bounded) or .npz (full arrays).
+
+    A 301x301 field map is 90601 points per component; ``max_array_items=2000``
+    truncates it into a number that looks like data.  ``format: npz`` writes the
+    untruncated array next to the ledger and leaves only metadata in JSON.
+    """
     out = {}
     for name, spec in extract.items():
         monitor, result = spec.get("monitor", name), spec.get("result", "T")
+        fmt = str(spec.get("format", "json")).lower()
         try:
-            raw = fdtd.getresult(monitor, result)
-            out[name] = jsonable(raw, cap)
+            if fmt == "npz":
+                if npz_dir is None:
+                    raise ConfigError("format=npz 但未给 npz 目录")
+                import numpy as np
+
+                raw = fdtd.getresult(monitor, result)
+                arrs = {}
+                if isinstance(raw, dict):
+                    for k, v in raw.items():
+                        try:
+                            a = np.asarray(v)
+                        except Exception:      # noqa: BLE001 - non-array keys are metadata
+                            continue
+                        # 只收数值数组：v251 的 dict 里还有 'Lumerical_dataset' 之类的
+                        # 对象句柄，存进 npz 会变成 dtype=object（必须 pickle 才能读回）。
+                        # "c" 必须留着：场监视器的 E/x 之外，E 本身是复数，
+                        # 漏掉它会让 npz 只剩坐标，而 dump 仍然「成功」（D-015）。
+                        if a.dtype.kind in "fiubc" and a.size:
+                            arrs[k] = a
+                else:
+                    arrs[result] = np.asarray(raw)
+                if not arrs:
+                    raise ConfigError(
+                        "监视器 %r 的 %r 没有任何数值数组（只有对象句柄），"
+                        "写出去会得到一个空 npz 而 dump 看起来是成功的" % (monitor, result))
+                path = npz_dir / ("%s_%s.npz" % (name, result))
+                np.savez_compressed(path, **arrs)
+                out[name] = {
+                    "format": "npz", "path": str(path),
+                    "bytes": path.stat().st_size,
+                    "sha256": hashlib.sha256(path.read_bytes()).hexdigest()[:16],
+                    "arrays": {k: {"shape": list(v.shape), "dtype": str(v.dtype)}
+                               for k, v in arrs.items()},
+                }
+            else:
+                out[name] = jsonable(fdtd.getresult(monitor, result), cap)
         except Exception as e:
             out[name] = {"ok": False, "error": "%s: %s" % (type(e).__name__, e)}
     return out
@@ -134,7 +193,9 @@ def read_monitors(fdtd, extract: dict, cap: int) -> dict:
 
 def run_one(cfg: dict, root: Path, out: Path) -> dict:
     """One iteration. Imports lumapi ONLY here (never during --dry-run)."""
-    shared = root / "skills" / "fdtd-package-workspace" / "scripts"
+    shared = root / "library" / "py"                  # 唯一实现（2026-11-11 从 _shared/ 迁入）
+    if not (shared / "lumapi_common.py").is_file():   # 兼容只带技能目录的部署
+        shared = root / "skills" / "fdtd-package-workspace" / "scripts"
     if str(shared) not in sys.path:
         sys.path.insert(0, str(shared))
     from lumapi_common import setup_env, open_fdtd, ascii_gate, verify_and_run
@@ -150,48 +211,89 @@ def run_one(cfg: dict, root: Path, out: Path) -> dict:
     idx = int(cfg.get("iteration", 1))
     iter_fsp = out / ("iteration_%03d.fsp" % idx)
     t0 = time.time()
-    checks = {"params": cfg.get("params") or {}, "parameter_map": cfg.get("parameter_map") or {}}
+    params = cfg.get("params") or {}
+    force = bool(cfg.get("force"))
+    extract = cfg.get("extract") or {}
+    need_npz = any(str(s.get("format", "json")).lower() == "npz" for s in extract.values())
+    npz_dir = out / "npz"
+    checks = {"params": params, "parameter_map": cfg.get("parameter_map") or {}}
 
     # Stage 1: load the EXISTING project, switch to layout, inject whitelisted
     # parameters only (no geometry rebuild), save, close.
     f = open_fdtd()
+    reused = False
+    layoutmode = None
     try:
         f.load(str(base))
-        f.switchtolayout()
-        applied = []
-        for param, value in checks["params"].items():
-            for mapping in checks["parameter_map"].get(param, []):
-                f.setnamed(mapping["object"], mapping["property"], float(value)
-                            if isinstance(value, (int, float)) else value)
-                applied.append({"object": mapping["object"],
-                                "property": mapping["property"], "value": value})
-        f.save(str(iter_fsp))
+        f.eval("lm_probe = layoutmode;")
+        layoutmode = float(f.getv("lm_probe"))
+        if layoutmode == 0.0 and not params and not force:
+            # The reference project already holds results.  Re-running it costs a full
+            # solve and changes nothing (P05: 4 projects x 70 min of pure repetition).
+            reused = True
+            if need_npz:
+                npz_dir.mkdir(parents=True, exist_ok=True)
+            results = read_monitors(f, extract, int(cfg.get("max_array_items", 2000)),
+                                    npz_dir if need_npz else None)
+            applied = []
+        else:
+            f.switchtolayout()
+            applied = []
+            for param, value in checks["params"].items():
+                for mapping in checks["parameter_map"].get(param, []):
+                    f.setnamed(mapping["object"], mapping["property"], float(value)
+                               if isinstance(value, (int, float)) else value)
+                    applied.append({"object": mapping["object"],
+                                    "property": mapping["property"], "value": value})
+            if need_npz:
+                npz_dir.mkdir(parents=True, exist_ok=True)
+            f.save(str(iter_fsp))
         checks["applied"] = applied
     finally:
         f.close()
 
-    # Stage 2: project-verified sequence -- a NEW session loads the saved .fsp
-    # before run(); running in the modelling session fails silently.
-    f2 = verify_and_run(str(iter_fsp), verbose=False)
-    try:
-        results = read_monitors(f2, cfg.get("extract") or {},
-                               int(cfg.get("max_array_items", 2000)))
-    finally:
-        f2.close()
+    if not reused:
+        # Stage 2: project-verified sequence -- save (done above) then run.  A new session
+        # is the default because it is replayable; same-session iteration is also valid
+        # (defects/D-004 proved it is `save`, not session age, that matters).
+        f2 = verify_and_run(str(iter_fsp), verbose=False)
+        try:
+            results = read_monitors(f2, extract, int(cfg.get("max_array_items", 2000)),
+                                    npz_dir if need_npz else None)
+        finally:
+            f2.close()
 
     log = iter_fsp.with_name(iter_fsp.stem + "_p0.log")
+    caliber = cfg.get("caliber") or None
     ledger = {
         "ok": True, "iteration": idx, "mode": cfg.get("mode", "Design"),
         "params": checks["params"], "applied": checks["applied"],
         "param_key": check_whitelist(cfg)["param_key"],
         "base_fsp": str(base.relative_to(root)) if base.is_relative_to(root) else str(base),
         "base_fsp_size": base.stat().st_size,
-        "iter_fsp": str(iter_fsp), "p0_log": str(log) if log.exists() else None,
-        "assert_ran": "passed (layoutmode / _p0.log / Completed / no diverging)",
+        "iter_fsp": str(iter_fsp) if not reused else str(base),
+        "layoutmode_at_load": layoutmode,
+        "reused_stored": int(reused),
+        "force": int(force),
+        "p0_log": str(log) if log.exists() else None,
+        "assert_ran": ("not run: reused stored results (layoutmode=0, no params, --force not set)"
+                       if reused else
+                       "passed (layoutmode / _p0.log / Completed / no diverging)"),
         "results": results,
+        "caliber": caliber,
         "elapsed_s": round(time.time() - t0, 3),
         "utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
+    if caliber:
+        # repro-card compatible projection, so the same run feeds check_reproduction
+        # without retyping the same声明 a second time (P05 §7).
+        ledger["repro_card"] = {
+            "target": {"quantity": caliber.get("target_quantity"),
+                       "value": caliber.get("target_value"),
+                       "source": caliber.get("paper_ref")},
+            "actual_solver": caliber.get("actual_solver"),
+            "numerics_aligned_from": caliber.get("numerics_aligned_from"),
+        }
     (out / ("iteration_%03d.json" % idx)).write_text(
         json.dumps(ledger, indent=2, ensure_ascii=False), encoding="utf-8")
     return ledger
@@ -227,6 +329,12 @@ def main(argv=None) -> int:
 
     if args.dry_run:
         root = repo_root()
+        try:
+            out_probe = assert_writable_out(root, Path(args.out))
+        except ConfigError as e:
+            print(json.dumps({"ok": False, "error": str(e)}, ensure_ascii=False)
+                  if args.json else "ERROR " + str(e))
+            return EXIT_USAGE
         plan = {"ok": True, "dry_run": True, "mode": gate["mode"],
                 "params": gate["params"], "param_key": gate["param_key"],
                 "base_fsp": cfg["base_fsp"],
@@ -237,14 +345,20 @@ def main(argv=None) -> int:
                              "save -> close",
                              "verify_and_run (new session load -> run -> assert_ran)",
                              "getresult -> ledger -> close"],
+                "reuse_if_stored": not (cfg.get("params") or {}) and not cfg.get("force"),
                 "extract": list((cfg.get("extract") or {}).keys()),
-                "out": str(Path(args.out)), "session_opened": False}
+                "out": str(out_probe), "session_opened": False}
         print(json.dumps(plan, ensure_ascii=False) if args.json
               else "\n".join("%-20s %s" % (k, v) for k, v in plan.items()))
         return EXIT_OK
 
     root = repo_root()
-    out = Path(args.out)
+    try:
+        out = assert_writable_out(root, Path(args.out))
+    except ConfigError as e:
+        print(json.dumps({"ok": False, "error": str(e)}, ensure_ascii=False)
+              if args.json else "ERROR " + str(e))
+        return EXIT_USAGE
     retries = int(cfg.get("max_retries", 3))
     last = None
     for attempt in range(retries + 1):

@@ -129,14 +129,125 @@ def ascii_gate(p, verbose: bool = True) -> bool:
         return False
 
 
-def assert_ran(fdtd, fsp_path, verbose: bool = True) -> bool:
-    """三判据确认"仿真真的算了"。任一不过就抛异常。
+def monitor_domain_report(fdtd, gap: float = 0.3e-6) -> list:
+    """几何判定：每个监视器相对 FDTD 盒的位置。
+
+    为什么不能只看 `getresult`（EXP-25 实测）：监视器压在 PML 内仍然**会记录数据**，
+    只是数值非物理；只有当它整个跑出仿真盒，`getresult` 才报 `Can not find result`。
+    所以「数据存在」不足以证明「数据可用」，必须在建模后做几何校验。
+
+    返回 [{name, axis, pos, lo, hi, status}]，status ∈ ok / pml_overlap / outside。
+    """
+    def g(obj, prop):
+        return float(fdtd.getnamed(obj, prop))
+
+    axes = ("x", "y", "z")
+    box = {}
+    for ax in axes:
+        c = g("FDTD", ax)
+        s = g("FDTD", ax + " span")
+        box[ax] = (c - s / 2.0, c + s / 2.0)
+
+    fdtd.eval("selectall;")
+    # getAllSelectedObjects() returns SimObject wrappers, not strings.  str(obj) yields
+    # "<lumapi.SimObject object at 0x...>" and every getnamed() then misses silently
+    # (caught by EXP-24: the gate reported "0 monitors" and passed everything).
+    names = []
+    for o in (fdtd.getAllSelectedObjects() or []):
+        nm = getattr(o, "name", None)
+        if nm is None and isinstance(o, str):
+            nm = o
+        if nm:
+            names.append(str(nm))
+    out = []
+    for name in names:
+        try:
+            typ = str(fdtd.getnamed(name, "type"))
+        except Exception:                        # noqa: BLE001
+            continue
+        if "monitor" not in typ.lower():
+            continue
+        entry = {"name": name, "type": typ}
+        worst = "ok"
+        for ax in axes:
+            try:
+                pos = g(name, ax)
+            except Exception:                    # noqa: BLE001 - planar monitors may omit axes
+                continue
+            lo, hi = box[ax]
+            if not (lo <= pos <= hi):
+                worst = "outside"
+                entry[ax] = {"pos": pos, "lo": lo, "hi": hi, "status": "outside"}
+            elif pos < lo + gap or pos > hi - gap:
+                if worst != "outside":
+                    worst = "pml_overlap"
+                entry[ax] = {"pos": pos, "lo": lo, "hi": hi, "status": "pml_overlap"}
+        entry["status"] = worst
+        out.append(entry)
+    return out
+
+
+def assert_in_domain(fdtd, gap: float = 0.3e-6, verbose: bool = True) -> dict:
+    """建模后、run 前的几何闸：监视器不得压在 PML 里，更不得跑出仿真盒。
+
+    P07 事件：`below_structure=0.15 µm` → 监视器压进 PML → `T=-0.80, A=1.60`，
+    而三判据全过。EXP-25 进一步证明 PML 内的监视器照样返回数据，所以这个闸是
+    唯一能在「数值已经不对」之前拦住的地方。
+    """
+    rep = monitor_domain_report(fdtd, gap)
+    bad = [r for r in rep if r["status"] != "ok"]
+    if verbose:
+        for r in rep:
+            if r["status"] != "ok":
+                print(f"[域闸门] {r['name']} ({r.get('type')}) -> {r['status']}")
+    if bad:
+        detail = "; ".join(
+            "%s=%s" % (r["name"], r["status"]) for r in bad)
+        raise RuntimeError(
+            f"监视器与 FDTD 边界不足 {gap * 1e6:.3f} um（或已在盒外）: {detail}。"
+            f"PML 内仍会返回数据但非物理，必须先扩大盒子或内移监视器"
+        )
+    return {"monitors": len(rep), "bad": 0}
+
+
+def assert_has_results(fdtd, monitors, verbose: bool = True) -> dict:
+    """第四判据：`getresult` 必须至少返回一个非空数据集。
+
+    前三判据只证明「引擎跑过」，不证明「有结果」——盒子抬到 4 m 时
+    layoutmode=0、有 _p0.log、有 Completed，但 `getresult` 报
+    `Can not find result 'T'`（EXP-24 实测）。
+    """
+    got, failed = {}, {}
+    for name in monitors:
+        try:
+            raw = fdtd.getresult(name, "T")
+            item = raw[0] if isinstance(raw, (list, tuple)) else raw
+            arr = item["T"] if isinstance(item, dict) else item
+            n = int(getattr(__import__("numpy").asarray(arr), "size", 0))
+            (got if n else failed).__setitem__(name, n)
+        except Exception as e:                   # noqa: BLE001
+            failed[name] = "%s: %s" % (type(e).__name__, str(e).splitlines()[0][:80])
+    if verbose:
+        for k, v in got.items():
+            print(f"   结果 {k}: {v} 点")
+        for k, v in failed.items():
+            print(f"   [空] {k}: {v}")
+    if not got:
+        raise RuntimeError(
+            "所有监视器都没有返回数据（getresult 全空）→ 监视器可能在盒外，"
+            "或 run 之后没有把结果写回工程: %s" % failed)
+    return {"ok": got, "empty": failed}
+
+
+def assert_ran(fdtd, fsp_path, verbose: bool = True, monitors=None) -> bool:
+    """确认"仿真真的算了，而且留下了可用于计算的数"。任一不过就抛异常。
 
     ① layoutmode == 0.0    （1.0 = 还在 layout，即 run() 静默失效）
     ② 存在 <工程名>_p0.log （引擎真的被拉起来）
     ③ 日志含 'Completed'   （算到底了）
+    ④ 传了 monitors 时：`getresult` 至少一个非空（EXP-24：前三项全过但结果为空）
 
-    另会扫 'diverging' —— 发散是"不报错的错"，只看到 R=0 很容易误判。
+    另会扫 'diverging' 与 'outside the simulation' —— 都是"不报错的错"。
     """
     # ① 模式
     fdtd.eval("lm = layoutmode;")
@@ -163,6 +274,11 @@ def assert_ran(fdtd, fsp_path, verbose: bool = True) -> bool:
             f"{log.name} 出现 diverging（场发散）→ "
             f"dt stability factor 0.99→0.95，或改 CPU 双精度（SKILL.md §6.3）"
         )
+    outside = [ln.strip() for ln in txt.splitlines() if "outside the simulation" in ln]
+    if outside:
+        raise RuntimeError(
+            f"{log.name} 报「{outside[0][:90]}」→ 有对象在仿真盒外，它不会记录数据。"
+            f"这仍会显示 Completed / layoutmode=0（EXP-24 实测），所以必须在这里拦。")
 
     if verbose:
         for line in txt.splitlines():
@@ -170,6 +286,8 @@ def assert_ran(fdtd, fsp_path, verbose: bool = True) -> bool:
                 print("   网格:", line.split(":")[-1].strip())
             if "total iterations" in line:
                 print("   迭代:", line.strip())
+    if monitors:
+        assert_has_results(fdtd, list(monitors), verbose=verbose)
     return True
 
 

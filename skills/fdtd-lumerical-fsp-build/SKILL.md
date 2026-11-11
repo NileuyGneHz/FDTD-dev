@@ -1,4 +1,4 @@
----
+﻿---
 name: fdtd-lumerical-fsp-build
 description: >
   从 JSON model spec 一键生成 Lumerical FDTD 工程（.fsp），**不跑仿真**。
@@ -53,7 +53,7 @@ python skills/fdtd-lumerical-fsp-build/scripts/build_fsp.py \
    不许"反正差 10%、可以解释"就放行（EXP-43 的两个 mismatch 正是这么被抓到的）。
 3. **石墨烯只走 1 nm box**（D-2）。`2drect` + 石墨烯材料必然报
    `value supplied is not acceptable for the property 'material'`；这不是 bug，是对象类型限制。
-4. **不要复制 builder 进来**。改行为请改 `_shared/fsp_build.py`，两个调用方（本技能与
+4. **不要复制 builder 进来**。改行为请改 `library/py/fsp_build.py`，两个调用方（本技能与
    `run_fdtd_sweep.py`）必须始终指向同一份实现。
 
 ## 4. 三条硬规则
@@ -62,7 +62,7 @@ python skills/fdtd-lumerical-fsp-build/scripts/build_fsp.py \
    mesh accuracy 与 spec 求值结果比对，容差 `max(1e-9, |值|·1e-9)`。不一致就 exit 1。
    事件：EXP-43 把 spec 里 `l` 改大 10%，`--check` 报出
    `cross_x x span expected=1.87e-06 actual=1.7e-06`（两处），exit 1。
-2. **不要把 builder 复制进本技能**。实现在 `_shared/fsp_build.py`，本技能只是 CLI 外壳；
+2. **不要把 builder 复制进本技能**。实现在 `library/py/fsp_build.py`，本技能只是 CLI 外壳；
    `run_fdtd_sweep.py` 也 import 同一份。D-005 / D-006 / EXP-02 三次事故都是"复制一份再各自改"。
 3. **石墨烯只走 1 nm box**（D-2）。2D 面对象不接受任意材料：`2drect` 只支持 RLC / PEC /
    2D 材料表，给石墨烯会报 `value supplied is not acceptable for the property 'material'`。
@@ -188,7 +188,7 @@ inspect_fsp.py --config <cfg> --out ... --json        # 对象树 / 材料 / 存
 | 文件 | 什么时候读 |
 |---|---|
 | `references/spec_extensions.md` | 写新材料 / 新监视器 / 频域源之前；含每条的读回证据与坑 |
-| `_shared/fsp_build.py` | 要改建模行为时（唯一实现） |
+| `library/py/fsp_build.py` | 要改建模行为时（唯一实现） |
 | `skills/fdtd-lumerical-fsp-introspection/SKILL.md` | 建完要核对对象树 / 材料 / 存谱时 |
 
 按需加载：只有写扩展字段时才读 references；只建 P01 这类旧 schema 的单胞不需要。
@@ -198,7 +198,7 @@ inspect_fsp.py --config <cfg> --out ... --json        # 对象树 / 材料 / 存
 | 文件 | 用途 |
 |---|---|
 | `scripts/build_fsp.py` | 本技能唯一入口（build / check） |
-| `_shared/fsp_build.py` | 唯一 builder 实现（材料 / 几何 / 阵列 / 求解区 / 源 / 监视器） |
+| `library/py/fsp_build.py` | 唯一 builder 实现（材料 / 几何 / 阵列 / 求解区 / 源 / 监视器） |
 | `references/spec_extensions.md` | 扩展字段的完整取值与读回证据 |
 | `skills/fdtd-metasurface-assembly/SKILL.md` | 从相位 CSV 装配 array spec 时 |
 | `skills/fdtd-lumerical-fsp-introspection/scripts/inspect_fsp.py` | 建完反解析核对 |

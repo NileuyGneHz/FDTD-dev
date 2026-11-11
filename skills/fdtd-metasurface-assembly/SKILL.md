@@ -1,4 +1,4 @@
----
+﻿---
 name: fdtd-metasurface-assembly
 description: >
   把 fdtd-holo-phase-retrieval 产出的量化相位版图（quantized_phase*.csv）+ 单元库
@@ -101,7 +101,7 @@ python skills/fdtd-metasurface-assembly/scripts/assemble_spec.py \
 | 文件 | 什么时候读 |
 |---|---|
 | `skills/fdtd-lumerical-fsp-build/SKILL.md` §array | 要手写 array spec / 改 check 行为时 |
-| `_shared/fsp_build.py`（`array_cells` / `array_plan`） | 要理解行主序与作用域注入时 |
+| `library/py/fsp_build.py`（`array_cells` / `array_plan`） | 要理解行主序与作用域注入时 |
 | `skills/fdtd-holo-phase-retrieval/SKILL.md` | 要重新生成相位 CSV 时 |
 
 ## 9. 相关文件

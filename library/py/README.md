@@ -1,6 +1,8 @@
-# _shared — 跨包共享工具
+# library/py — 跨包共享模块
 
 > 只放**两个以上包**会用到的东西。单包专用的脚本留在该包 `scripts\` 内。
+> **本目录是共享模块的唯一实现位置**（2026-11-11 从 `_shared/` 迁入，
+> 见 `docs/constitution/workspace-layout.md` §10 与 `library/AGENTS.md` 约束 5）。
 
 ---
 
@@ -12,7 +14,7 @@ FDTD 会话与校验的共享工具。把 `SKILL.md` §8.4 的实测片段固化
 
 ```python
 import sys
-sys.path.insert(0, r"F:\Lumercial_WS\FDTD_WS\_shared")
+sys.path.insert(0, r"F:\Lumercial_WS\FDTD_WS\library\py")
 from lumapi_common import setup_env, open_fdtd, ascii_gate, assert_ran, verify_and_run
 
 setup_env()                                  # 设置 license + import lumapi

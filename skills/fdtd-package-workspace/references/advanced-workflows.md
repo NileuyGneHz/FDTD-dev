@@ -10,7 +10,8 @@
 
 ## Workflow D: batch-migrate a course/paper directory into packages
 
-A complete implementation already exists in `scripts/migrate_classes_to_packages.py`. Key design points:
+A complete implementation already exists in `tools/migrate_classes_to_packages.py`
+(repo-level tool — **do not copy it into `scripts/`**, see D-006). Key design points:
 
 1. **`LECTURE_TO_PKG` mapping table**: lecture number (`041`) → package ID. The lecture is identified
    from the first three digits of a path part.
@@ -73,7 +74,7 @@ The right way to restructure is **machine-assisted relocation, not hand-copying*
    separator" and assert that each one appears in the new file; every reported difference **must be
    explained individually** (on this project all 8 differences were intentionally fixed references).
 5. **Zero out the side effects**: after renumbering, `grep` the whole repo for old anchors (including
-   `.py` docstrings, `_shared\`, and the copies under `skills\`), fix them all and re-sync
+   `.py` docstrings, `library\py\`, and the copies under `skills\`), fix them all and re-sync
    the copies; **the number of leftover old-style anchors must be 0**.
 6. **Archiving discipline**: once the chapter scheme is settled, write it into the "maintenance
    conventions" at the end of the document and **stop appending "·补"-style sections**.
@@ -176,7 +177,7 @@ prerequisite physics it exercises, not just an answer.
    they also occasionally "tidy" a value; the cheapest guard is a keyword sweep over the source for
    every figure they quote.
 
-5. **Update the maps.** `packages\PACKAGES.md` (the per-package inventory row + a short note that
+5. **Update the maps.** `cases\INDEX.md` (the per-package inventory row + a short note that
    every package now carries `自测题_5问.md`), and the package `README.md` if its paper list or
    target figure changed.
 

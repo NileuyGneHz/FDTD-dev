@@ -10,9 +10,15 @@
 ├─ paper/        论文 PDF + 补充材料（只读）
 ├─ model/        .fsp + .lsf + spec_<id>.json
 ├─ config/       sweep_*.json / run_*.json（只有参数）
-├─ results/      csv / 图 / report.md / _p0.log
+├─ results/      单元轨原始产物：csv / .fsp / _p0.log / 单次运行子目录
 └─ notes/        踩坑、口径差异、待问作者
 ```
+
+> **`results/` 是双轨制的一半**（2026-11-11 裁定）。本单元内的 `results/` 只放**原始产物**：
+> 与 `model/` 里某次运行一一对应的 `.fsp`、`_p0.log`、`point_*.csv`、`summary.csv`。
+> 要横向比、进报告与图的交付物（`.png`、汇总表、`repro_report.md`）进
+> 根级 `results/<PkgID>_<ShortTitle>/<YYYY-MM-DD>/`，**不放这里**。
+> 分工与判据见 `path-conventions.md` §6.0。
 
 ## 逐项规则
 
@@ -22,7 +28,7 @@
 | `paper/` | ✅ | 不改名、不移动、不改内容；命名 `<AuthorYear>_<Journal>.pdf` |
 | `model/` | ✅ | **路径纯 ASCII**；`.fsp` 是状态、`.lsf` 是源、spec 是参数，三者同放，不许二选一 |
 | `config/` | ○ | 只有参数，没有逻辑；脚本从它读输入 |
-| `results/` | ○ | 一次运行一个子目录；必须有 `_p0.log` 才能声称"算过" |
+| `results/` | ○ | 单元轨：一次运行一个子目录；必须有 `_p0.log` 才能声称"算过"；**不要求** `index.json`。子目录名不做格式约束，但根下不许平铺文件 |
 | `notes/` | ○ | 写"还没定论的东西"；每条最终收敛成 `defects/D-xxx` |
 
 ## 四条禁止

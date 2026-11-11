@@ -11,6 +11,16 @@
 | `handoff.md` | 当前未完成的事：卡在哪、下一步、涉及哪个单元 |
 | `<YYYY-MM-DD>.md` | 当天会话流水：做了什么、试了什么、为什么放弃 |
 
+**`MEMORY.md` 不在这里**（2026-11-11 订正）。长期记忆分两处，都属**宿主侧**：
+
+| 位置 | 内容 | 入库 |
+|---|---|---|
+| `.workbuddy/memory/` | WorkBuddy 会话记忆（`MEMORY.md` + 每日文件） | ❌ gitignored |
+| `agents/<role>/memory/` | 角色包私产（`known-issues.md` / `materials.md` / `conventions`） | ✅ |
+
+`docs/constitution/workspace-layout.md` §3 曾把 `MEMORY.md` 列在 `journal/` 下，
+是 2026-11-06 建仓时的笔误——`journal/` 从建仓起就没有这个文件。已同轮改正。
+
 ## 每条日志的结构
 
 ```md

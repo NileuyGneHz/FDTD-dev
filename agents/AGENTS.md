@@ -31,3 +31,8 @@
 3. **`memory/` 只记实测**。没跑过的结论不许写进 `known-issues.md`。
 4. **技能与 memory 冲突时，信 memory 里的实测证据**，并在同一轮修技能。
 5. `evals/` 每条必须写"禁止动作"——只写"应该做什么"测不出退化。
+6. **已复现的坑归 `defects/`，memory 只留未定论**（2026-11-11 新增）。
+   `defects/AGENTS.md` 第 4 条已禁止"两处各写一份"，本条把它落到 memory 侧：
+   - 坑一旦被复现并定性 → 开 `D-xxx`，`known-issues.md` 里只留一行指针
+   - 只观察到现象、还没定性 → 留在 `known-issues.md`，标 `[未立项]`
+   - 判据：`known-issues.md` 的每一条，要么有 `D-xxx` 指针，要么带 `[未立项]` 标记

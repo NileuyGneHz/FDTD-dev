@@ -1,4 +1,4 @@
-# FDTD_WS 结构规范（修订版 v3）
+﻿# FDTD_WS 结构规范（修订版 v3）
 
 版本：2026-11-06。本文是工作区的**唯一结构定义**：搬目录之前先改本文，再改磁盘。
 
@@ -46,16 +46,20 @@ FDTD_WS\                          ★ 所有会话都从这里打开
 │  ├─ product-context\README.md       L1 给谁做、解决什么、首版范围、非目标
 │  ├─ constitution\                   L2
 │  │  ├─ field-manual.md              Lumerical v251 八章正文（唯一技术正文）
-│  │  ├─ path-conventions.md          工作根 / ASCII / 零外写 / 体积红线
+│  │  ├─ workspace-layout.md          本文：全景结构 / 脚本归属 / 双宿主接入
+│  │  ├─ path-conventions.md          工作根 / ASCII / 零外写 / 体积红线 / results 双轨
 │  │  ├─ naming.md                    包·技能·角色·缺陷·任务 命名表
 │  │  ├─ archive-contract.md          一个归档单元必须有什么
 │  │  ├─ script-contract.md           脚本归属与 CLI 契约
-│  │  └─ host-integration.md          DSH / WorkBuddy 接入事实与风险
+│  │  ├─ skill-change-contract.md     技能怎么加/改/禁止/回归
+│  │  ├─ reproduction-contract.md     复现口径 / 证据 / 训练语料
+│  │  ├─ collaboration-charter.md     协作章程（原 agent.md）
+│  │  ├─ host-integration.md          DSH / WorkBuddy 接入事实与风险
+│  │  └─ workbuddy-skill-rules.md     WorkBuddy 技能发现规则（源码级）
 │  ├─ features\specs\                 L3 FEAT-xxx 能力验收
-│  ├─ features\feature-v1\            首版能力地图
 │  ├─ plans\                          L4 有日期的方案
 │  ├─ tasks\{active,recent,archive}\  L5 动作拆分
-│  └─ api\                            Lumerical API 索引（指向技能 references）
+│  └─ api\                            外部接口索引（指向 field-manual 与技能 SKILL.md，不复制）
 │
 ├─ cases\                         ── 【只读】10 个已完成复现
 │  ├─ INDEX.md                        十行表：ID/主题/论文/结论/可复用点
@@ -68,7 +72,7 @@ FDTD_WS\                          ★ 所有会话都从这里打开
 │
 ├─ library\                       ── 跨课题复用（只增不改）
 │  ├─ materials\                      材料模型：名称 + 参数 + cite
-│  ├─ py\                             纯函数模块（无 __main__），被技能脚本 import
+│  ├─ py\                             纯模块（无 argparse CLI），被技能脚本 import
 │  ├─ schemas\                        spec / sweep 的 JSON Schema 与校验器
 │  └─ figs\                           图样式、配色、导出预设
 │
@@ -95,11 +99,18 @@ FDTD_WS\                          ★ 所有会话都从这里打开
 │  ├─ check_packages.py               归档单元自检
 │  ├─ check_scripts.py                包内出现 .py → FAIL
 │  ├─ check_git_limits.py             提交前体积体检
+│  ├─ check_skill_contract.py         技能内容契约 K1–K17
+│  ├─ check_reproduction.py           复现卡 R1–R13 + R14 + R16
+│  ├─ check_acceptance.py             验收表 config/acceptance.json
+│  ├─ check_results_layout.py         results 双轨落位（--also-cases 查单元轨）
+│  ├─ check_experiments.py            逐项实验台账 D1–D5
+│  ├─ probe_gpu_eligibility.py        每个 .fsp 的 GPU/CPU 资格判定
+│  ├─ migrate_classes_to_packages.py  课程素材 → 包内的搬迁脚本（含改名映射）
 │  ├─ skills-wire.py                  重建两处入口 junction
 │  └─ skills-doctor.py                六项风险一次查完
 │
 ├─ defects\                       D-xxx：根因 / 修复 / 验证
-├─ journal\                       会话交接：handoff.md、<date>.md、MEMORY.md
+├─ journal\                       会话交接：handoff.md、<date>.md（MEMORY.md 属宿主侧，不在此）
 ├─ iterations\iter-1-foundation\  RELEASE / acceptance / runtime-contract
 ├─ _scratch\                      一次性脚本、中间 .fsp、日志（gitignore）
 └─ _archive\                      课程素材、历史日志（gitignore）
@@ -140,7 +151,9 @@ P01_Absorber_Liu2010\
 | **模型脚本**（`.lsf`） | 单元内 `model\` | 它是 `.fsp` 的可读源，必须同放；由 `run_lsf.py` 统一执行 |
 | **一次性脚本** | `_scratch\` | 只服务一次，不进包、不入库 |
 
-**纯模块**（`lumapi_common.py` 这类，无 `__main__`）放 `library\py\`，被技能脚本 import，不直接运行。
+**纯模块**（`lumapi_common.py` 这类，无 argparse CLI 入口，可带 `__main__` 自测块）
+放 `library\py\`，被技能脚本 import，不直接运行。`library\py\` 是共享模块的**唯一实现位置**；
+技能目录下只允许放转发壳（`runpy` 注入，找不到就 ImportError），绝不复制实现。
 
 ### 5.1 CLI 契约
 
@@ -282,9 +295,11 @@ agents\<name>\
 | 根 `SKILL.md` | `docs\constitution\field-manual.md`（同轮改三处指针） |
 | `agent.md` | `AGENTS.md` |
 | `WhaleNote.md` / 两个 Log | `journal\handoff.md` + `journal\<date>.md` |
-| `_shared\lumapi_common.py` | `library\py\` |
-| `typora-user-images\` | `docs\assets\` |
-| `course_media\` | `_archive\course_media\`（gitignore） |
+| `_shared\lumapi_common.py` | `library\py\` ✅ **已完成（2026-11-11）** |
+| `_shared\fsp_build.py` | `library\py\` ✅ **已完成（2026-11-11）** |
+| `_shared\README.md` | `library\py\README.md` ✅ **已完成（2026-11-11）** |
+| `typora-user-images\` | `docs\assets\` ✅ **已完成（2026-11-11）** |
+| `course_media\` | `_archive\course_media\`（gitignore） ✅ **已完成（2026-11-11）** |
 | `skills\` `agents\` 两处入口 | 不动，补 `INDEX.md` 与 `_TEMPLATE` |
 
 ---

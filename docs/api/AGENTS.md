@@ -6,11 +6,16 @@
 
 ## 内容
 
-| 对象 | 索引指向 |
-|---|---|
-| Lumerical `lumapi` | `skills/fdtd-lumerical-headless/references/`（属性名、材料类型、结果布局） |
-| Python 运行时 | `docs/constitution/path-conventions.md`（托管解释器路径） |
-| 宿主接口 | `docs/constitution/host-integration.md`（DSH / WorkBuddy 扫描规则） |
+| 对象 | 索引指向 | 版本 |
+|---|---|---|
+| Lumerical `lumapi`（属性名、材料类型、结果布局） | `docs/constitution/field-manual.md`（八章技术正文，唯一权威） | `v251` |
+| Lumerical 会话生命周期 / `.lsf` 执行 | `skills/fdtd-lumerical-headless/SKILL.md`（该技能**只有** `SKILL.md` + `scripts/`，无 `references/`） | `v251` |
+| Python 运行时（托管解释器路径） | `docs/constitution/path-conventions.md` §2 | — |
+| 宿主接口（DSH / WorkBuddy 扫描规则） | `docs/constitution/host-integration.md` | — |
+
+> 2026-11-11 订正：本表原先指向 `skills/fdtd-lumerical-headless/references/`，
+> 但该目录**不存在**（实测该技能下只有 `SKILL.md` 与 `scripts/run_lsf.py`）。
+> 指向不存在的路径比不写更糟——读者会以为是自己找错了地方。
 
 ## 约束
 

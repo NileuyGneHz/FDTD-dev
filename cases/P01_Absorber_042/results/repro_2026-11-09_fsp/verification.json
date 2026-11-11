@@ -1,0 +1,32 @@
+{
+  "fsp": "F:\\Lumercial_WS\\FDTD_WS\\cases\\P01_Absorber_042\\results\\repro_2026-11-09_fsp\\P01_Absorber_042_repro.fsp",
+  "backup": "F:\\Lumercial_WS\\FDTD_WS\\_scratch\\p01_repro\\P01_Absorber_042_repro_build_only_backup.fsp",
+  "layoutmode_before": 1.0,
+  "metrics": {
+    "lambda_range_um": [
+      3.999999999999999,
+      8.5
+    ],
+    "n_points": 91,
+    "peak_A": 0.8069379708102874,
+    "peak_lambda_um": 5.85,
+    "R_at_peak": 0.19307334518646568,
+    "T_at_peak": -1.1315996753131341e-05,
+    "fwhm_um": 0.8000000000000007,
+    "T_max_abs": 1.3979192877603948e-05,
+    "max_energy_residual": 1.1102230246251565e-16,
+    "A_at_4um": 0.04163483818455652,
+    "A_at_6um": 0.7146729907627982,
+    "A_at_10um": null
+  },
+  "layoutmode_after_run": 0.0,
+  "saved_results_into_fsp": true,
+  "convergence": {
+    "log_exists": true,
+    "log_bytes": 4942,
+    "final_auto_shutoff": 8.83863e-05,
+    "threshold": 0.0001,
+    "early_termination": true,
+    "converged": true
+  }
+}

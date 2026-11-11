@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "fsp": "F:\\Lumercial_WS\\FDTD_WS\\cases\\P01_Absorber_042\\results\\repro_2026-11-09_fsp\\P01_Absorber_042_repro.fsp",
+  "bytes": 478368,
+  "wall_s": 7.53,
+  "layoutmode": 1.0,
+  "p0_log": false,
+  "spec_sha256": "f81e0285d7a18a99",
+  "monitors": [
+    {
+      "name": "R",
+      "kind": "power",
+      "z": 2.225e-06
+    },
+    {
+      "name": "T",
+      "kind": "power",
+      "z": -2.8850000000000003e-06
+    },
+    {
+      "name": "E_spacer",
+      "kind": "field",
+      "z": -9.25e-08
+    },
+    {
+      "name": "nidx_spacer",
+      "kind": "index",
+      "z": -9.25e-08
+    }
+  ],
+  "wavelength_range": [
+    4e-06,
+    8.5e-06
+  ],
+  "z_range": [
+    -3.285e-06,
+    2.6e-06
+  ],
+  "solves": 0,
+  "check": {
+    "checked": 34,
+    "mismatches": 0
+  }
+}

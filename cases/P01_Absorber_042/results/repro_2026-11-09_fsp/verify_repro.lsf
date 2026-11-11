@@ -1,0 +1,100 @@
+# =====================================================================
+# P01_Absorber_042_repro - verification script (Lumerical FDTD script)
+# ---------------------------------------------------------------------
+# HOW TO USE
+#   Open P01_Absorber_042_repro.fsp in Lumerical FDTD, then open this
+#   .lsf in the Script File Editor and press Run (or paste into the
+#   Script Prompt). The delivered .fsp already contains stored results.
+#
+# ACCEPTANCE POLICY (human verdict 2026-11-09, Q4 closed)
+#   The Lumerical ~0.82 baseline is the PASS/FAIL gate.
+#   The paper's 0.97 (CST Microwave Studio 2009 + experiment) is a
+#   REFERENCE ONLY: its solver gap is reported, never used as a gate.
+#   Do not retune l / w / a / ts to reach 0.97 - that is a fit.
+#
+# Variables are left in the workspace so headless callers can read them
+# back with getv("peak_A") etc.
+# =====================================================================
+
+Rres = getresult("R", "T");
+Tres = getresult("T", "T");
+lam_um = Rres.lambda * 1e6;
+R = Rres.T;
+T = Tres.T;
+A = 1 - R - T;
+
+peak_A = max(A);
+ipk = find(A == peak_A, 1);
+peak_lam_um = lam_um(ipk);
+R_at_peak = R(ipk);
+T_at_peak = T(ipk);
+
+half = find(A >= peak_A/2);
+fwhm_um = lam_um(half(length(half))) - lam_um(half(1));
+
+T_max_abs = max(abs(T));
+energy_residual = max(abs(R + T + A - 1));
+
+i4 = find(abs(lam_um - 4.0) == min(abs(lam_um - 4.0)), 1);
+A_at_4um = A(i4);
+i6 = find(abs(lam_um - 6.0) == min(abs(lam_um - 6.0)), 1);
+A_at_6um = A(i6);
+
+# ---- ACCEPTANCE GATE: human verdict 2026-11-09 ----
+accept_peak_A = 0.82;
+accept_peak_A_tol = 0.02;
+accept_peak_lam_um = 5.85;
+accept_peak_lam_tol = 0.30;
+
+# ---- paper reference: informational only, NOT a gate ----
+paper_peak_A = 0.97;
+paper_peak_lam_um = 6.0;
+paper_fwhm_um = 1.0;
+paper_R_at_peak = 0.03;
+paper_T = 0.0;
+paper_A_at_4um = 0.10;
+
+? "=== P01 reproduction check ===";
+? "peak A          = " + num2str(peak_A) + "     accepted 0.82 +/- 0.02";
+? "peak lambda(um) = " + num2str(peak_lam_um) + "     accepted 5.85 +/- 0.30";
+? "R at peak       = " + num2str(R_at_peak);
+? "T at peak       = " + num2str(T_at_peak);
+? "FWHM (um)       = " + num2str(fwhm_um);
+? "A at 4 um       = " + num2str(A_at_4um);
+? "A at 6 um       = " + num2str(A_at_6um);
+? "max |T|         = " + num2str(T_max_abs);
+? "|R+T+A-1| max   = " + num2str(energy_residual);
+
+? "--- acceptance gate (human verdict 2026-11-09) ---";
+if (abs(peak_A - accept_peak_A) <= accept_peak_A_tol) {
+  ? "PASS  C1 : peak A inside accepted Lumerical baseline 0.82 +/- 0.02";
+} else {
+  ? "FAIL  C1 : peak A outside accepted Lumerical baseline";
+}
+if (abs(peak_lam_um - accept_peak_lam_um) <= accept_peak_lam_tol) {
+  ? "PASS  C1 : peak wavelength inside 5.85 +/- 0.30 um";
+} else {
+  ? "FAIL  C1 : peak wavelength outside accepted baseline";
+}
+if (T_max_abs < 1e-3) {
+  ? "PASS  C2 : transmission is zero across the band (opaque ground plane)";
+} else {
+  ? "FAIL  C2 : T is not zero";
+}
+if (energy_residual < 1e-3) {
+  ? "PASS  energy conservation R+T+A = 1";
+} else {
+  ? "FAIL  energy conservation";
+}
+
+? "--- paper-side comparison (INFORMATIONAL, not a gate) ---";
+? "INFO  paper A = " + num2str(paper_peak_A) + " @ " + num2str(paper_peak_lam_um) + " um (CST 2009 + experiment)";
+? "INFO  solver gap in peak A = " + num2str(paper_peak_A - peak_A) + " ; annotated, not to be closed by fitting";
+? "INFO  R at peak delta = " + num2str(R_at_peak - paper_R_at_peak) + " (paper " + num2str(paper_R_at_peak) + ")";
+? "INFO  FWHM = " + num2str(fwhm_um) + " vs paper " + num2str(paper_fwhm_um) + " um";
+? "INFO  A at 4 um = " + num2str(A_at_4um) + " vs paper " + num2str(paper_A_at_4um);
+
+? "--- not checkable inside this unit-cell project ---";
+? "C6 effective eps/mu inversion (Fig.3), C7 per-layer loss density (Fig.4),";
+? "C8 UCA/UCB graded absorber imaging (Fig.5), A(10 um) - source stops at 8.5 um.";
+? "See repro_report_2026-11-09.md and skill_gap_backlog.md.";

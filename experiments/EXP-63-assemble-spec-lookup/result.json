@@ -1,0 +1,22 @@
+{
+  "exp": "EXP-63",
+  "verdict": "pass",
+  "metrics": {
+    "self_test": "18/18",
+    "row_major_first_cell_level": 0,
+    "row_major_last_cell_level": 0,
+    "pitch_inferred_um": [0.5, 0.5],
+    "cell_params_len_3x3": 9,
+    "distinct_params_3x3": 8,
+    "missing_level_error_names_levels_and_counts": true,
+    "duplicate_coord_rejected": true,
+    "upsample_rejected": true,
+    "noninteger_stride_rejected": true,
+    "nonuniform_grid_rejected": true,
+    "aniso_pitch_split_axes": true
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "哑库（只有 level 0）必须报缺档且列出缺失 level 与出现次数；若查表退化成'取第一条'，第 13 条（9 格 ≥8 种参数）与第 17 条会失败——两条判据分别卡'有 9 条'与'每条对不对'两个方向"
+  }
+}

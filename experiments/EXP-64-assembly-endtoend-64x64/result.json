@@ -1,0 +1,24 @@
+{
+  "exp": "EXP-64",
+  "verdict": "pass",
+  "metrics": {
+    "mode": "crop（判据偏差追记：stride 会把 0.4 µm 单元周期拉成 1.6 µm，产生的是光栅不是超表面；见 PLAN §9 追记）",
+    "cells": 4096,
+    "pitch_um": 0.4,
+    "aperture_um": 25.6,
+    "source_grid": [256, 256],
+    "crop_window": "中心 64x64，stride=[1,1]",
+    "build_wall_s": 383.41,
+    "fsp_bytes": 6858045,
+    "layoutmode": 1.0,
+    "p0_log": false,
+    "check_checked": 12298,
+    "check_mismatches": 0,
+    "check_coverage_note": "ellipse 单元建成 polygon 后引擎侧无 x/y/x span/y span 属性（几何在 vertices），check 诚实降级为只断 z/z span；box 模板的逐格尺寸断言由 EXP-61 的 3x3 覆盖",
+    "hard_limit_rejection_exit": 1
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "256x256 全量（65536 格）必须报错退出：实 Hard 上限 _HARD_LIMIT_CELLS=8192，实测 exit=1，错误信息指向 --mode crop 降规模。此前的第一版判据（stride 降采样到 64x64）会在物理上产生 1.6 µm 周期的光栅，被当场否掉并追记到 PLAN §9"
+  }
+}

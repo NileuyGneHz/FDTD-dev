@@ -62,6 +62,57 @@ skills:
     hands_to: fdtd-lumerical-session-control
     note: on-demand only; do not add to load_order; no adjoint / topology optimization (L1 non-goal)
 
+  - id: fdtd-holo-phase-retrieval
+    path: ../../skills/fdtd-holo-phase-retrieval
+    stage: 1.8
+    load_when:
+      - a metasurface hologram / metalens task has a target intensity image but no phase map yet
+      - a phase library must be quantised to 2/4/8 levels before array assembly
+      - asked "what phase should each cell carry for this image?"
+    consumes: target intensity image (png/npz) + sampling parameters (n / pad / dx / lambda / z)
+    produces: phase_map.npz, quantized_phase*.csv, holo_metrics.json, library_map.json
+    exit_criteria:
+      - metrics.rmse is reported with the relative-L2 definition (never RMS)
+      - quantised Strehl <= 1 and strehl/sinc^2 within the reported margin
+      - --self-test is 15/15 (positive control + ablation negative control included)
+    hands_to: fdtd-lumerical-figure
+    note: >-
+      design-side only: no lumapi, no .fsp, no array assembly. Opposite direction to
+      fdtd-lumerical-phase-retrieval (stage 4), which EXTRACTS dphi from simulated fields.
+
+  - id: fdtd-metasurface-assembly
+    path: ../../skills/fdtd-metasurface-assembly
+    stage: 1.9
+    load_when:
+      - a quantised phase map (quantized_phase*.csv) exists and a full metasurface spec is wanted
+      - the unit-cell library is missing a phase level and the gap must be named, not guessed
+      - asked "turn this phase CSV into per-cell geometry"
+    consumes: quantized_phase*.csv + library_map.json + geometry.json
+    produces: spec_meta.json (fsp-build array spec, cell_params per cell)
+    exit_criteria:
+      - --self-test is 20/20 (lookup, missing-level, crop/stride, duplicate-coord included)
+      - assembly mode is recorded in meta.assembled_from (no silent subsampling)
+      - missing library levels raise with level list AND occurrence counts
+    hands_to: fdtd-lumerical-fsp-build
+    note: >-
+      lookup only: no lumapi, no phase inversion, no library calibration. crop mode keeps the
+      unit period; stride mode magnifies it (raster, not metasurface) and is recorded as such.
+
+  - id: fdtd-lumerical-fsp-build
+    path: ../../skills/fdtd-lumerical-fsp-build
+    stage: 2
+    load_when:
+      - a validated spec exists but only the .fsp is wanted (hand-off, review, or a later run)
+      - the model needs field / index monitors, a frequency-domain source, or a graphene slab
+      - someone must check that an existing .fsp matches its spec
+    consumes: spec_<id>.json
+    produces: <tag>.fsp, <tag>_build.json (no _p0.log, layoutmode stays 1)
+    exit_criteria:
+      - build exits 0 and the .fsp exists with layoutmode == 1
+      - --check reports 0 mismatches against the spec
+    hands_to: fdtd-lumerical-unitcell-simulation
+    note: build-only by design; dimension "2D" is not supported yet (defects/D-008)
+
   - id: fdtd-lumerical-unitcell-simulation
     path: ../../skills/fdtd-lumerical-unitcell-simulation
     stage: 2
@@ -75,7 +126,55 @@ skills:
     exit_criteria:
       - final Auto Shutoff below the configured threshold
       - mesh refined once with the answer moving less than the target tolerance
-    hands_to: report writing (assets/report_template.md)
+    hands_to: fdtd-lumerical-figure
+
+  - id: fdtd-lumerical-phase-retrieval
+    path: ../../skills/fdtd-lumerical-phase-retrieval
+    stage: 4
+    load_when:
+      - the deliverable is a wave plate / polarization device, so phi_x - phi_y IS the result
+      - power spectra already exist but the acceptance target is a phase difference
+      - two polarizations were simulated separately and the phase must be differenced on one plane
+    consumes: spec_<id>.json + polarization setting (+ the two E-field monitors it asks for)
+    produces: phase.csv, dphi_deg (per point, modulo 2*pi, convention stated in the header)
+    exit_criteria:
+      - both polarizations read the same monitor plane, so the common propagation phase cancels
+      - the empty-structure control gives dphi = 0 (mod 360 deg) before any device number is used
+    hands_to: fdtd-lumerical-figure
+    note: >-
+      conditional stage 4 — insert it between 2/3 and 5 only when the target quantity is a phase.
+      Power-only reproductions go unitcell -> figure directly; loading this then is a false step.
+
+  - id: fdtd-lumerical-field-map
+    path: ../../skills/fdtd-lumerical-field-map
+    stage: 3.5
+    load_when:
+      - the acceptance quantity lives in the field, not in R/T (focal length, focal spot, phase profile, OAM charge, exit angle)
+      - a metalens / vortex / anomalous-reflection reproduction needs numbers rather than a picture
+      - a field monitor was already dumped and must be turned into auditable scalars
+    consumes: field monitor (.fsp or a format=npz dump) + optional background group
+    produces: field_metrics.json, field_map.npz, focus/phase/kspace csv
+    exit_criteria:
+      - axes.prop and freq.index are reported and match the monitor's normal / requested wavelength
+      - off_axis_ratio is checked before any "no focus" claim is made
+      - "|fit_slope| ~ 1 for a designed phase; fit_rms_rad is reported alongside it"
+    hands_to: fdtd-lumerical-figure
+    note: >-
+      compute only, never plots; `figure --kind field` consumes field_map.npz directly.
+      Does not report focusing efficiency (needs incident-power normalisation, stage 2/3).
+
+  - id: fdtd-lumerical-figure
+    path: ../../skills/fdtd-lumerical-figure
+    stage: 5
+    load_when:
+      - data exists (csv / npz / spec) and a figure is needed
+      - the same plot must be regenerated from a ledger instead of copy-pasted code
+    consumes: point_*.csv, phase.csv, field .npz, spec.json
+    produces: "*.png + a meta json carrying every number printed on the figure"
+    exit_criteria:
+      - the script exits 0 and the png is non-empty
+      - every annotated number equals the value in the input data
+    note: zero engine; never build or solve anything here
 
   - id: fdtd-package-workspace
     path: ../../skills/fdtd-package-workspace
@@ -105,3 +204,11 @@ rules:
     exists; never add them to load_order. Reproduce mode must never inject parameters.
   - The X loop decides parameters and executes iterations; it does not build geometry. Building a
     unit cell from a spec remains stage 2 (fdtd-lumerical-unitcell-simulation).
+  - Stage 4 (fdtd-lumerical-phase-retrieval) is CONDITIONAL — insert it between 2/3 and 5 only when
+    the acceptance target is a phase quantity (dphi / phase / polarization state). A power-only
+    reproduction that loads it is doing a false step, and a wave-plate reproduction that skips it
+    will report T ~ 1 on both axes while the device is wrong.
+  - fdtd-lumerical-headless has no row here on purpose, not by omission. It is the cross-cutting
+    base (session lifecycle + .lsf execution via run_lsf.py) that every other skill runs through;
+    it is never a pipeline stage and never enters load_order. Same for the shared library
+    _shared/lumapi_common.py — if you are "loading" it, you are calling it, not staging it.

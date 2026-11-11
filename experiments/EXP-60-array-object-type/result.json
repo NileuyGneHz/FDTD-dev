@@ -1,0 +1,20 @@
+{
+  "exp": "EXP-60",
+  "verdict": "pass",
+  "metrics": {
+    "cells_3x3_handcheck": "9/9",
+    "check_checked": 64,
+    "check_mismatches": 0,
+    "row_major_order_verified": true,
+    "cell_count_mismatch_rejected": true,
+    "cell_label_misalign_rejected": true,
+    "zero_grid_rejected": true,
+    "build_wall_s_3x3": 8.06,
+    "layoutmode": 1.0,
+    "p0_log": false
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "半张 cell_params（1/4 条）被拒绝而非静默补位；标注 i/j 与行主序位置不一致被拒绝（cell_params[0] 写 j=1 应为 j=0）；grid.nx=0 被拒绝"
+  }
+}

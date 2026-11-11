@@ -1,0 +1,19 @@
+{
+  "exp": "EXP-61",
+  "verdict": "pass",
+  "metrics": {
+    "full_assertions_3x3": 64,
+    "good_spec_mismatches": 0,
+    "mutated_spec_mismatches": 1,
+    "mutated_object": "arr_r1c1",
+    "mutated_property": "x span",
+    "mutation_test_M1_centres_only_on_mutated": 0,
+    "mutation_test_M1_meaning": "只断中心的旧检查对尺寸变异不可见",
+    "mutation_test_M2_stripped_cell_params_raises": "NameError: name 'd1' is not defined",
+    "mutation_test_M2_meaning": "逐格参数只可能来自 cell_params，全局表里没有"
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "首次实现只断言格子中心（27 条），改一格 d1 +10% 检查不出（mismatches=0）——该缺陷被负对照当场抓到并修复；修复后同一变异 mismatches=1 且指名 arr_r1c1 的 x span"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "exp": "EXP-65",
+  "verdict": "pass",
+  "metrics": {
+    "check_skill_contract": "合格技能 13 · OK 129 · WARN 0 · FAIL 0（改动前 12 技能 OK 121，分母未缩小）",
+    "skills_doctor": "ALL GREEN（.workbuddy/skills 13 条与技能数一致，经 tools/skills-wire.py --apply 生成接线）",
+    "check_experiments": "EXP-60..64 全 pass 落账（本条即 EXP-65）",
+    "check_scripts": "OK 包内没有 .py",
+    "user_level_junction": "S_ISLNK=False reparse=True，SKILL.md 经链路可读",
+    "self_test_assembly": "20/20"
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "从 skills.yaml 删掉 assembly 条目后 check_skill_contract 报 FAIL：K17 'INDEX 标了数字 stage 但没进编排: fdtd-metasurface-assembly(stage 1.9)'——门禁确实覆盖注册表完整性；恢复条目后四门禁复绿"
+  }
+}

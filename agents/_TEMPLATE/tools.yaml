@@ -1,0 +1,51 @@
+# tools.yaml — what <domain>-<role>-agent may call, and what each call needs first.
+# 每条都必须是**在本机真跑过**的工具；不许写"将来可能用"的东西。
+# 复制本文件 → agents/<name>/tools.yaml，按角色删减。
+
+tools:
+  - id: lumapi_session
+    kind: python-api
+    entry: lumapi.FDTD(hide=True)
+    requires:
+      - ANSYSLMD_LICENSE_FILE=1055@localhost
+      - sys.path includes "F:\Lumercial_WS\ANSYS Inc\v251\Lumerical\api\python"
+      - the Lumerical GUI is closed (it competes for the same seat)
+    gives: an object-model handle; ~3 s to open
+    failure: "Failed to checkout feature 'lumerical_gui'" -> memory/known-issues.md item 1
+    note: always close in a finally block, or the next run inherits a stale seat
+
+  - id: gpu_mode
+    kind: tool-script
+    entry: ../../tools/gpu_mode.py
+    requires: 无（--status 只读；--set 需 GUI 已关闭）
+    gives: 读/切全局 FDTD\GPU-mode（改 ini，不碰 setresource）
+    note: >
+      GPU 是 real32。含 Drude 的工程会在 GPU 上发散且引擎不报错（D-019）。
+      切了必须还原：--set cpu。
+
+  - id: gpu_guard
+    kind: tool-script
+    entry: ../../tools/gpu_guard.py
+    requires: 一个 .fsp（判资格要开会话读对象树）
+    gives: 按资格自动切 GPU/CPU，跑完（含异常）必还原
+    note: gpu_risky 需 --allow-risky 或 --probe-log 才放行
+
+  - id: run_fdtd_sweep
+    kind: skill-script
+    entry: ../../skills/fdtd-lumerical-unitcell-simulation/scripts/run_fdtd_sweep.py
+    requires: a spec that passes validate_spec --strict
+    gives: per-point CSV (lam_um,R,T,A) + summary.csv + the .fsp actually simulated
+
+  - id: check_gates
+    kind: tool-script
+    entry: ../../tools/<check_xxx>.py
+    requires: 无
+    gives: exit 0 = 通过，非 0 = 失败并指名要改哪个文件
+    note: 交付前必须跑；见 tools/AGENTS.md 的清单
+
+# 不允许调用的东西（写清楚为什么）
+denied:
+  - id: setresource
+    reason: 改全局资源配置且持久化；不还原会让 GUI 报 "no active GPU resources"（field-manual §6.3）
+  - id: 任何直接写 cases/ 的操作
+    reason: cases/ 是只读知识资产

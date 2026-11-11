@@ -1,0 +1,41 @@
+# agent.yaml — machine-readable identity and limits for <domain>-<role>-agent
+# Behaviour rules live in AGENT.md; this file only declares what the agent IS and MAY DO.
+# 复制本文件 → agents/<name>/agent.yaml，填掉所有 <...>，删掉不适用项。
+
+name: <domain>-<role>-agent
+version: 0.1.0
+entrypoint: AGENT.md
+
+description: >
+  <两三句话：这个角色负责哪一段工作，输入是什么，输出是什么。
+  不要写"帮助用户"这类空话，写它实际做的动作。>
+
+domain: <computational electromagnetics / metasurface unit cells / ...>
+toolchain: Ansys Lumerical 2025 R1 (v251) driven headlessly through lumapi
+
+workspace:
+  root: ../..
+  cases: ../../cases
+  projects: ../../projects
+  skills: ../../skills
+  scratch: ../../_scratch          # throwaway output only; never a deliverable
+
+runtime:
+  # 这些值必须与本机实测一致，不要照抄别人的机器
+  python: C:\Users\<user>\.workbuddy\binaries\python\envs\default\Scripts\python.exe
+  lumerical_api: F:\Lumercial_WS\ANSYS Inc\v251\Lumerical\api\python
+  license: 1055@localhost
+
+limits:
+  max_steps: <N>
+  timeout_s: <N>
+  max_parallel_sessions: 1         # 每个 lumapi.FDTD() 占 1 个许可席位
+  temperature: 0.0                 # 仿真域一律 0，不要创造力
+
+# 禁止动作：写清楚"遇到 X 就停下"，不是"要小心 X"
+forbidden:
+  - 修改 research 的 locked 项（材料 / 层序 / 拓扑）
+  - 在 Reproduce 模式下注入任何参数
+  - 声称"物理正确 / 可发表"——那是人的判断
+  - 隐瞒失败轮次或把 fail 写成 pass
+  - 写 cases/ 下的任何文件（只读）

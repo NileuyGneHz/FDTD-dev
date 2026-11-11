@@ -1,0 +1,49 @@
+# skills.yaml — which skill to load, when, and what it hands to the next stage.
+# 复制本文件 → agents/<name>/skills.yaml。
+# 约束（由 tools/check_skill_contract.py 机检）：
+#   - path 必须指向含 SKILL.md 的真实技能
+#   - stage 必须与 skills/INDEX.md 一致
+#   - INDEX 里数字 stage 的技能**必须**出现在编排里（K17）
+#   - stage X 的横切能力可以只登记 INDEX，不进 load_order
+
+skills:
+  # ── 主链路：按 stage 顺序，只在需要时加载 ──────────────────────────
+  - id: fdtd-package-workspace
+    path: ../../skills/fdtd-package-workspace
+    stage: 0
+    load_when:
+      - locating a task by package ID
+      - creating a new package from the template
+      - running the packaging self-check
+    consumes: package ID
+    produces: package layout / README / index updates
+    note: not every task needs this; only when the package itself is being created or repaired
+
+  - id: fdtd-paper-parameter-extraction
+    path: ../../skills/fdtd-paper-parameter-extraction
+    stage: 1
+    load_when:
+      - starting from a paper PDF or a new package with no spec yet
+      - a reproduction is off and the inputs themselves are in doubt
+    consumes: paper PDF
+    produces: spec_<id>.json (+ assumptions[], missing[])
+    exit_criteria:
+      - validate_spec.py --strict exits 0
+      - targets[] has at least two quantities
+      - every material carries a cite
+    hands_to: fdtd-lumerical-unitcell-simulation
+
+  # <在此按角色需要补 stage 1.5 / 1.8 / 1.9 / 2 / 3 / 4 / 3.5 / 5 的条目>
+
+load_order: [fdtd-package-workspace, fdtd-paper-parameter-extraction, fdtd-lumerical-unitcell-simulation]
+
+rules:
+  - Never load stage 2 before stage 1 has produced a validated spec, unless the user explicitly
+    supplies one.
+  - Never load all three "just in case" — each carries a different decision model and they compete
+    for attention.
+  - If a skill and memory disagree, trust the measured evidence in memory/known-issues.md and fix
+    the skill in the same turn.
+  - Stage 4 (fdtd-lumerical-phase-retrieval) is CONDITIONAL — insert it between 2/3 and 5 only when
+    the acceptance target is a phase quantity. A power-only reproduction that loads it is doing a
+    false step.

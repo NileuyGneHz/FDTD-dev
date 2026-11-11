@@ -33,3 +33,4 @@
 | 2026-10-01 | `archive\SKILL_old_user_level.bak-20260930.md` | 用户级 skill `lumerical-fdtd-headless` 的旧版快照（40KB，含已被推翻的结论），仅作回溯用 |
 | 2026-10-01 | `archive\_probe_model_script.py` / `archive\_probe_optimization_ns.py` | O&S「model 脚本 → A 结果」诊断的取证脚本（对应 `SKILL.md` §5.4） |
 | 2026-10-01 | `archive\_verify_i18n.py` | 英文化一致性校验：§ 引用是否可解析 / 小节编号是否与中文原版一致 / README 中英章节对齐 / frontmatter 完好。改动文未来再动结构时可复跑 |
+| 2026-11-10 | `llama_cpp_feasibility\cpuid.c` / `mem_bw.py` | 本地 LLM 可行性取证：CPUID 查 SIMD（i7-11800H 支持 AVX2/AVX512/**VNNI**）；多线程 memcpy 实测内存带宽 1T 24.79 → 16T 36.45 GB/s，用来估算 CPU decode 的 tok/s 上限。换机器可重跑 |

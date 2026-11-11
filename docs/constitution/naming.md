@@ -47,7 +47,7 @@ fdtd-<role>-agent
 | 论文 PDF | `<AuthorYear>_<Journal>.pdf` | `Liu2010_PRL.pdf` |
 | 模型参数 | `spec_<unit>.json` | `spec_p01.json` |
 | 扫参配置 | `sweep_<unit>.json` | `sweep_p01.json` |
-| 结果目录 | `results/<run_id>/` | `results/20261106_a` |
+| 结果目录 | `results/<PkgID>_<ShortTitle>/<YYYY-MM-DD>/` | `results/P02_PolarizationControl_045/2026-11-10/` |
 | 会话日志 | `journal/<YYYY-MM-DD>.md` | `journal/2026-11-06.md` |
 
 ## 6. 保留字

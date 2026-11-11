@@ -1,0 +1,122 @@
+{
+  "case": "P01",
+  "paper": {
+    "title": "Liu et al., Metamaterial perfect absorber, PRL 104, 207403 (2010)",
+    "doi": "10.1103/PhysRevLett.104.207403",
+    "file": "cases/P01_Absorber_042/paper/"
+  },
+  "items": [
+    {
+      "id": "C1",
+      "claim": "峰值吸收 A = 0.97 @ 6.0 µm（论文 Fig.2a）",
+      "quantity": "peak_absorption",
+      "paper_value": 0.97,
+      "unit": "1",
+      "source": "Fig.2(a) p.2",
+      "definition": "A = 1 - R - T，正入射，取 Fig.2(a) 仿真曲线峰值",
+      "tolerance": "0.82±0.02（2026-11-09 人裁决的机器门禁；论文 0.97 仅作 INFO）",
+      "measured": 0.8069,
+      "status": "PASS",
+      "cause": "Lumerical 0.8069 @ 5.85 µm vs 论文 0.97 @ 6.0 µm，差距归因为求解器口径（论文为 CST/实验），见 cases/P01_Absorber_042/notes/repro-card.md",
+      "card_target": true
+    },
+    {
+      "id": "C2",
+      "claim": "地平面下 T≈0（不透明）",
+      "quantity": "ground_plane_transmission",
+      "paper_value": 0.0,
+      "unit": "1",
+      "source": "p.1-2 Fig.1",
+      "definition": "地平面下方 T 监视器的 max|T|",
+      "tolerance": "<1e-3",
+      "measured": 1.4e-05,
+      "status": "PASS"
+    },
+    {
+      "id": "C3",
+      "claim": "R = 0.03 @ 6 µm",
+      "quantity": "reflectance_at_peak",
+      "paper_value": 0.03,
+      "unit": "1",
+      "source": "Fig.2(a) p.2",
+      "definition": "R 监视器在源上方，取峰位处值",
+      "tolerance": "±0.05",
+      "measured": 0.1931,
+      "status": "FAIL",
+      "cause": "R@peak 0.1931，超容差。吸收仍达 0.81，说明能量去了介质层而不是被反射；与 C1 同一求解器口径差"
+    },
+    {
+      "id": "C4",
+      "claim": "FWHM = 1.0 µm；A(4µm)=10%、A(10µm)=1%",
+      "quantity": "fwhm_um",
+      "paper_value": 1.0,
+      "unit": "um",
+      "source": "Fig.2(b) p.2",
+      "definition": "A(λ) 曲线半高全宽",
+      "tolerance": "±0.2",
+      "measured": 0.8,
+      "status": "FAIL",
+      "cause": "0.80 vs 1.0±0.2：带宽偏窄 0.2 µm，同一口径差的下游表现"
+    },
+    {
+      "id": "C5",
+      "claim": "ERR 电共振 + 地平面磁共振 → Z=√(µ/ε) 匹配 → R≈0",
+      "quantity": "impedance_match",
+      "paper_value": 0.0,
+      "unit": "1",
+      "source": "p.1 Fig.1",
+      "definition": "需要「去地平面」对照的 R 比较",
+      "tolerance": "定性",
+      "status": "N/A",
+      "unmeasured_reason": "未建「去地平面」对照工程；机理未被独立验证，只有 R≈0 的间接证据"
+    },
+    {
+      "id": "C6",
+      "claim": "反演 ε 与 µ 在 ω₀ 同时过零",
+      "quantity": "epsilon_mu_zero_crossing",
+      "paper_value": 0.0,
+      "unit": "1",
+      "source": "p.3 Fig.3",
+      "definition": "S11/S21 反演（Smith 2002）",
+      "tolerance": "定性",
+      "status": "N/A",
+      "unmeasured_reason": "单胞模型没有端口，做不了 S 参数反演；全器件/端口设置超出 iter-1 边界"
+    },
+    {
+      "id": "C7",
+      "claim": "能量主要耗散在 Al₂O₃，比金属性损耗大一个量级",
+      "quantity": "loss_ratio_dielectric_metal",
+      "paper_value": 10.0,
+      "unit": "1",
+      "source": "p.3 Fig.4",
+      "definition": "逐层 ∫(1/2)ωε''|E|² dV 的比值",
+      "tolerance": "定性",
+      "status": "N/A",
+      "unmeasured_reason": "只看了场局域化（E_spacer 定性），未做逐层耗散积分，比值不可定量"
+    },
+    {
+      "id": "C8",
+      "claim": "UCA/UCB 双尺度子晶格 → 40 dB 选择性、6 µm 可成像",
+      "quantity": "dual_scale_imaging",
+      "paper_value": 40.0,
+      "unit": "dB",
+      "source": "p.3-4 Fig.5",
+      "definition": "140×140 µm 全器件的成像对比度",
+      "tolerance": "定性",
+      "status": "N/A",
+      "unmeasured_reason": "需全器件模型（nx=ny=1 的单胞表达不了），L1 明确全器件不在 iter-1"
+    },
+    {
+      "id": "C9",
+      "claim": "工艺/层厚：100 nm Au / 185 nm ALD Al₂O₃ / 100 nm Au on Si",
+      "quantity": "layer_thickness_agreement",
+      "paper_value": 0.0,
+      "unit": "nm",
+      "source": "p.2 fabrication",
+      "definition": "各层厚度与论文 fabrication 段逐项比对",
+      "tolerance": "±5",
+      "status": "N/A",
+      "unmeasured_reason": "几何已按论文层厚建（与 spec 一致），但没有逐层实测对照表，故不报数"
+    }
+  ]
+}

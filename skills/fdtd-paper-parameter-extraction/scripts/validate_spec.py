@@ -78,6 +78,14 @@ def main() -> int:
     with open(args.spec, "r", encoding="utf-8") as fh:
         spec = json.load(fh)
 
+    # 占位值必须拦在门口。
+    # 事件：P09 的 Au 用 PLACEHOLDER Drude 占位（论文写的是 σ=4e7 S/m），
+    # `--strict` 却放行 —— 与 SKILL.md CRITICAL #2「静默替换」自相矛盾。
+    _raw = json.dumps(spec, ensure_ascii=False)
+    for _hint in ("PLACEHOLDER", "TODO", "FIXME", "<TBD>"):
+        if _hint in _raw:
+            err("spec 仍含占位值 %r：占位参数不是已验证参数，先补真值或写进 missing[]" % _hint)
+
     for key in REQUIRED_TOP:
         if key not in spec:
             err("missing top-level key: %s" % key)

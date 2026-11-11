@@ -1,0 +1,78 @@
+{
+  "paper": "Sun et al., Nano Lett. 2012, 12, 6223-6228",
+  "lambda_m": 8.5e-07,
+  "supercell_period_m": 1.2e-06,
+  "xi_over_k0": 0.708333,
+  "theta_r_normal_incidence_eq2_deg": 45.099,
+  "theta_ic_eq2_deg": 16.958,
+  "sign_convention": "paper theta_i = -(Lumerical 'angle theta'); verified against Eq.(2) at four non-zero angles",
+  "rows": [
+    {
+      "label": "thi20",
+      "lumerical_angle_theta_deg": 20.0,
+      "paper_theta_i_deg": -20.0,
+      "peak_theta_r_deg": 21.459,
+      "eq2_predicted_theta_r_deg": 21.488,
+      "delta_vs_eq2_deg": -0.03,
+      "peak_abs_unnormalised": 4.186566505222224e-10,
+      "conventional_specular_level_rel_own_peak": 0.015414,
+      "conventional_frac_within_1deg": 0.012914,
+      "energy_fraction_within_4deg": 0.8502,
+      "peak_vs_theta_i_0_ratio": 0.677793
+    },
+    {
+      "label": "thi10",
+      "lumerical_angle_theta_deg": 10.0,
+      "paper_theta_i_deg": -10.0,
+      "peak_theta_r_deg": 32.287,
+      "eq2_predicted_theta_r_deg": 32.323,
+      "delta_vs_eq2_deg": -0.035,
+      "peak_abs_unnormalised": 5.063630940488168e-10,
+      "conventional_specular_level_rel_own_peak": 0.000353,
+      "conventional_frac_within_1deg": 0.000607,
+      "energy_fraction_within_4deg": 0.8522,
+      "peak_vs_theta_i_0_ratio": 0.819787
+    },
+    {
+      "label": "thi00",
+      "lumerical_angle_theta_deg": 0.0,
+      "paper_theta_i_deg": -0.0,
+      "peak_theta_r_deg": 45.069,
+      "eq2_predicted_theta_r_deg": 45.099,
+      "delta_vs_eq2_deg": -0.031,
+      "peak_abs_unnormalised": 6.176766220830387e-10,
+      "conventional_specular_level_rel_own_peak": 0.001179,
+      "conventional_frac_within_1deg": 0.000837,
+      "energy_fraction_within_4deg": 0.8876,
+      "peak_vs_theta_i_0_ratio": 1.0
+    },
+    {
+      "label": "thim10",
+      "lumerical_angle_theta_deg": -10.0,
+      "paper_theta_i_deg": 10.0,
+      "peak_theta_r_deg": 61.83,
+      "eq2_predicted_theta_r_deg": 61.882,
+      "delta_vs_eq2_deg": -0.052,
+      "peak_abs_unnormalised": 8.268809644527196e-10,
+      "conventional_specular_level_rel_own_peak": 0.000272,
+      "conventional_frac_within_1deg": 0.000257,
+      "energy_fraction_within_4deg": 0.8858,
+      "peak_vs_theta_i_0_ratio": 1.338696
+    },
+    {
+      "label": "thim20",
+      "lumerical_angle_theta_deg": -20.0,
+      "paper_theta_i_deg": 20.0,
+      "peak_theta_r_deg": -21.434,
+      "eq2_predicted_theta_r_deg": null,
+      "delta_vs_eq2_deg": null,
+      "peak_abs_unnormalised": 9.776763636865048e-11,
+      "conventional_specular_level_rel_own_peak": 0.070172,
+      "conventional_frac_within_1deg": 0.020691,
+      "energy_fraction_within_4deg": 0.3002,
+      "peak_vs_theta_i_0_ratio": 0.158283
+    }
+  ],
+  "png_all": "F:\\Lumercial_WS\\FDTD_WS\\results\\P04_AnomalousReflection_047\\farfield_fullangle_all_incidences.png",
+  "csv_all": "F:\\Lumercial_WS\\FDTD_WS\\results\\P04_AnomalousReflection_047\\farfield_fullangle_all_incidences.csv"
+}

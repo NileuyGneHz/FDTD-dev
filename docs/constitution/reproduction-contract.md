@@ -137,18 +137,69 @@ agent 不替人下「物理正确 / 可发表」的结论。
 | 字段 | 内容 | 对应检查 |
 |---|---|---|
 | `case / mode / date` | 单元 ID、`reproduce`、日期 | `[R1]` |
-| `target / actual_solver / locked / numerics_aligned_from` | §1 口径声明 | `[R2][R3]` |
-| `truth_sources[]` | 每个参考 `.fsp` 的 path / role / converged / shutoff / p0_log | `[R4]` |
-| `runs[]` | name / out / p0_log / shutoff_final / threshold / peak_A / peak_lam_um | `[R5][R9]` |
-| `same_input_regression` | baseline_A / repeat_A / delta / tolerance | `[R6]` |
+| `target / actual_solver / locked / numerics_aligned_from` | §1 口径声明。`target{quantity, value, definition, source, solver, measured_columns[]}`；`definition` 写「用哪个公式 / 哪个面 / 哪种平均」，`source` 要能回查（含 `Fig.`/`Eq.`/`Table`/`p.N`/`§`）；`locked{geometry[], numerics[], materials[]}`；`actual_solver` 只比**求解器族**（`Lumerical FDTD` ≡ `Lumerical FDTD v251`） | `[R2][R3][R14]` |
+| `truth_sources[]` | 每个参考 `.fsp` 的 path / role / converged / shutoff / threshold / p0_log / peak_*。**从未跑过的工程**写 `unrun: true` + `layoutmode: 1`（二者缺一即判伪造豁免） | `[R4]` |
+| `runs[]` | name / out / p0_log / shutoff_final / threshold / 各指标列 | `[R5][R9][R13]` |
+| `same_input_regression` | baseline / repeat / delta / tolerance；或单次成本过高时写 `repeat_cost_s`（≥300 s）+ `repeat_skipped_reason`，此时 `verdict.status` **不得**为 `reproduced` | `[R6]` |
+| `caliber{}`（可选，Reproduce） | 口径声明块：`source{paper_value, units}`、`numerics_aligned_from`、`geometry_from`、`differences[]`。与 `target` 冗余但可直出卡字段 | `[R3]` |
 | `excluded[]` | suspect / verdict / evidence / rerun | `[R7]` |
 | `verdict` | status / gap / explainable_by / stop_reason | `[R8]` |
 | `defects[]` | 关联的 D 号 | `[R10]` |
 | `training_items[]` | 见 §8 | `[R11]` |
-| `rerun_commands[]` | 可复跑命令 | `[R12]` |
+| `rerun_commands[]` | 可复跑命令。命令里引用的**仓库内**文件（`skills/` `cases/` `tools/` `docs/` 开头）必须真实存在；`_scratch/` 产物允许尚未生成 | `[R12][R16]` |
 
 `--case <id>` 只查一个包；默认扫全部 `cases/*/notes/repro-card.md` 与
 `projects/*/notes/repro-card.md`。一张卡都没有时只报 WARN，不阻塞现有门禁。
+
+### 7.1 验收表 `config/acceptance.json`（一旦声称做过复现就必须交）
+
+**为什么不能只写在报告里**：P02/P03/P04 的验收结论只存在于散文里，
+于是出现三种漂移——论文没给的量被写成数字（P02 的 poly-Si、P05 的 −0.958）；
+报告写 PASS 而卡里没有对应 target（两套真相）；N/A 不写原因，下一个人以为「测了但不合格」。
+把验收行变成数据，是唯一能机器判的形式。
+
+**放哪、什么时候必须存在**：`cases/<PkgID>/config/acceptance.json`。
+仅当该包**声称做过复现**（`docs/<PkgID>/repro_report.md` 或
+`<pkg>/results/repro_report.md` 存在）时才强制；没开工的包跳过，不判失败。
+
+```json
+{
+  "case": "P02",
+  "paper": {"title": "...", "doi": "10.1364/...", "file": "paper/xxx.pdf"},
+  "items": [
+    {"id": "A1", "claim": "相位差在设计波长处接近 180°",
+     "quantity": "dphi", "paper_value": 180, "unit": "deg",
+     "source": "Fig.2c p.5", "definition": "arg<Ex>-arg<Ey>，监视器面空间平均",
+     "tolerance": "±18", "measured": 211.1, "status": "FAIL",
+     "cause": "D-002（论文 Fig.2 与 Fig.3 尺寸自相矛盾）", "card_target": true}
+  ]
+}
+```
+
+| 项 | 机器判（`check_acceptance.py`） |
+|---|---|
+| 顶层 `case` / `paper` / `items[]` | 缺键 FAIL；`items` 为空 FAIL |
+| `paper` 三字段 `title` / `doi` / `file` | 只查 `paper` 这个键在场，**内部字段未逐条校验**（见下方「靠自觉」） |
+| 每条必填 | `id` `claim` `quantity` `paper_value` `unit` `source` `definition` `tolerance` `status` |
+| `id` 唯一 | 重复 FAIL |
+| `definition` 非空 | 空 FAIL——判据定义不清时，数字对不上也无法归因 |
+| `status` 取值 | 只允许 `PASS` / `FAIL` / `N/A` / `CALIBER`，其余 FAIL |
+| `status=PASS/FAIL` | `source` 必须含 `Fig.`/`Eq.`/`Table`/`p.N`/`§`；`measured` 必须是数值 |
+| `status=FAIL` | 必须给 `cause`（D 号或报告章节） |
+| `status=N/A` | 必须给 `unmeasured_reason`，且 `measured` 必须为 `null`（不能又说不测又给数） |
+| `card_target: true` | **恰好一条**（0 或多条都 FAIL）。仅当包内有可解析的复现卡时校验 |
+| 卡-表双向比对 | `card_target.quantity` 必须等于卡里 `target.quantity`；卡里 `target.unmeasured_reason` 非空时，该条 `status` 必须是 `N/A` |
+
+**靠自觉（脚本判不了，别假装能判）**：
+
+- `claim` 的措辞要能和论文原句对上，不能是「吸收很好」这类无法证伪的话。
+- `cause` 要指向真实的 D 号或报告小节，不是「数值误差」。
+- `tolerance` 的来源要写得出（论文误差棒 / 采样步长 / 收敛残差）。
+- `CALIBER` 用于「论文口径本身有争议」的行（例：P02 的尺寸自相矛盾），
+  它不是 PASS 也不是 FAIL，代表**这一行不能用来判定成败**。
+
+退出码：`0` 全绿 / `1` 有 FAIL / `2` 参数或路径错误。
+`--all` 一次扫全部包；`--json` 给流水线；`--self-test` 是它自己的负对照（1 正例 + 3 负例）。
 
 ---
 
@@ -196,20 +247,27 @@ defects/D-xxx  →  包 notes/  →  references/  →  scripts/  →  SKILL.md
 
 ## 9. 门禁命令（复制即用）
 
-`[R1]`–`[R12]` 只覆盖**可机检**部分。以下靠自觉，脚本不查，别假装能判：
+`[R1]`–`[R16]` 覆盖**可机检**部分（编号说明：`R15` 从未分配，属历史跳号，
+新增规则从 `R16` 续编，**不要复用 R15**，否则旧卡与旧日志里的引用会指向两条不同规则）。
+以下靠自觉，脚本不查，别假装能判：
 §2 硬规则 3（渲染论文原图核对几何）、§8 硬规则 1（SKILL.md 因果断言的证据锚点）、
-§10 坑点表里的定性判断。这类规则按 `docs/constitution/AGENTS.md` 约束 1 处理。
+§10 坑点表里的定性判断、§7.1 里标「靠自觉」的四项。
+这类规则按 `docs/constitution/AGENTS.md` 约束 1 处理。
 
 ```bash
 PY="C:/Users/saber/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
 cd F:/Lumercial_WS/FDTD_WS
 
-"$PY" tools/check_reproduction.py --case P01        # 复现卡 R1-R12
+"$PY" tools/check_reproduction.py --case P01        # 复现卡 R1-R16
 "$PY" tools/check_reproduction.py --self-test       # 负对照：确认门禁没退化
 "$PY" tools/check_reproduction.py --json            # 机器可读，便于流水线串接
 "$PY" tools/check_reproduction.py --emit-template   # 打印新卡骨架
 "$PY" tools/check_reproduction.py --card cases/P01_Absorber_042/notes/repro-card.md  # 草稿卡自检
-"$PY" tools/check_skill_contract.py                 # 内容契约 K1-K14
+"$PY" tools/check_acceptance.py --all               # 验收表（§7.1），与卡做双向比对
+"$PY" tools/check_acceptance.py --case P02          # 只看一个包
+"$PY" tools/check_acceptance.py --self-test         # 验收表门禁自己的负对照
+"$PY" tools/check_results_layout.py                 # results/ 落位（path-conventions §6）
+"$PY" tools/check_skill_contract.py                 # 内容契约 K1-K16
 "$PY" tools/skills-doctor.py                       # 宿主接入
 "$PY" tools/check_scripts.py                       # 包内无 .py
 "$PY" tools/check_packages.py --pkg P01             # 打包自检
@@ -265,3 +323,5 @@ cd F:/Lumercial_WS/FDTD_WS
 | 日期 | 变更 |
 |---|---|
 | 2026-11-07 | 初版，从 P01 参考 FSP 复现中提炼：口径声明、真相源优先级、锁定/数值边界、三层回归、收敛三判据、复现卡与训练条目；配套 `tools/check_reproduction.py`（R1–R12）。首张卡为 `cases/P01_Absorber_042/notes/repro-card.md` |
+| 2026-11-09 | 补 `unrun` 豁免（带 `layoutmode: 1` 自证）、`repeat_cost_s` 成本分级、`[R3]` 改比求解器族、`[R13]` 指标必须在产物里；`caliber{}` 声明块。 |
+| 2026-11-10 | **补齐门禁先行造成的契约缺口**：新增 §7.1 验收表 `config/acceptance.json`（此前 `tools/check_acceptance.py` 已在要求这个文件，但没有任何规范定义它，4 个包因此只能靠猜），逐项区分「机器判 / 靠自觉」；`target.definition` 与 `[R14]`、`rerun_commands` 引用实存与 `[R16]` 补进 §7 字段表 —— 这两条规则早就在 `check_reproduction.py` 里生效，但文件头 docstring 与本契约都只写到 `[R13]`。明确 `R15` 为历史跳号、禁止复用（已核 `git log -S'R15' -- '*.md' '*.py'` 全历史为空）。§9 命令块补 `check_acceptance` / `check_results_layout`。 |

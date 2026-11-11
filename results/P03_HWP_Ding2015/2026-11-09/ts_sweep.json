@@ -1,0 +1,115 @@
+{
+ "points": [
+  {
+   "ts_nm": 90,
+   "layoutmode": 0.0,
+   "elapsed_s": 35.0,
+   "mean_PCR_900_1600": 0.9385832953097952,
+   "mean_R_cr_900_1600": 0.8350241061616672,
+   "mean_R_co_900_1600": 0.055030005292314714,
+   "PCR_peak": 0.9998762026014515,
+   "PCR_peak_lam_nm": 1015.0,
+   "band95_nm": [
+    919.9999999999999,
+    1139.9999999999998
+   ],
+   "band95_width_um": 0.2199999999999999,
+   "band90_width_um": 0.3500000000000002,
+   "diverging": false,
+   "completed": true,
+   "gpu_engine": true,
+   "n_R_gt1": 0,
+   "ini_restored": true
+  },
+  {
+   "ts_nm": 100,
+   "layoutmode": 0.0,
+   "elapsed_s": 31.0,
+   "mean_PCR_900_1600": 0.9699230694207195,
+   "mean_R_cr_900_1600": 0.8656586423102454,
+   "mean_R_co_900_1600": 0.026906386326595845,
+   "PCR_peak": 0.9999730033258931,
+   "PCR_peak_lam_nm": 1074.9999999999998,
+   "band95_nm": [
+    900.0,
+    1279.9999999999998
+   ],
+   "band95_width_um": 0.3799999999999998,
+   "band90_width_um": 0.8649999999999999,
+   "diverging": false,
+   "completed": true,
+   "gpu_engine": true,
+   "n_R_gt1": 0,
+   "ini_restored": true
+  },
+  {
+   "ts_nm": 110,
+   "layoutmode": 0.0,
+   "elapsed_s": 62.7,
+   "mean_PCR_900_1600": 0.993234190208003,
+   "mean_R_cr_900_1600": 0.8905520760861335,
+   "mean_R_co_900_1600": 0.006028662047578473,
+   "PCR_peak": 0.9999927595737867,
+   "PCR_peak_lam_nm": 1155.0000000000002,
+   "band95_nm": [
+    825.0,
+    1620.0000000000002
+   ],
+   "band95_width_um": 0.7950000000000003,
+   "band90_width_um": 0.8450000000000004,
+   "diverging": false,
+   "completed": true,
+   "gpu_engine": true,
+   "n_R_gt1": 0,
+   "ini_restored": true
+  },
+  {
+   "ts_nm": 120,
+   "layoutmode": 0.0,
+   "elapsed_s": 44.9,
+   "mean_PCR_900_1600": 0.9777796513232594,
+   "mean_R_cr_900_1600": 0.8805253463155442,
+   "mean_R_co_900_1600": 0.019980226848283423,
+   "PCR_peak": 0.9999484116281261,
+   "PCR_peak_lam_nm": 884.9999999999998,
+   "band95_nm": [
+    834.9999999999999,
+    1590.0
+   ],
+   "band95_width_um": 0.7550000000000001,
+   "band90_width_um": 0.82,
+   "diverging": false,
+   "completed": true,
+   "gpu_engine": true,
+   "n_R_gt1": 0,
+   "ini_restored": true
+  },
+  {
+   "ts_nm": 130,
+   "layoutmode": 0.0,
+   "elapsed_s": 30.9,
+   "mean_PCR_900_1600": 0.9661484597904338,
+   "mean_R_cr_900_1600": 0.8697045643540438,
+   "mean_R_co_900_1600": 0.0305317882872743,
+   "PCR_peak": 0.9997683315824737,
+   "PCR_peak_lam_nm": 910.0,
+   "band95_nm": [
+    1165.0,
+    1594.9999999999998
+   ],
+   "band95_width_um": 0.42999999999999977,
+   "band90_width_um": 0.8300000000000001,
+   "diverging": false,
+   "completed": true,
+   "gpu_engine": true,
+   "n_R_gt1": 0,
+   "ini_restored": true
+  }
+ ],
+ "best_by_mean_PCR_nm": 110,
+ "best_by_PCR95_band_width_nm": 110,
+ "paper_optimum_nm": 110,
+ "tolerance_nm": 10,
+ "verdict": "PASS",
+ "note": "Reproduce-mode verification sweep: all other parameters frozen; only ts varied. GPU used after CPU/GPU agreement <=2.7e-4 was established."
+}

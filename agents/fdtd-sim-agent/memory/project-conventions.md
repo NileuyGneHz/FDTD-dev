@@ -1,4 +1,4 @@
-# memory/project-conventions.md
+﻿# memory/project-conventions.md
 
 Durable project rules. Change only when a convention actually changes; this is not a journal.
 
@@ -10,7 +10,7 @@ FDTD_WS\
 ├── skills\            reusable skills, standard layout: SKILL.md + scripts/ + references/ + assets/
 ├── agents\            agent definitions (this one lives in agents\fdtd-sim-agent\)
 ├── tools\             repo-level scripts (check_packages.py, check_git_limits.py)
-├── _shared\           modules used by 2+ packages
+├── library\py\        modules used by 2+ packages
 ├── _scratch\          throwaway. never a deliverable; archive before deleting
 ├── course_media\      lecture videos (git-ignored, 7.4 GB)
 ├── agent.md           project charter / iron laws
@@ -27,7 +27,7 @@ that path, so they must be loaded explicitly by path.
 1. **One package = one paper.** Everything for that paper lives inside it: `paper\ fsp\ scripts\ results\ notes\`.
 2. **Package directory and `.fsp` filenames must be pure ASCII.** A Chinese filename crashes the GPU
    engine (error 1113). Rename map in `fsp\_rename_map.json`.
-3. **New work never lands in the workspace root.** If it is not paper-specific, it goes to `_shared\`;
+3. **New work never lands in the workspace root.** If it is not paper-specific, it goes to `library\py\`;
    if it is a general tool, to `tools\` or `F:\Lumercial_WS\scripts\`.
 4. **Every package carries `paper\自测题_5问.md`** — five fixed question slots per paper.
 5. **Every package README follows the same §0–§6 skeleton**; §0 is the agent takeover block and must

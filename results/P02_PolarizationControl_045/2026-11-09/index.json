@@ -1,0 +1,30 @@
+{
+    "case":  "P02",
+    "date":  "2026-11-09",
+    "verdict":  "inconclusive",
+    "solver":  "Lumerical FDTD v251",
+    "artifacts":  [
+                      "P02_controls.png",
+                      "P02_phase_band.png",
+                      "P02_spectra.png",
+                      "T_R_phi_hwp_pol0.csv",
+                      "T_R_phi_hwp_pol90.csv",
+                      "T_R_phi_qwp_pol0.csv",
+                      "T_R_phi_qwp_pol90.csv",
+                      "control_cpu.csv",
+                      "control_empty.csv",
+                      "control_fig2_geometry.csv",
+                      "control_mesh10.csv",
+                      "final_hwp.csv",
+                      "final_qwp.csv",
+                      "phase45_hwp_gpu.csv",
+                      "phase45_qwp_gpu.csv",
+                      "polarimetry_hwp.csv",
+                      "polarimetry_qwp.csv",
+                      "run_evidence.csv",
+                      "spectra_hwp.csv",
+                      "spectra_qwp.csv",
+                      "repro_report.md"
+                  ],
+    "note":  "2026-11-10 由 EXP-51 从 results/P02_PolarizationControl_045/ 根目录归位；文件 mtime 全部为 2026-11-09"
+}

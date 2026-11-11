@@ -2,7 +2,7 @@
 
 > Fill this in after every reproduction run. Keep it short: one page. The value is in the
 > **deviation table**, not in restating the paper.
-> Copy this file to `packages\<P0N_...>\results\repro_report.md` and fill it there.
+> Copy this file to `cases\<P0N_...>\results\repro_report.md` and fill it there.
 
 ## 1. Identity
 

@@ -16,10 +16,17 @@ migrate_classes_to_packages.py —— 把 Classes\FDTD 的论文与 .fsp 复制�
   4. 跳过清单（.bak / .m1v / _p0.log 等派生文件）
 
 ⚠️ 本脚本只复制，不删除任何源文件。
+
+单一实现声明（2026-11-08）：
+  本文件是**唯一**实现，位于仓库 `tools\`（协作章程指定的位置）。
+  `skills\fdtd-package-workspace\scripts\` 下曾有一份逐字节相同的副本，已删除 ——
+  两份副本一起烂掉正是 D-005 记录的坑（重命名后 `packages/`、`fsp/` 全失效）。
+  路径已对齐 TASK-002 之后的结构：包根 `cases/`、工程子目录 `model/`。
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import shutil
 import sys
@@ -27,8 +34,9 @@ from pathlib import Path
 
 SRC_ROOT = Path(r"F:\Lumercial_WS\Classes\FDTD")
 WS_ROOT = Path(r"F:\Lumercial_WS\FDTD_WS")
-PKG_ROOT = WS_ROOT / "packages"
+PKG_ROOT = WS_ROOT / "cases"          # 2026-11-08: packages/ 已改名为 cases/
 MEDIA_DIR = WS_ROOT / "course_media"
+MODEL_SUBDIR = "model"                # 2026-11-08: 包内 fsp/ 已改名为 model/
 
 # ---- 讲次 -> 包 ID -------------------------------------------------------
 
@@ -119,12 +127,35 @@ def lecture_of(path: Path) -> str | None:
 
 
 def main() -> int:
+    global SRC_ROOT, WS_ROOT, PKG_ROOT, MEDIA_DIR
+    ap = argparse.ArgumentParser(
+        description="把课程目录的论文 / .fsp / .lsf / 视频复制进 cases/ 包结构（只复制，不删除源）。")
+    ap.add_argument("--src", default=str(SRC_ROOT), help=f"源目录（默认 {SRC_ROOT}）")
+    ap.add_argument("--out", default=str(WS_ROOT), help=f"工作区根目录（默认 {WS_ROOT}）")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="只打印计划：不建目录、不复制、不写报告")
+    args = ap.parse_args()
+
+    SRC_ROOT = Path(args.src)
+    WS_ROOT = Path(args.out)
+    PKG_ROOT = WS_ROOT / "cases"
+    MEDIA_DIR = WS_ROOT / "course_media"
+    dry = args.dry_run
+
     if not SRC_ROOT.is_dir():
         print(f"[ERROR] 源目录不存在: {SRC_ROOT}", file=sys.stderr)
         return 1
     if not PKG_ROOT.is_dir():
-        print(f"[ERROR] 包目录不存在: {PKG_ROOT}", file=sys.stderr)
+        print(f"[ERROR] 包目录不存在: {PKG_ROOT}（先建 cases/ 或传 --out）", file=sys.stderr)
         return 1
+
+    def ensure_dir(p: Path) -> None:
+        if not dry:
+            p.mkdir(parents=True, exist_ok=True)
+
+    def copy2(src: Path, dst: Path) -> None:
+        if not dry:
+            shutil.copy2(src, dst)
 
     report: list[str] = []
     log: list[dict] = []
@@ -139,7 +170,7 @@ def main() -> int:
 
     # ================= 1. 论文 PDF =================
     print("=" * 78)
-    print("1/3  复制论文 PDF")
+    print("1/4  复制论文 PDF")
     print("=" * 78)
     paper_files = sorted(SRC_ROOT.glob("课件/*/*.pdf"))
     n_paper = 0
@@ -153,13 +184,13 @@ def main() -> int:
             skipped.append((str(f), "无法识别讲次"))
             continue
         pkg = PKG_ROOT / LECTURE_TO_PKG[lec] / "paper"
-        pkg.mkdir(parents=True, exist_ok=True)
+        ensure_dir(pkg)
         # 论文名保留语义但去特殊字符
         new_stem = name.rsplit(".", 1)[0]
         new_stem = new_stem.replace(" ", "_").replace("&", "and")
         new_stem = "".join(c if (c.isalnum() or c in "_-.") else "_" for c in new_stem)
         dst = pkg / (new_stem + ".pdf")
-        shutil.copy2(f, dst)
+        copy2(f, dst)
         report.append(f"  [复制] {lec} {name}")
         report.append(f"         -> {pkg.parent.name}/paper/{dst.name}")
         n_paper += 1
@@ -169,7 +200,7 @@ def main() -> int:
     # ================= 2. fsp 工程 =================
     print()
     print("=" * 78)
-    print("2/3  复制 .fsp 工程（含改名）")
+    print("2/4  复制 .fsp 工程（含改名）")
     print("=" * 78)
     fsp_files = sorted(SRC_ROOT.glob("课件/*/*.fsp"))
     fsp_log: dict[str, dict[str, str]] = {}   # pkg -> {new: orig}
@@ -184,11 +215,11 @@ def main() -> int:
             skipped.append((str(f), "无法识别讲次"))
             continue
         pkg_name = LECTURE_TO_PKG[lec]
-        pkg = PKG_ROOT / pkg_name / "fsp"
-        pkg.mkdir(parents=True, exist_ok=True)
+        pkg = PKG_ROOT / pkg_name / MODEL_SUBDIR
+        ensure_dir(pkg)
         new_name, orig = safe_name(f.stem, ".fsp")
         dst = pkg / new_name
-        shutil.copy2(f, dst)
+        copy2(f, dst)
         size = f.stat().st_size
         total_bytes += size
         fsp_log.setdefault(pkg_name, {})
@@ -203,14 +234,14 @@ def main() -> int:
     # 写每包的改名对照
     for pkg_name, mapping in fsp_log.items():
         if mapping:
-            mp = PKG_ROOT / pkg_name / "fsp" / "_rename_map.json"
+            mp = PKG_ROOT / pkg_name / MODEL_SUBDIR / "_rename_map.json"
             mp.write_text(json.dumps(mapping, ensure_ascii=False, indent=2), encoding="utf-8")
             print(f"  改名对照 -> {pkg_name}\\fsp\\_rename_map.json  ({len(mapping)} 条)")
 
     # ================= 3. lsf 脚本 =================
     print()
     print("=" * 78)
-    print("3/3  复制 .lsf 脚本")
+    print("3/4  复制 .lsf 脚本")
     print("=" * 78)
     lsf_files = sorted(SRC_ROOT.glob("课件/*/*.lsf"))
     n_lsf = 0
@@ -219,9 +250,9 @@ def main() -> int:
         if not lec:
             continue
         pkg = PKG_ROOT / LECTURE_TO_PKG[lec] / "scripts"
-        pkg.mkdir(parents=True, exist_ok=True)
+        ensure_dir(pkg)
         dst = pkg / f.name
-        shutil.copy2(f, dst)
+        copy2(f, dst)
         n_lsf += 1
         print(f"  {lec}  {f.name}")
 
@@ -230,7 +261,7 @@ def main() -> int:
     print("=" * 78)
     print("4/4  复制课程视频（较慢，6GB）")
     print("=" * 78)
-    MEDIA_DIR.mkdir(parents=True, exist_ok=True)
+    ensure_dir(MEDIA_DIR)
     mp4s = sorted(SRC_ROOT.glob("*.mp4"))
     n_video = 0
     for f in mp4s:
@@ -243,7 +274,7 @@ def main() -> int:
             print(f"  跳过（已存在且大小一致）: {new_name}")
             continue
         print(f"  复制 {f.name}  ({f.stat().st_size / 1e9:.2f}GB) -> {new_name} ...", flush=True)
-        shutil.copy2(f, dst)
+        copy2(f, dst)
         n_video += 1
 
     # ================= 报告 =================
@@ -257,7 +288,7 @@ def main() -> int:
         "## 策略",
         "",
         "- **只复制，不删除**：源目录所有文件保持不动",
-        "- 非 ASCII / 含特殊字符的文件名自动改为 ASCII，对照见各包 `fsp\\_rename_map.json`",
+        "- 非 ASCII / 含特殊字符的文件名自动改为 ASCII，对照见各包 `model\\_rename_map.json`",
         "- 跳过派生文件：`.bak` / `.m1v` / `_p0.log`",
         "",
         "## 汇总",
@@ -279,7 +310,8 @@ def main() -> int:
         lines += [f"| `{Path(p).name}` | {r} |" for p, r in skipped]
         lines += [""]
 
-    (WS_ROOT / "_migration_report.md").write_text("\n".join(lines), encoding="utf-8")
+    if not dry:
+        (WS_ROOT / "_migration_report.md").write_text("\n".join(lines), encoding="utf-8")
     print()
     print("=" * 78)
     print(f"完成：论文 {n_paper} / fsp {n_fsp} / lsf {n_lsf} / 视频 {n_video}")

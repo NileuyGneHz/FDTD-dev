@@ -1,5 +1,10 @@
 {
   "_comment": "All relative paths are resolved against the repository root (the workspace directory containing skills/), never against cwd. Never point --out inside cases/.",
+  "_comment_analysis": "analysis.mode: auto | absorption | transmission | reflection. target_wavelength_um parameterises the 'at target' metric; omit it and no *_at_target_um key is emitted (no hardcoded 6 um).",
+  "analysis": {
+    "mode": "absorption",
+    "target_wavelength_um": 6.0
+  },
   "fsp": [
     "cases/P01_Absorber_042/model/infrared_perfect_absorber.fsp",
     "cases/P01_Absorber_042/model/d2_perfectCross.fsp",

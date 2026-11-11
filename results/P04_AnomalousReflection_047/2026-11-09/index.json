@@ -1,0 +1,36 @@
+{
+    "case":  "P04",
+    "date":  "2026-11-09",
+    "verdict":  "reproduced",
+    "solver":  "Lumerical FDTD v251",
+    "artifacts":  [
+                      "P04_AnomalousReflection_047_buildonly.fsp",
+                      "P04_AnomalousReflection_047_repro.fsp",
+                      "P04_AnomalousReflection_047_repro_output.h5",
+                      "README.md",
+                      "efficiency_summary.json",
+                      "farfield_angle_850nm.png",
+                      "farfield_angle_850nm_summary.json",
+                      "farfield_angle_850nm_thi00.csv",
+                      "farfield_fullangle_850nm.png",
+                      "farfield_fullangle_850nm_summary.json",
+                      "farfield_fullangle_850nm_thi00.csv",
+                      "farfield_fullangle_all_incidences.csv",
+                      "farfield_fullangle_all_incidences.png",
+                      "flat_reference_spectrum_thi00.csv",
+                      "incidence_scan_summary.json",
+                      "logs",
+                      "run_thi00_gpu",
+                      "scripts",
+                      "sw_field_ey_xz_theta_i_+20deg.csv",
+                      "sw_field_ey_xz_theta_i_+20deg.png",
+                      "sw_field_summary.json",
+                      "repro_report.md"
+                  ],
+    "note":  "2026-11-10 由 EXP-51 从 results/P04_AnomalousReflection_047/ 根目录归位；文件 mtime 全部为 2026-11-09",
+    "subdirs":  {
+                    "logs":  7,
+                    "scripts":  6,
+                    "run_thi00_gpu":  1
+                }
+}

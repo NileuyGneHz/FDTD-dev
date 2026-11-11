@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "_how_to_use": "Copy to packages/P0N_.../scripts/spec_<id>.json, replace every TODO, delete the keys starting with underscore that you do not need, then run validate_spec.py. Every value in metres; wp/wc in rad/s.",
+  "_how_to_use": "Copy to cases/P0N_.../config/spec_<id>.json, replace every TODO, delete the keys starting with underscore that you do not need, then run validate_spec.py. Every value in metres; wp/wc in rad/s.",
   "meta": {
     "package": "TODO P0N_...",
     "paper": {

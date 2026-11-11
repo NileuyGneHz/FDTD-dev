@@ -178,10 +178,19 @@ def check_one_pkg(pkg_dir: Path) -> list[Issue]:
     cfg_dir = pkg_dir / "config"
     counts["config"] = len([p for p in cfg_dir.iterdir()]) if cfg_dir.is_dir() else 0
 
-    # 4) 是否有 .fsp
-    fsp_dir = pkg_dir / "model"
-    fsp_files = list(fsp_dir.rglob("*.fsp")) if fsp_dir.is_dir() else []
-    has_fsp = len(fsp_files) > 0
+    # 4) .fsp 普查：包内**所有** .fsp，不只 model\
+    #    P02/P03 的交付工程在包根、P04 的交付在仓库根 results\ —— 只扫 model\ 会让
+    #    「ERROR=0」虚绿（2026-11-09 三份复现报告的共同盲区）。
+    all_fsp = [f for f in pkg_dir.rglob("*.fsp") if "_archive" not in f.parts]
+    ref_fsp = [f for f in all_fsp if f.parent.name == "model"]
+    delivered_fsp = [f for f in all_fsp if f.parent.name != "model"]
+    has_fsp = len(all_fsp) > 0
+
+    # 4.1) ASCII 检查覆盖**全部** .fsp（交付工程同样会进 GPU 引擎）
+    for f in all_fsp:
+        if not is_ascii(f.name):
+            issues.append(Issue("ERROR", name,
+                                f"文件名含非 ASCII -> GPU 引擎必崩: {f.relative_to(pkg_dir)}"))
 
     # 5) paper 为空
     if counts.get("paper", 0) == 0:
@@ -191,25 +200,50 @@ def check_one_pkg(pkg_dir: Path) -> list[Issue]:
     if counts.get("config", 0) == 0 and counts.get("results", 0) == 0 and not has_fsp:
         issues.append(Issue("WARN", name, "config\\ 与 results\\ 均为空且无 .fsp（新包？）"))
 
-    # 7) 有 fsp 但没 _p0.log —— 可能从未实跑
-    if has_fsp:
-        for f in fsp_files:
-            log = f.with_name(f.stem + "_p0.log")
-            if not log.exists():
-                issues.append(
-                    Issue(
-                        "WARN",
-                        name,
-                        f"{f.name} 无同名 _p0.log（未实跑过？或日志在别处）",
-                    )
-                )
+    # 7) 参考工程有 fsp 但没 _p0.log —— 可能从未实跑
+    #    只对 model\ 里的参考资产提示；交付工程可以是有意保持 layoutmode=1 的 build-only
+    for f in ref_fsp:
+        log = f.with_name(f.stem + "_p0.log")
+        if not log.exists():
+            issues.append(
+                Issue("WARN", name, f"{f.name} 无同名 _p0.log（未实跑过？或日志在别处）")
+            )
 
     # 8) 统计体积
     total = sum(f.stat().st_size for f in real_files(pkg_dir))
     detail = "  ".join(f"{k}={v}" for k, v in counts.items())
-    issues.append(Issue("INFO", name, f"{detail}  体积={human(total)}  fsp={len(fsp_files)}"))
+    issues.append(Issue("INFO", name,
+                        f"{detail}  体积={human(total)}  fsp={len(all_fsp)}"
+                        f"（参考 {len(ref_fsp)} / 交付 {len(delivered_fsp)}）"))
 
     return issues
+
+
+def self_test() -> int:
+    """负对照：包根放一个 .fsp，改前会漏统计，改后必须被算进 fsp 计数。"""
+    import tempfile
+
+    tmp = Path(tempfile.mkdtemp(prefix="pkg_self_"))
+    try:
+        pkg = tmp / "P99_SelfTest"
+        (pkg / "model").mkdir(parents=True)
+        (pkg / "paper").mkdir()
+        (pkg / "results").mkdir()
+        (pkg / "notes").mkdir()
+        (pkg / "README.md").write_text("# P99\n\n测试包，无占位符。\n", encoding="utf-8")
+        (pkg / "model" / "reference.fsp").write_bytes(b"x")
+        (pkg / "delivered.fsp").write_bytes(b"x")      # 包根交付工程：旧逻辑扫不到
+
+        issues = check_one_pkg(pkg)
+        info = " ".join(i.msg for i in issues if i.level == "INFO")
+        if "fsp=2" not in info or "交付 1" not in info:
+            print("self-test: 包根 .fsp 未被统计 -> %s" % info, file=sys.stderr)
+            return 1
+        print("self-test: 包根 .fsp 已统计（%s）" % info)
+        return 0
+    finally:
+        import shutil
+        shutil.rmtree(tmp, ignore_errors=True)
 
 
 # ---- 主流程 --------------------------------------------------------------
@@ -220,7 +254,11 @@ def main() -> int:
     ap.add_argument("--pkg", help="只检查指定包，如 P03")
     ap.add_argument("--json", action="store_true", help="输出 JSON")
     ap.add_argument("--strict", action="store_true", help="有 WARN 也算失败")
+    ap.add_argument("--self-test", action="store_true", help="自测：包根 .fsp 必须被统计")
     args = ap.parse_args()
+
+    if args.self_test:
+        return self_test()
 
     if not PKG_ROOT.is_dir():
         print(f"[ERROR] 找不到 cases 目录: {PKG_ROOT}", file=sys.stderr)

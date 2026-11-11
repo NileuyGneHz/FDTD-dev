@@ -12,7 +12,7 @@
 fdtd-lumerical-design-loop   选下一组 params（纯决策，不碰 lumapi）
         │  next_params.json
         ▼
-【本技能】                    白名单校验 → 增量改参 → 两段式 run → 原始结果读回
+【本技能】                    白名单校验 → 增量改参 → save→run → 原始结果读回
         │  iteration_NNN.json
         ▼
 fdtd-lumerical-design-loop   FOM / 逐项 gap / 三态出口（拿 results 当 observation）
@@ -46,18 +46,30 @@ fdtd-lumerical-design-loop   FOM / 逐项 gap / 三态出口（拿 results 当 o
 `fdtd-lumerical-fsp-introspection` 先查 manifest，不要猜。
 示例 `assets/session_config.example.json` 里的 `nanobrick` / `x span` 是占位示意。
 
-## 3. 为什么是两段式 run（项目实测，别改）
+## 3. 为什么默认两段式 run（2026-11-08 重新实测，结论已订正）
 
-`fdtd-lumerical-headless` CRITICAL #1 与
-`fdtd-package-workspace/scripts/lumapi_common.py` 的 `verify_and_run()`（约 260–289 行）
-记录的是**本机 v251 实测结论**：在新建的建模会话里直接 `run()` 会静默失效——
-不抛异常、立刻返回、没有 `_p0.log`。可靠序列是：
+**旧结论（作废）**：CRITICAL #1 曾写「在新建的建模会话里直接 `run()` 会静默失效，必须新会话」。
+**新实测（本机 v251，2026-11-08）**：静默失效的真正前提是**从未 `save` 过**，与「是否新会话」无关。
+
+| 序列 | 实测 |
+|---|---|
+| 建模 → `run()`（未 save） | 4.9 s 返回、无异常、`layoutmode` 仍 1、无 `_p0.log`、`getresult` 报 `Can not find result` |
+| 建模 → `save` → `run()`（**同会话**） | `layoutmode` 0、`_p0.log` 4181 B、`Completed 43 iterations` |
+| `save` → `close` → 新会话 `load` → `run` | 与上一行**逐位一致**（T_max 相同、同为 43 iterations） |
+| 同会话两轮改参（save→run→读回 ×2） | 第二轮波长 1500→1000 nm：`T` 改变、迭代 43→68、`_p0.log` mtime 更新 |
+
+证据：`_scratch/regress/_gate/session_rule/`（`session_rule.json`、`equivalence.json`、`c4b.json`）
+与 `_scratch/regress/_gate/probe_session_rule*.py`。
+
+**因此**：默认仍走两段式（它额外买到「工程可复算 / 可重放 / 每轮有独立 `.fsp`」），
+但这**不是引擎强制**，**同会话迭代（C4）是允许的**，前提是每轮 `switchtolayout` → 改参 →
+`save` → `run` → 读回。可靠序列：
 
 ```
 ① open_fdtd() → load(base_fsp) → switchtolayout()
 ② 白名单 setnamed（只改数值，不 add* / 不重建几何）
-③ save(iteration_NNN.fsp) → close()
-④ verify_and_run(iteration_NNN.fsp)   # 内部：save → close → 新会话 load → switchtolayout → run → assert_ran
+③ save(iteration_NNN.fsp)                     # ③ 是硬前提，不可省
+④ run() → assert_ran()                        # 同会话即可；两段式等价
 ⑤ getresult → 台账 → close()
 ```
 
@@ -65,11 +77,13 @@ fdtd-lumerical-design-loop   FOM / 逐项 gap / 三态出口（拿 results 当 o
 另会扫 `diverging`（发散是「不报错的错」）。**收敛数值（Auto Shutoff）不在这里判**，
 由上层读 `_p0.log`，避免把判据复制两份。
 
-> 与前文外部调研的取舍：`chriskeraly/lumopt` 的 `Simulation` 类是「同一 session
-> 反复 `save` + `run`」，但本项目实测规则与之冲突。按契约「证据先于改动」，
-> 本次**不引入**未在本机验证过的 persistent-session 实现；C4 的价值通过
-> 「工程体不重建 + 只做增量 `setnamed` + 自动逐轮编排」实现。
-> 若将来要验证单 session 复用，须先写 `defects/D-xxx` 并带同 spec 的对照数字。
+> **一个假轮次的坑（实测）**：`setnamed` 成功、`getnamed` 回读也一致，**不代表该参数会影响指标**。
+> 同一模型把 source 的 `x span` 从 0.30 改到 0.45 µm，`T` 一位都没动。
+> 所以 design-loop 在把某参数放进 `search_space` 之前，必须有一次**敏感性对照**（改到边界值看指标是否响应），
+> 否则搜索会在一维上白跑。这条对应 L1 §⑥「参数写了但没注入」的姊妹情形：**注入了但不在因果链上**。
+>
+> 与外部调研的取舍更新：`chriskeraly/lumopt` 的「同一 session 反复 save + run」**与本机实测一致**，
+> 不再是冲突项；C4 的实现可走单会话，但每轮仍必须落独立 `.fsp` 与 `_p0.log` 以保证可审计。
 
 ## 4. 白名单 / 越界规则（L1 红线）
 
@@ -91,7 +105,7 @@ fdtd-lumerical-design-loop   FOM / 逐项 gap / 三态出口（拿 results 当 o
 | `bind socket` | transient | 是（退避 2s/4s/6s） | ansyscl 端口 TIME_WAIT；报错里「check licenses」是误导 |
 | `diverging` | numerical | 否 | dt stability factor 0.99→0.95 或 CPU 双精度 |
 | `1113` | path | 否 | 路径含非 ASCII，以 `_p0.log` 为准 |
-| `layoutmode` | sequence | 否 | 建模会话直接 run 静默失效，走两段式 |
+| `layoutmode` | sequence | 否 | `run` 前没 `save`（或改参前没 `switchtolayout`）；补 `save` 即可，不必换会话 |
 | `analysis mode` | sequence | 否 | 改对象前 `switchtolayout()` |
 | `Failed to checkout` | license | 否 | 先修 license daemon，别重跑仿真 |
 | `Auto Shutoff` | convergence | 否 | 提高 `simulation_time` |
@@ -119,7 +133,7 @@ L1 §⑥「每轮可追溯率 100%」= 参数 + 目标函数 + `_p0.log` + 判�
 
 ## 7. 预算与席位
 
-- 每轮最多 2 个 `lumapi.FDTD()`（两段式），都在 `finally` 里 `close()`；
+- 两段式每轮 2 个 `lumapi.FDTD()`、同会话迭代每轮 1 个，都在 `finally` 里 `close()`；
   每个占 1 个许可席位，别并行开多个迭代。
 - `max_wall_minutes` 由 design-loop 的 `budget` 管；本技能只记 `elapsed_s`。
 - 输出全部落 `--out`，**绝不写回 `cases/`**（契约 §4.4 / §5）。

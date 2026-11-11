@@ -1,4 +1,4 @@
-# skills.yaml — which skill to load, when, and what it hands to the next stage.
+﻿# skills.yaml — which skill to load, when, and what it hands to the next stage.
 # Paths are relative to this agent directory.
 # 2026-11-06: skills renamed with the fdtd- prefix; ids and paths updated to match.
 
@@ -211,4 +211,4 @@ rules:
   - fdtd-lumerical-headless has no row here on purpose, not by omission. It is the cross-cutting
     base (session lifecycle + .lsf execution via run_lsf.py) that every other skill runs through;
     it is never a pipeline stage and never enters load_order. Same for the shared library
-    _shared/lumapi_common.py — if you are "loading" it, you are calling it, not staging it.
+    library/py/lumapi_common.py — if you are "loading" it, you are calling it, not staging it.

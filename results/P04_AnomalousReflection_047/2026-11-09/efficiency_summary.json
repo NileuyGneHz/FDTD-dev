@@ -1,0 +1,23 @@
+{
+  "definition": "eta = P(anomalous) / P(incident). P(incident) from a flat-mirror reference run (rod group disabled, same stack/source) divided by the analytic flat-mirror reflectance R_flat.",
+  "lambda_m": 8.5e-07,
+  "n_Au_at_850nm_jc": [
+    0.164293,
+    5.338064
+  ],
+  "n_MgF2_at_850nm": 1.3755,
+  "R_flat_tmm": 0.977962,
+  "peak_theta_r_deg": 45.019,
+  "specular_over_anomalous_peak": 0.002362,
+  "P_rods_over_P_flat": 0.79179,
+  "eta_all_nonspecular": 0.7743,
+  "eta_main_lobe_pm4deg": 0.681,
+  "cumulative_fraction_pm4deg": 0.8794,
+  "cumulative_fraction_pm8deg": 0.9213,
+  "cumulative_fraction_pm12deg": 0.9356,
+  "absorbed_fraction_all_nonspecular": 0.2257,
+  "paper_eta": "> 0.80 (normal incidence), ~20% absorbed",
+  "uncertainty": "dominated by R_flat (Au JC data + 50 nm MgF2 thin film), +-0.02; GPU real32 arithmetic adds <0.01",
+  "note": "The flat reference keeps the Au ground plane and the 50 nm MgF2 spacer; only the 200-object nanorod group is disabled.",
+  "cross_check_int_E2_dx": 2.68009062987716e-05
+}

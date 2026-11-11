@@ -231,13 +231,19 @@ not from Lumerical. Report ~0.82 as the Lumerical result and state the solver ga
 one number yields a model that reproduces one figure and predicts nothing. Change one knob,
 state the offset, and say what it means.
 
-## Known limitation: phase is not extracted yet
+## 边界：本技能只出功率，相位交给下一个技能
 
 The builder reports **power only** (`R`, `T`, `A`). For a wave-plate or any phase-engineered device,
 transmission alone is not the result — a half-wave plate additionally needs `φx − φy = π`, and a
 device can show `T ≈ 1` on both axes while having the wrong phase difference entirely.
 
-The correct method, when phase is needed:
+**Phase retrieval is implemented — use `fdtd-lumerical-phase-retrieval`** (stage 4,
+`fdtd-lumerical-phase-retrieval/scripts/run_phase_sweep.py`), which consumes this skill's spec and
+writes `phase.csv` / `dphi_deg`.
+Do not re-implement it here, and do not claim a phase figure was reproduced after running only
+this builder.
+
+Method that skill uses (for orientation only):
 
 1. Add one E-field monitor (`addprofile`) on the same plane as `T`, covering the same spectral range.
 2. Run each polarization separately (the spec already supports sweeping `polarization_deg`).
@@ -245,7 +251,6 @@ The correct method, when phase is needed:
    bare-substrate reference run is required.
 4. Report the difference modulo 2π and state the convention.
 
-Until this is implemented, say so explicitly rather than implying a phase figure was reproduced.
 Measured reference point (P02, 2026-11-04): `T(1.56 µm) = 0.959 / 0.980` for the two axes.
 
 ## References（load on demand）

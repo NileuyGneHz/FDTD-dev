@@ -1,0 +1,110 @@
+{
+  "case": "P04",
+  "paper": {
+    "title": "Sun et al., High-efficiency broadband anomalous reflection, Nano Lett. 12, 6223 (2012)",
+    "doi": "10.1021/nl3032668",
+    "file": "cases/P04_AnomalousReflection_047/paper/"
+  },
+  "items": [
+    {
+      "id": "A1",
+      "claim": "正入射反常反射角 θr = 45.5°（理论 45.1°）",
+      "quantity": "theta_r_deg",
+      "paper_value": 45.5,
+      "unit": "deg",
+      "source": "Fig.2c p.5",
+      "definition": "全角复场 DFT（0.025° 网格）的远场峰位",
+      "tolerance": "±2",
+      "measured": 45.07,
+      "status": "PASS",
+      "cause": "Δ = -0.43°；czt 课程口径给 45.11°"
+    },
+    {
+      "id": "A2",
+      "claim": "临界角 θic ≈ 17°",
+      "quantity": "theta_ic_deg",
+      "paper_value": 17.0,
+      "unit": "deg",
+      "source": "p.4 正文",
+      "definition": "θi>θic 后无传播级次的边界（解析式 + 数值验证）",
+      "tolerance": "±3",
+      "measured": 16.96,
+      "status": "PASS"
+    },
+    {
+      "id": "A3",
+      "claim": "正入射转换效率 η > 80%",
+      "quantity": "efficiency_pct",
+      "paper_value": 80.0,
+      "unit": "%",
+      "source": "Fig.3 p.6",
+      "definition": "全反射能量口径；括号内为主瓣（±4°）",
+      "tolerance": "±10",
+      "measured": 77.4,
+      "status": "PASS",
+      "cause": "临界通过：差 2.6 pp；主瓣 68.1%，吸收 22.6%"
+    },
+    {
+      "id": "A4",
+      "claim": "相位梯度 ξ/k₀ = 0.708",
+      "quantity": "xi_over_k0",
+      "paper_value": 0.708,
+      "unit": "1",
+      "source": "Fig.1c caption",
+      "definition": "ξ = 2π/Lx，Lx=1200 nm，λ=850 nm",
+      "tolerance": "±0.01",
+      "measured": 0.7083,
+      "status": "PASS"
+    },
+    {
+      "id": "A5",
+      "claim": "常规（镜面）反射被抑制",
+      "quantity": "specular_fraction_pct",
+      "paper_value": 0.0,
+      "unit": "%",
+      "source": "Fig.2c p.5",
+      "definition": "θr=0° 邻域 ±1° 内占反射能量的比例",
+      "tolerance": "<1",
+      "measured": 0.084,
+      "status": "PASS"
+    },
+    {
+      "id": "A6",
+      "claim": "θi>θic 转为束缚表面波，1/e 衰减长度 = 1/√(kx²-k₀²)",
+      "quantity": "decay_length_nm",
+      "paper_value": 421.0,
+      "unit": "nm",
+      "source": "Eq.(2) p.3",
+      "definition": "kx=1.05k₀ 处 |Ey| 的傅里叶分量沿 z 的指数拟合长度；论文值取解析式 1/√(kx²-k₀²)",
+      "tolerance": "±42",
+      "measured": 411.0,
+      "status": "PASS",
+      "cause": "差 2.4%"
+    },
+    {
+      "id": "A7",
+      "claim": "广义斯涅尔定律 θr = sin⁻¹(sinθi + ξ/k₀)",
+      "quantity": "snell_max_dev_deg",
+      "paper_value": 0.0,
+      "unit": "deg",
+      "source": "Eq.(2) p.3",
+      "definition": "5 点入射角扫描，实测峰位与公式解的最大偏差",
+      "tolerance": "±2",
+      "measured": 0.05,
+      "status": "PASS",
+      "cause": "4 点可解的全部命中"
+    },
+    {
+      "id": "A8",
+      "claim": "异常反射保持同偏振",
+      "quantity": "polarization_preserved",
+      "paper_value": 0.0,
+      "unit": "1",
+      "source": "p.4 正文",
+      "definition": "源 polarization angle=90°，监视器只取 Ey 分量",
+      "tolerance": "定性",
+      "status": "N/A",
+      "unmeasured_reason": "这是建模时的既定选择（源与监视器都锁在 y），不是测出来的结论；单列会把设计当证据"
+    }
+  ]
+}

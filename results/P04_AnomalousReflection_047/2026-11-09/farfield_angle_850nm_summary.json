@@ -1,0 +1,26 @@
+{
+  "lambda_m": 8.5e-07,
+  "Lx_m": 1.2e-06,
+  "xi_over_k0": 0.7083333333333334,
+  "theta_r_theory_deg": 45.09947203931103,
+  "theta_ic_theory_deg": 16.957763300004142,
+  "runs": [
+    {
+      "label": "thi00",
+      "csv": "F:\\Lumercial_WS\\FDTD_WS\\results\\P04_AnomalousReflection_047\\farfield_angle_850nm_thi00.csv",
+      "n_points": 300,
+      "theta_range_deg": [
+        35.0,
+        89.0
+      ],
+      "peak_theta_czt_deg": 45.11371237458194,
+      "peak_theta_python_dft_deg": 45.11371237458194,
+      "peak_agreement_deg": 0.0,
+      "peak_P_arb": 0.5508415777762173,
+      "theory_theta_r_deg": 45.099,
+      "delta_from_theory_deg": 0.014,
+      "n_x_samples": 5013
+    }
+  ],
+  "png": "F:\\Lumercial_WS\\FDTD_WS\\results\\P04_AnomalousReflection_047\\farfield_angle_850nm.png"
+}

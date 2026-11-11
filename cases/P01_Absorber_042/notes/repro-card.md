@@ -14,6 +14,7 @@
     "value": 0.97,
     "wavelength_um": 6.0,
     "source": "paper Fig.2(a) simulated R/T/A + experiment",
+    "definition": "A = 1 - R - T，正入射，取 Fig.2(a) 仿真曲线峰值",
     "solver": "CST Microwave Studio 2009"
   },
   "actual_solver": "Lumerical FDTD v251",

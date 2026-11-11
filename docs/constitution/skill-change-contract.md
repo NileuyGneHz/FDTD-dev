@@ -3,7 +3,7 @@
 > 一句话：**技能是流水线的 API。改技能 = 改契约。**
 > 没有证据、没有回归、没有登记的修改，一律按"破坏"处理，不按"改进"处理。
 >
-> 配套门禁：`python tools/check_skill_contract.py`（内容规则由 `[K1]`–`[K14]` 覆盖）
+> 配套门禁：`python tools/check_skill_contract.py`（内容规则由 `[K1]`–`[K17]` 覆盖）
 > 与 `python tools/skills-doctor.py`（宿主接入）。两者全绿才算改完。
 
 ---
@@ -55,7 +55,7 @@ defects/D-xxx  →  包 notes/  →  references/  →  scripts/  →  SKILL.md
 | 3 | 写 `SKILL.md` 六段骨架（概述 / CRITICAL / 核心工作流 / 示例 / 故障排除 / 按需加载）。英文技能可换成等价标题，但 **CRITICAL、排错、按需加载**三段必须有 | 正文 ≤500 行；CRITICAL 每条都是"做了就会坏" |
 | 4 | 写 `scripts/*.py` | `--config --out --dry-run --json`；退出码 `0/1/2`；不假设 cwd |
 | 5 | `skills/INDEX.md` 加一行 | `name \| stage \| scripts \| consumes \| produces \| hands_to \| 边界` |
-| 6 | `python tools/skills-wire.py` → 确认计划 → `--apply` | 两处入口条数 == 技能数；不手改入口目录 |
+| 6 | `python tools/skills-wire.py` → 确认计划 → `--apply`；**再同步用户级 junction**（§7 命令） | 项目内两处入口条数 == 技能数；`~/.workbuddy/skills` 里也有同名条目；不手改入口目录 |
 | 7 | `check_skill_contract.py` + `skills-doctor.py` | 双 `ALL GREEN`，exit 0 |
 | 8 | **新建会话**验证发现 | 本会话看不到是正常的（§7），不要为此改结构 |
 
@@ -132,7 +132,7 @@ defects/D-xxx  →  包 notes/  →  references/  →  scripts/  →  SKILL.md
 
 | 改动 | 必须同步 | 不同步的后果 |
 |---|---|---|
-| 新增技能 | `INDEX.md` + `skills-wire.py --apply` + `skills.yaml`（若进主链路） | 发现不了 / 编排断 |
+| 新增技能 | `INDEX.md` + `skills-wire.py --apply` + **用户级 junction（§7）** + `skills.yaml`（若进主链路） | 发现不了 / 当前会话调不到 / 编排断 |
 | 改名字 | 禁止；确需改 → 全部引用点 + defect | 静默断链，运行时才炸 |
 | 改 `scripts/` 文件名 | `INDEX.md` 的 scripts 列 + 正文命令示例 + 跨技能 import | `FileNotFoundError` |
 | 改 `CRITICAL` | `journal/` + 对应 `defects/D-xxx` | 判据退化成传说 |
@@ -141,8 +141,16 @@ defects/D-xxx  →  包 notes/  →  references/  →  scripts/  →  SKILL.md
 | **任何改动** | `journal/<date>.md` 一笔 | 下次会话从零猜 |
 
 `skills/INDEX.md` 是**全集**，`agents/*/skills.yaml` 是**主链路子集**——所以技能可以只登记 INDEX 不进编排（横切能力、按需能力）。
-但 `skills.yaml` 里写下的每一条 `path` 都会由 `[K14]` 验证：指向的目录必须存在且含 `SKILL.md`。
+但 `skills.yaml` 里写下的每一条 `path` 都会由 `[K14]` 验证：指向的目录必须存在且含 `SKILL.md`；
+**文件本身还必须是合法 YAML**（`[K14]` 先 `yaml.safe_load` 再抽 path——正则能判引用对不对，
+判不了文件能不能被解析，2026-11-10 的 D-011 就是这么全绿的）。
 **改名后不同轮改技能表，`check_skill_contract.py` 必红。**
+
+准入判据（`[K17]`，2026-11-10 加）：`INDEX.md` 里 stage 列**含数字**的技能必须出现在某个
+`skills.yaml`；只有 **stage `X`** 的横切/按需能力可以只登记 INDEX（例：`headless` 是会话底座，
+永远不是流水线环节）。反过来，删掉一个数字 stage 的条目**不会**让 `[K14]` 变红（它只看
+写下的 `path`），所以这条覆盖检查必须单独存在——漏掉 stage 4 时波片器件的两个偏振透射率
+都 ≈ 1，指标反而更好看（D-012）。
 
 ---
 
@@ -157,11 +165,17 @@ defects/D-xxx  →  包 notes/  →  references/  →  scripts/  →  SKILL.md
 **因此本项目规范：技能改动一律假设"下一会话才生效"。**
 不要在同一轮里"改完技能 → 立刻依赖它跑流水线"，那条路走不通，会浪费半小时。
 
-要当前会话立刻能用：往用户级目录挂一条 junction（Node API，免管理员、免 CMD）：
+要当前会话立刻能用：往用户级目录挂 junction（Node API，免管理员、免 CMD）。
+**在仓库根运行**，把新增技能名填进 `NAMES`；命令幂等，可反复跑：
 
 ```bash
-node -e "const fs=require('fs');const n='fdtd-lumerical-x';const s='F:/Lumercial_WS/FDTD_WS/skills/'+n;const u=process.env.USERPROFILE+'/.workbuddy/skills/'+n;if(!fs.existsSync(u))fs.symlinkSync(s,u,'junction');console.log(u)"
+node -e "const fs=require('fs'),p=require('path');const U=p.join(process.env.USERPROFILE,'.workbuddy','skills');const NAMES=['fdtd-lumerical-x'];for(const n of NAMES){const s=p.resolve('skills',n),u=p.join(U,n);if(!fs.existsSync(p.join(s,'SKILL.md'))){console.log('SKIP',n,'no SKILL.md');continue}if(fs.existsSync(u)){console.log('KEEP',n);continue}fs.symlinkSync(s,u,'junction');console.log('LINK',n,'->',s)}"
 ```
+
+> ⚠️ **`skills-wire.py` 只重建项目内 `.agents/skills` 与 `.workbuddy/skills` 两处，不碰用户级目录。**
+> 新增技能只跑 `--apply` 会漏挂用户级 → 当前会话 `Skill(name)` 仍报 `Can not find skill`。
+> 2026-11-07 实测：这样漏掉了 `fsp-introspection` / `session-control` / `design-loop` 三条；
+> 判据是 `~/.workbuddy/skills` 的条目数 == `skills/INDEX.md` 的技能数（8）。
 
 挂完用注册名显式调用（`skill://` 与相对路径都无效）；确认时用一个不存在的名字做阴性对照，应报 `Can not find skill`。
 
@@ -175,9 +189,10 @@ node -e "const fs=require('fs');const n='fdtd-lumerical-x';const s='F:/Lumercial
 ```bash
 PY="C:/Users/saber/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
 
-"$PY" tools/check_skill_contract.py    # 内容契约 K1–K14（含 INDEX 登记与 skills.yaml 编排）
+"$PY" tools/check_skill_contract.py    # 内容契约 K1–K17（含 INDEX 登记、skills.yaml 语法+编排、文档声明实存、stage 覆盖）
 "$PY" tools/skills-doctor.py           # 宿主接入 6 项
 "$PY" tools/check_scripts.py           # 包内不得有 .py
+"$PY" tools/check_reproduction.py      # 复现卡 R1–R13（改了复现流程才需要跑）
 "$PY" tools/skills-wire.py             # dry-run：看入口计划（--apply 才落盘）
 ```
 
@@ -193,12 +208,15 @@ PY="C:/Users/saber/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
 | `description` 解析成空串 | 用了折叠块 `description: >`，正则只抓第一行 | 先识别 `>`，再收集后续缩进行 |
 | 引用看着对，实际不存在 | 跨技能引用漏了前缀，写成 `scripts/run_fdtd_sweep.py`（实际在 `fdtd-lumerical-unitcell-simulation/scripts/`） | 跨技能必须写全 `<skill>/scripts/<file>`；`[K9]` 会抓 |
 | 改完 `Skill(name)` 立刻报 `Can not find skill` | project 级是会话快照，不是文件坏了 | 新开会话；要立刻用就挂 user 级 junction |
+| `--apply` 跑完了新技能还是调不到 | `skills-wire.py` 不覆盖用户级目录 | §7 的 Node 命令补挂；核对两边条目数相等 |
 | `references/` 里多出一个技能 | 递归 5 层，子目录的 `SKILL.md` 被注册 | 子目录只放普通 `.md` |
 | `ln -s` 建完内容不共享 | Git Bash 的 `ln -s` 静默退化成复制 | 用 Node `fs.symlinkSync(..., "junction")` |
 | 扫不到链接型技能 | junction 的 `Dirent.isDirectory()` 为 false | 把 `isSymbolicLink()` 一并算作目录 |
 | `--dry-run` 还是开了仿真会话 | 只"打印参数"就返回，没在校验阶段拦 | dry-run 必须在 `lumapi.FDTD()` **之前** return |
 | 换机器后规则全失效 | 文档里写了 `F:\Lumercial_WS\...` 绝对路径 | 只写仓库相对路径 |
-| 文档里的命令指向已删除的脚本 | 目录重构后没人清引用（实例：`maintain-links.cjs` 已于 11-05 删除） | 改结构时同轮 grep 旧名；`[K9]` 只覆盖技能正文，规范文档要人工扫 |
+| 文档里的命令指向已删除的脚本 | 目录重构后没人清引用（实例：`maintain-links.cjs` 已于 11-05 删除） | 改结构时同轮 grep 旧名；`[K15]` 已覆盖 `docs/` `iterations/` `agents/` `INDEX.md`，`_scratch/` `journal/` 仍靠人工 |
+| **四处文档都写了、脚本根本不存在** | 先写规范后补实现，实现没落地（实例：`run_lsf.py`，P04 于 11-07 发现） | `[K15]` 扫描全仓库声明，`[K9]` 只看技能正文抓不到 |
+| 文档写了 `--json`，脚本不认 | 文档先生效、脚本后加旗标 | `[K16]`：文档同一行写在该脚本后的 `--flag` 必须被 argparse 接受 |
 | 提交后仓库里多了 `__pycache__` | 本地缓存进了库 | `git ls-files '*.pyc'` 应为空；`.gitignore` 已覆盖 |
 
 ---
@@ -238,3 +256,8 @@ PY="C:/Users/saber/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
 |---|---|
 | 2026-11-07 | 初版：确立归属判定顺序、A/B/C 三档修改门槛、容差表、门禁四条、压缩档降级规则；配套 `tools/check_skill_contract.py`（K1–K14），首次运行 5 个技能 `ALL GREEN`（5 项 WARN） |
 | 2026-11-07（二轮） | **首次实战检验**：按 §2 的 8 步新增 `fdtd-lumerical-fsp-introspection`，按 §3 的 B 档订正 `fdtd-lumerical-unitcell-simulation`（失败案例 + 对照案例 + 2 个 case 数值回归，见 `journal/2026-11-07.md`）。结论：8 步够用，且「证据先于改动」直接拦下了一次错误结论（P01 的 ts 量取面猜测）。新增 §2 步骤 6 的 `skills-wire.py --apply` 与 §6 的按需编排（`skills.yaml` 加条目但不进 `load_order`）两个实操细节，已写入对应文件。技能数 5→6，门禁 `ALL GREEN`（FAIL 0 / WARN 4，WARN 全为既有脚本 CLI，属 C 档遗留） |
+| 2026-11-07（四轮·A 档订正） | 重新加载核查发现 **`skills-wire.py` 只覆盖项目内两处入口、不碰用户级**：23:10 新增的 `session-control` / `design-loop` 与二轮的 `fsp-introspection` 共 3 条漏挂，当前会话实测 `Can not find skill`（阴性对照），补挂后 3/3 加载成功（阳性对照）。订正 §2 步骤 6、§6 同步表、§7 新增幂等补挂命令与条目数判据、§9 坑表；不改脚本、不改判据，属 A 档。技能数已为 8，门禁 `ALL GREEN`（OK 77 / WARN 4 / FAIL 0） |
+| 2026-11-08（五轮·幽灵入口） | 依据 P02/P03/P04 三份调查报告的实地核查，新增 `[K15]`（文档声明的 `scripts/*.py` 必须实存）与 `[K16]`（同行 `--flag` 必须被脚本接受）。阴性对照：把 `run_lsf.py` 改名后 `[K15]` 在 `INDEX.md` 与 `script-contract.md` 两处同时 FAIL，恢复后转 OK（12 处声明全绿），证明该规则正是 `[K9]` 覆盖不到的盲区。同步补上 `run_lsf.py` 实体，实测三条安全闸（无 `allow_run` 拒 / 无 `timeout_seconds` 拒 / `cases/` 内 `.fsp` 拒）与 `getv` 回读通路。 |
+| 2026-11-08（六轮·盘点清理） | 清掉两处小问题（`fdtd-lumerical-headless/SKILL.md` 的 UTF-8 BOM、`skills/` 下 3 个 `__pycache__`），补齐 `run_fdtd_sweep.py` 的 `--json`（**默认输出双 case 逐字节不变**）。更重的一条：`migrate_classes_to_packages.py` 在 `tools/` 与技能内有两份逐字节相同副本、且路径停在 `packages/`/`fsp/` 改名之前；它能躲过 `[K11]` 是因为「无 argparse 即视为纯模块」的豁免，而它恰好有 `__main__` 无 argparse。处置：单一实现归位 `tools/` 并补 `--src/--out/--dry-run`，删技能内副本，立 `defects/D-006`。同时修正 `[K15]` 的误判 —— 它原先把 `tools/xxx.py` 也拼成 `<skill>/scripts/xxx.py`，现改为区分「技能内引用」与「仓库级引用」，并各留一个阴性对照。门禁 `ALL GREEN`（OK 84 / WARN 0 / FAIL 0），**但该 0 来自 WARN 来源被移出扫描范围，不等于问题已解决**。 |
+| 2026-11-09（第一轮·新增两技能） | 按 `docs/tasks/PLAN-2026-11-09-skill-repair.md` 落地第一轮（45/45 实验落账）。**技能 8 → 10**：新增 `fdtd-lumerical-fsp-build`（stage 2，只建不跑，`build_fsp.py` 带 `--check` 逐字段自检）与 `fdtd-lumerical-figure`（stage 5，六类图，零引擎）。架构上把 builder 从 `run_fdtd_sweep.py` 切片搬进 `_shared/fsp_build.py`（451→209 行，抽取前后 P01 建出的 `.fsp` **11 对象 / 0 字段差异 / 同样 474963 B**），两个调用方 import 同一份，杜绝第三次「两份实现」（D-005/D-006/EXP-02 已各犯一次）。同时新增 `experiments/` 台账与 `tools/check_experiments.py`（D1–D5，自带 7 个合成用例，含 `deferred_without_flag`）。门禁 `ALL GREEN`（10 技能，OK 102 / WARN 0 / FAIL 0）。未完成项全部登记：`D-007`（inspect_fsp 大结构 273 s）、`D-008`（2D 建不出来，z 是不变轴）、`D-009`（5 个长跑/独占实验跳过）。 |
+| 2026-11-10（补门禁盲区） | ① `[K14]` 改为**先 `yaml.safe_load` 再抽 path**：`produces: *.png` 行首的 `*` 是 YAML 别名指示符，整份 `skills.yaml` 早已对任何真正的解析器无效，而正则门禁全绿（D-011）。② 新增 `[K17]`：INDEX 里**数字 stage** 的技能必须进 `skills.yaml`，只有 stage `X` 可只登记 INDEX —— `phase-retrieval`(4) 此前缺失，编排链 `2/3 → 5` 直接跳过 stage 4（D-012）。③ 两个负对照：把 `*` 放回行首 → K14 FAIL（`while scanning an alias`）；删掉 phase 条目 → **K14 仍 OK、K17 FAIL**（`phase-retrieval(stage 4)`），后者正是这条缺陷存在的理由。④ `master` 侧同步：`reproduction-contract` 补 §7.1 验收表与 `[R14]`/`[R16]`，`path-conventions` 补 §6 `results/` 两级落位，`naming.md` 的 `results/<run_id>/` 与新规冲突已改。 |

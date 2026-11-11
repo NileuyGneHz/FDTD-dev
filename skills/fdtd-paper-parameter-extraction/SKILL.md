@@ -39,7 +39,7 @@ It is the contract with the building skill — nothing downstream should have to
 
 4. **Validate.**
    ```bash
-   "$PY" scripts/validate_spec.py packages/P0N_.../scripts/spec_<id>.json --strict
+   "$PY" scripts/validate_spec.py cases/P0N_.../config/spec_<id>.json --strict
    ```
    It checks structure, unit plausibility (a "185" that should be 185 nm fails), material kinds,
    object references, and warns when a lattice period is combined with PML boundaries.

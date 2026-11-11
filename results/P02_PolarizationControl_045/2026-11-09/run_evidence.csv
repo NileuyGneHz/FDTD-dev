@@ -1,0 +1,11 @@
+run_id,kind,solver,seconds,layoutmode,completed,diverging,grid,iterations,T_band_mean,R_band_mean
+hwp_pol0,single-pol,GPU,12.32,0.0,True,False,Simulation size in gridpoints: 40 x 40 x 129; Simulation size in gridpoints: 40 x 40 x 129,Starting 26550 total iterations,0.9763,0.0236
+hwp_pol90,single-pol,GPU,9.1,0.0,True,False,Simulation size in gridpoints: 40 x 40 x 129; Simulation size in gridpoints: 40 x 40 x 129,Starting 26550 total iterations,0.8942,0.1064
+qwp_pol0,single-pol,GPU,12.35,0.0,True,False,Simulation size in gridpoints: 40 x 40 x 129; Simulation size in gridpoints: 40 x 40 x 129,Starting 26550 total iterations,0.968,0.032
+qwp_pol90,single-pol,GPU,10.39,0.0,True,False,Simulation size in gridpoints: 40 x 40 x 129; Simulation size in gridpoints: 40 x 40 x 129,Starting 26550 total iterations,0.9463,0.0538
+hwp_gpu,45deg-phase,GPU,11.16,0.0,True,False,,,0.9649,
+qwp_gpu,45deg-phase,GPU,11.45,0.0,True,False,,,0.9338,
+control_cpu,control,CPU,78.51,,True,False,Simulation size in gridpoints: 40 x 40 x 129,,,
+control_empty,control,GPU,6.33,,True,False,Simulation size in gridpoints: 40 x 40 x 129,,,
+control_mesh10,control,GPU,34.54,,True,False,Simulation size in gridpoints: 77 x 77 x 178,,,
+control_fig2_geometry,geometry-diagnosis,GPU,,,true,false,,,,

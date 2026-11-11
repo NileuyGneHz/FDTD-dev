@@ -36,8 +36,8 @@ implementation, one place to fix. Do not fork the builder.
 ```bash
 PY="C:/Users/saber/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
 "$PY" skills/fdtd-lumerical-phase-retrieval/scripts/run_phase_sweep.py \
-      --spec packages/P0N_.../scripts/spec_<id>.json --pol 0 90 \
-      --out packages/P0N_.../results/phase_<id>
+      --spec cases/P0N_.../config/spec_<id>.json --pol 0 90 \
+      --out cases/P0N_.../results/phase_<id>
 ```
 
 Output `phase.csv`: `lam_um, phase_deg_<pol>..., dphi_deg, T_<pol>...`

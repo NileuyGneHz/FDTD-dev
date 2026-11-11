@@ -1,0 +1,8 @@
+{
+  "theta_i_deg": 0.0,
+  "peak_theta_r_deg": 45.069,
+  "eq2_predicted_deg": 45.099,
+  "specular_level_rel_peak": 0.001179,
+  "png": "F:\\Lumercial_WS\\FDTD_WS\\results\\P04_AnomalousReflection_047\\farfield_fullangle_850nm.png",
+  "csv": "F:\\Lumercial_WS\\FDTD_WS\\results\\P04_AnomalousReflection_047\\farfield_fullangle_850nm_thi00.csv"
+}

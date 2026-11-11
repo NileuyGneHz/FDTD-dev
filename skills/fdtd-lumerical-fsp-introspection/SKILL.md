@@ -100,6 +100,22 @@ PY="C:/Users/saber/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
 三条在 6 µm 处聚合在 0.0027 内 → Lumerical 在该论文参数下的稳定答案就是 ~0.82，
 与论文 CST/实验的 0.97 属求解器口径差异。**不要**调 `ts` 到 120 nm 去凑 0.962，那是拟合。
 
+## 结构组（structure group）怎么读
+
+组内子对象只有一条出口：`obj.getChildren()`，而它内部是
+`select(children)+getAllSelectedObjects()`，代价 **0.057 s/子对象**——
+30×30 阵列的组要 255 s（`select('group::*')`、`selectpartial('*')`、`selectinside`
+在 v251 上都拿不到，别浪费时间）。所以：
+
+| 组的样子 | 行为 | manifest 里会看到 |
+|---|---|---|
+| 带 `period`（周期阵列，子对象 ≈ number²×每胞） | 不展开 | `children_collapsed` + `children_are_array` + `duplicates_unchecked` + `n_children_declared` |
+| `number > 256` | 不展开 | 同上 |
+| 其余（如 21 个手工摆的柱） | 展开并查同名 | `children_collapsed` + `n_children` +（有重名时）`duplicate_name` |
+
+**`duplicates_unchecked: true` 的含义是「没查」，不是「查过没有重名」。**
+这句话是这块唯一的坑：漏读它会把「未知」当成「干净」。
+
 ## 故障排除
 
 | 症状 | 处置 |

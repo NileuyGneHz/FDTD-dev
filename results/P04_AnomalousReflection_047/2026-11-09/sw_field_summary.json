@@ -1,0 +1,16 @@
+{
+  "fsp": "F:\\Lumercial_WS\\FDTD_WS\\_scratch\\tmp_p04repro_run\\run_sw_p20.fsp",
+  "layoutmode": 0.0,
+  "paper_theta_i_deg": 20.0,
+  "lumerical_angle_theta_deg": -20.0,
+  "kx_over_k0": 1.0504,
+  "paper_kx": "2*pi/811 nm^-1 = 1.048 k0",
+  "decay_length_measured_m": 4.11e-07,
+  "decay_length_theory_m": 4.21e-07,
+  "decay_length_note": "fit of A*exp(-z/L)+C to the Fourier amplitude at kx = 1.0504 k0 for 0 < z < 1.45 um; the propagating orders sit at kx = 0.342 k0 and are filtered out. Theory: 1/sqrt(kx^2-k0^2) = 421 nm",
+  "png": "F:\\Lumercial_WS\\FDTD_WS\\results\\P04_AnomalousReflection_047\\sw_field_ey_xz_theta_i_+20deg.png",
+  "csv": "F:\\Lumercial_WS\\FDTD_WS\\results\\P04_AnomalousReflection_047\\sw_field_ey_xz_theta_i_+20deg.csv",
+  "n_x": 5013,
+  "n_z": 143,
+  "solved_log": "_p0.log: Detected GPU 0 / real32 / Completed 15296 iterations / Early termination (autoshutoff satisfied), 9.38045e-06"
+}

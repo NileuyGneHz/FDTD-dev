@@ -89,8 +89,12 @@ def run_polarization(spec, params, pol_deg, env, save_path):
     f = open_session(env)
     try:
         build_materials(f, spec)
-        z_bot, z_top = build_objects(f, spec, params)
-        geo = build_simulation(f, spec, params, z_bot, z_top)
+        p_bot, p_top = build_objects(f, spec, params)
+        geo = build_simulation(f, spec, params, p_bot, p_top)
+        if geo["axis"] != "z":
+            raise NotImplementedError(
+                "phase-retrieval 目前只支持 3D（传播轴 z）：这里把场监视器写死在 z 上。"
+                 "2D 相位提取需要先给 add_field_monitor 做轴向泛化。")
         f.setnamed("source", "polarization angle", float(pol_deg))
         period = ev(spec["lattice"]["period_x"], params)
         add_field_monitor(f, spec["simulation"], params, geo["z_T"], period)

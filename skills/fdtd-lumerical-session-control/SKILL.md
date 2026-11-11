@@ -2,10 +2,10 @@
 name: fdtd-lumerical-session-control
 description: >
   在已有 Lumerical FDTD 工程上执行一轮「人定空间、agent 调参」闭环的白名单参数注入与结果读回：
-  只改 search_space 内的尺寸，不重建几何；按项目已验证的两段式序列 run，
+  只改 search_space 内的尺寸，不重建几何；按已验证的 save→run 序列求解（同会话迭代亦可），
   读回监视器原始数据并写每轮台账。当需要在 Design 模式下微调尺寸/角度/占空比、
   复跑同一工程、排查 run 静默失效或需要逐轮可追溯证据时使用。
-  触发词：微调整、增量改参、同工程复跑、白名单参数、两段式 run、iteration 台账。
+  触发词：微调整、增量改参、同工程复跑、白名单参数、iteration 台账、同会话迭代。
 agent_created: true
 ---
 
@@ -29,9 +29,11 @@ agent_created: true
    `Reproduce` + 非空 `params` 直接拒绝，不做任何仿真。
 2. **`params` 必须是 `search_space` 的子集，且不得命中 `locked`**。越界即停、
    回去问人——材料 / 层序 / 拓扑是人的设计决策，不是 agent 的自由度。
-3. **必须走两段式 run**：`save` → `close` → 新会话 `load` → `switchtolayout` →
-   `run`。在建模会话里直接 `run()` **静默失效**（`fdtd-lumerical-headless` CRITICAL #1，
-   本项目实测）。不要照搬外部 `lumopt` 的单 session 反复 run 写法。
+3. **每轮 `run()` 之前必须 `save()`**：静默失效的真正前提是「工程没有磁盘路径」，
+   与「是否新会话」无关（2026-11-08 三组对照，`references/session-contract.md` §3：
+   未 save 时 `run()` 不抛异常、`layoutmode` 仍 1、无 `_p0.log`；save 后同会话与新会话结果**逐位一致**）。
+   默认仍走 `verify_and_run()` 的两段式（可复算、可重放），但**同会话迭代是被允许的**，
+   前提是每轮 `switchtolayout` → 改参 → `save` → `run`。
 4. **改对象之前必须 `switchtolayout()`**，否则报
    `you cannot modify most simulation objects while in analysis mode`。
 5. **`--dry-run` 不得 import lumapi、不得开会话**。它在任何 `lumapi.FDTD()` 之前返回；
@@ -80,7 +82,7 @@ python skills/fdtd-lumerical-session-control/scripts/session_control.py \
 |---|---|---|
 | `Could not bind socket on port …` | transient（可重试） | ansyscl 端口 TIME_WAIT；脚本自动退避重试，别去动 license |
 | 日志出现 `diverging` | numerical（停） | dt stability factor 0.99→0.95，或改 CPU 双精度 |
-| `layoutmode=1` / `run()` 立刻返回无日志 | sequence（停） | 建模会话直接 run 静默失效；必须 `verify_and_run` 两段式 |
+| `layoutmode=1` / `run()` 立刻返回无日志 | sequence（停） | `run` 前没 `save`；补 `save` 即可，不必换会话（save 后同会话实测与新会话逐位一致） |
 | `analysis mode` 报错 | sequence（停） | 改对象前 `switchtolayout()` |
 | 路径报 1113 / 弹窗乱码 | path（停） | 路径含非 ASCII，以 `_p0.log` 为准 |
 | `Failed to checkout` / `-97,121` | license（停） | 先跑 `z_fix_license_daemon.cmd`，别重跑仿真 |

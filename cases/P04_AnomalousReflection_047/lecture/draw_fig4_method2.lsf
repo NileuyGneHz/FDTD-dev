@@ -1,0 +1,11 @@
+res = 500;
+
+E2 = farfield3d("R_method2",1,res,res); # 计算远场投影
+ux = farfieldux("R_method2",1,res,res); # 创建远场投影的x坐标网格
+uy = farfielduy("R_method2",1,res,res); # 创建远场投影的y坐标网格
+
+theta = linspace(-90,90,300); # 极角
+phi = 0; # 方位角
+intensity = farfieldspherical(E2,ux,uy,theta,phi);
+
+plot(theta, intensity, "thetar", "intensity", "fig4a");

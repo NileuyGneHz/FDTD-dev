@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "fsp": "F:\\Lumercial_WS\\FDTD_WS\\projects\\R03_HWP_Ding2015\\model\\p03_hwp.fsp",
+  "bytes": 477683,
+  "wall_s": 6.59,
+  "layoutmode": 1.0,
+  "p0_log": false,
+  "spec_sha256": "694c218c19e04b3a",
+  "monitors": [
+    {
+      "name": "R",
+      "kind": "power",
+      "pos": 2.315e-06,
+      "axis": "z"
+    },
+    {
+      "name": "T",
+      "kind": "power",
+      "pos": -9.5e-07,
+      "axis": "z"
+    },
+    {
+      "name": "R_field",
+      "kind": "field",
+      "pos": 2.315e-06,
+      "axis": "z"
+    }
+  ],
+  "wavelength_range": [
+    7e-07,
+    1.7e-06
+  ],
+  "axis": "z",
+  "span_range": [
+    -1.35e-06,
+    2.69e-06
+  ],
+  "solves": 0,
+  "check": {
+    "checked": 28,
+    "mismatches": 0
+  }
+}

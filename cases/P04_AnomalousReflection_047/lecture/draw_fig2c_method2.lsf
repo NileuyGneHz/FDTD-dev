@@ -1,0 +1,10 @@
+res = 500;
+E2 = farfield3d("R_method2",1,res,res); # 计算远场投影(监视器名, 频率序号, 投影分辨率)
+ux = farfieldux("R_method2",1,res,res); # 创建远场投影的x坐标网格
+uy = farfielduy("R_method2",1,res,res); # 创建远场投影的y坐标网格
+
+theta = linspace(35,90,300);
+phi = 0;
+intensity = farfieldspherical(E2,ux,uy,theta,phi); # 将远场数据插值到球坐标，theta和phi分别为极角和方位角
+
+plot(theta, intensity, "thetar", "intensity", "fig2c");

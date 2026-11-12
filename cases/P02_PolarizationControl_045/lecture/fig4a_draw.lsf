@@ -1,0 +1,46 @@
+data = getresult("T","E");
+E = data.E;
+data = getresult("T","H");
+H = data.H;
+
+x = data.x;
+y = data.y;
+z = data.z;
+f = data.f;
+lmd = data.lambda;
+
+nx = length(x);
+ny = length(y);
+nz = length(z);
+nf = length(f);
+
+# *** y -> x ***
+S = conj(E(:, :, :, :, 1))*H(:, :, :, :, 2);
+S = 0.5*real(S); # W/m^2
+power_tran = integrate2(S(:,:,:,:), 1:2, x, y); # W
+
+SP = sourcepower(f);
+T1 = power_tran/SP;
+
+# *** y -> y ***
+S = -conj(E(:, :, :, :, 2))*H(:, :, :, :, 1);
+S = 0.5*real(S); # W/m^2
+power_tran = integrate2(S(:,:,:,:), 1:2, x, y); # W
+
+SP = sourcepower(f);
+T2 = power_tran/SP;
+
+# *** total ***
+data = getresult("T", "T");
+T_tot = data.T;
+
+
+
+plot(lmd*1e9,T_tot, "wavelength/nm", "transmission", "", "color=black");
+holdon;
+plot(lmd*1e9,T1, "wavelength/nm", "transmission", "", "color=blue");
+plot(lmd*1e9,T2, "wavelength/nm", "transmission", "", "color=red");
+legend("total", "y->x", "y->y");
+
+
+

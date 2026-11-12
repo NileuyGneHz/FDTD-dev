@@ -1,0 +1,19 @@
+x = getresult("field","x");
+z = getresult("field","z");
+
+nx = length(x);
+nz = length(z);
+
+Ec = matrix(nx*8,nz);
+xc = matrix(nx*8);
+
+for(i = 1:8)
+{
+    filename = "fig2g-" + num2str(i) + ".fsp";
+    load(filename);
+    Ex = getresult("field","Ex");
+    Ec((1:nx)+nx*(i-1), 1:nz) = Ex;
+    xc((1:nx)+nx*(i-1)) = x + 2*x(nx)*(i-1);
+}
+
+image(xc, z, Ec);

@@ -1,0 +1,10 @@
+res = 500;
+E2 = farfield3d("T",1,res,res);
+ux = farfieldux("T",1,res,res);
+uy = farfielduy("T",1,res,res);
+
+theta = linspace(-70,60,300);
+phi = 0;
+intensity = farfieldspherical(E2,ux,uy,theta,phi);
+
+plot(theta, intensity, "Refraction angle (degree)", "Intensity", "Fig3c");

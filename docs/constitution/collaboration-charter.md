@@ -121,10 +121,7 @@ FDTD_WS\
 | 路径 | 内容 | 备注 |
 |---|---|---|
 | `F:\Lumercial_WS\ANSYS Inc\v251\Lumerical\` | Lumerical 安装 | 商业软件，`api\python\lumapi.py` 在此 |
-| `F:\Lumercial_WS\Classes\FDTD\` | 导师给的课程原件（课件 / 论文 / 模板 .fsp / mp4） | **只读**，包内素材是从这里复制的 |
-| `F:\Lumercial_WS\scripts\` | 通用脚本库（`py.bat`、`z_fix_gpu_res.py`、`lumapi_probe.py`、`fsp_strings.py` …） | 被本仓库文档引用，但不在仓库内 |
-| `F:\Lumercial_WS\docs\` | 文档总库（指令清单、排查记录、GS 算法讲解） | 同上 |
-| `F:\Lumercial_WS\projects\` | 旧的散置工程目录（`d2\`、`L042\`） | ASCII 路径，可直接跑 |
+| `F:\Lumercial_WS\FDTD_WS\_archive\legacy-root-20261112\` | 2026-11-12 瘦身抢救归档（原 Classes / 根 docs / 根 scripts / 根 projects / WS） | 见该目录 README；课程 mp4 与 ppt 已进各 `cases\<P0N>\lecture\` |
 | `C:\Users\saber\.workbuddy\binaries\python\envs\default` | 托管 Python | 见 §3 |
 
 > ⚠️ 仓库内的文档会引用这些路径。**克隆到别的机器时它们不存在** —— 这是已知的移植性缺口，
@@ -251,7 +248,7 @@ Python 脚本**只往 UTF-8 文件写结果，不要 `print()` 中文**（重定
 - `_scratch\` 是**唯一允许"脏"的目录**，其余目录必须保持整洁。
 - 用完即删；要留档就移入 `_scratch\archive\` 并在 `_scratch\README.md` 登记一行。
 - 有复用价值时**提升**为正式脚本：单包 → 包内 `scripts\`；跨包 → `library\py\`；
-  通用大工具 → 外部 `F:\Lumercial_WS\scripts\`（引用不复制）。
+  通用大工具 → `_archive\legacy-root-20261112\root-scripts\`（2026-11-12 从外部 scripts\ 迁入）。
 - `.gitignore` 已排除 `_scratch/*`，仅保留其中的 `README.md`。
 
 ---

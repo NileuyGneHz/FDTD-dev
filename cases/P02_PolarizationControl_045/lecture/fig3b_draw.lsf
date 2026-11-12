@@ -1,0 +1,35 @@
+load("fig3_1.fsp");
+data = getresult("T","E");
+E = data.E;
+lmd = data.lambda;
+nlmd = length(lmd);
+Ex = E(1,1,1,:,1);
+angle_x = matrix(nlmd);
+angle_x(:) = unwrap(angle(Ex))/pi*180;
+
+load("fig3_2.fsp");
+data = getresult("T","E");
+E = data.E;
+lmd = data.lambda;
+nlmd = length(lmd);
+Ey = E(1,1,1,:,2);
+angle_y = matrix(nlmd);
+angle_y(:) = unwrap(angle(Ey))/pi*180;
+angle_y(1:2) = angle_y(1:2) + 180;
+
+delta_angle = angle_x-angle_y;
+
+
+plot(lmd*1e9, -angle_x-145, "lambda/nm", "phase", "", "color=blue");
+holdon;
+plot(lmd*1e9, -angle_y-145, "lambda/nm", "phase", "", "color=red");
+plot(lmd*1e9, delta_angle, "lambda/nm", "phase", "", "color=black");
+setplot("x min", 1450); setplot("x max", 1650); 
+setplot("y min", -280); setplot("y max", 280); 
+legend("phi_x", "phi_y", "phi_x - phi_y");
+
+
+
+
+
+

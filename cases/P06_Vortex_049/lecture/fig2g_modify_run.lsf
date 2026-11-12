@@ -1,0 +1,18 @@
+h0_list = [760, 1350, 1130, 940, 760, 1350, 1130, 940]*1e-9;
+Delta_list = [180, 60, 90, 120, 180, 60, 90, 120];
+y_mirror_list = [1,0,0,0,0,1,1,1];
+
+for(i = 1:8)
+{
+    filename = "fig2g-" + num2str(i) + ".fsp";
+    load(filename);
+    switchtolayout;
+    select("structure group");
+    set("h0",h0_list(i));
+    set("Delta",Delta_list(i));
+    set("y_mirror",y_mirror_list(i));
+    
+    run;
+    save;
+
+}

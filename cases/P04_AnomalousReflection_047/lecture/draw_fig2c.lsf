@@ -1,0 +1,19 @@
+data = getresult("R","E");
+x = data.x;
+E = data.E;
+
+lenx = length(x);
+
+Ey_list = matrix(lenx);
+Ey_list(:) = real(E(:, 1, 1, 1, 2));
+
+#plot(x, Ey_list);
+
+k0 = 2*pi/850e-9;
+theta_r = linspace(35, 89, 300);
+kx_list = k0*sin(theta_r*pi/180);
+
+E_k = czt(Ey_list, x, kx_list)/lenx*sqrt(2);
+P_k = abs(E_k)^2;
+
+plot(theta_r, P_k);

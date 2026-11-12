@@ -1,0 +1,171 @@
+{
+  "schema_version": "1.0",
+  "meta": {
+    "package": "R03",
+    "paper": {
+      "title": "Broadband High-Efficiency Half-Wave Plate: A Supercell-Based Plasmonic Metasurface Approach",
+      "authors": "Ding, Wang, He, Shalaev, Kildishev",
+      "journal": "ACS Nano",
+      "volume": "9",
+      "page": "4111-4119",
+      "year": 2015,
+      "doi": "10.1021/acsnano.5b00218"
+    },
+    "target_figure": "Fig. 1b/1c: R_co, R_cr and PCR at normal incidence; Fig. 3b: u/v reflection phase difference",
+    "source_pages": [3, 5],
+    "extracted_by": "agent",
+    "extracted_on": "2026-11-12"
+  },
+  "parameters": {
+    "p": 600e-9,
+    "l1": 390e-9,
+    "l2": 165e-9,
+    "tm": 80e-9,
+    "ts": 110e-9,
+    "d": 150e-9,
+    "t_sub": 200e-9
+  },
+  "lattice": {
+    "type": "square",
+    "period_x": "p",
+    "period_y": "p",
+    "supercell": {"nx": 1, "ny": 1}
+  },
+  "materials": {
+    "Au_Drude": {
+      "kind": "drude",
+      "wp": 1.37e16,
+      "wc": 1.224e14,
+      "unit": "rad/s",
+      "cite": "Methods p.5: plasma frequency wp=1.37e16 s^-1, damping wd=1.224e14 s^-1"
+    },
+    "SiO2_paper": {
+      "kind": "constant_nk",
+      "n": 1.45,
+      "k": 0.0,
+      "cite": "Methods p.5: SiO2 spacer is a lossless dielectric with constant n=1.45"
+    },
+    "Glass_sub": {
+      "kind": "constant_nk",
+      "n": 1.45,
+      "k": 0.0,
+      "cite": "Fig.1a says glass substrate; n not stated. Optically irrelevant below the 150 nm Au ground plane."
+    }
+  },
+  "objects": [
+    {
+      "id": "glass_sub",
+      "type": "box",
+      "material": "Glass_sub",
+      "mesh_order": 4,
+      "center": ["0", "0", "-(d + t_sub/2)"],
+      "span": ["p", "p", "t_sub"]
+    },
+    {
+      "id": "au_ground",
+      "type": "box",
+      "material": "Au_Drude",
+      "mesh_order": 2,
+      "center": ["0", "0", "-d/2"],
+      "span": ["p", "p", "d"]
+    },
+    {
+      "id": "sio2_spacer",
+      "type": "box",
+      "material": "SiO2_paper",
+      "mesh_order": 3,
+      "center": ["0", "0", "ts/2"],
+      "span": ["p", "p", "ts"]
+    },
+    {
+      "id": "au_brick",
+      "type": "polygon",
+      "material": "Au_Drude",
+      "mesh_order": 1,
+      "z": "ts + tm/2",
+      "z_span": "tm",
+      "vertices": [
+        [7.954951288348662e-08, 1.9622213177926697e-07],
+        [-1.9622213177926697e-07, -7.954951288348662e-08],
+        [-7.954951288348662e-08, -1.9622213177926697e-07],
+        [1.9622213177926697e-07, 7.954951288348662e-08]
+      ]
+    }
+  ],
+  "simulation": {
+    "dimension": "3D",
+    "mode": "reflection",
+    "bc": {"x": "Periodic", "y": "Periodic", "z": "PML"},
+    "mesh_accuracy": 4,
+    "mesh_override": {
+      "dx": 1e-08,
+      "dy": 1e-08,
+      "dz": 1e-08,
+      "z_range": ["-2e-07", "2.5e-07"]
+    },
+    "auto_shutoff": 1e-05,
+    "simulation_time": 5e-12,
+    "air_above": 2.5e-06,
+    "below_structure": 1e-06,
+    "source": {
+      "type": "plane_wave",
+      "direction": "Backward",
+      "polarization_deg": 0,
+      "wavelength_range": [7e-07, 1.7e-06],
+      "npts": 101,
+      "z": "auto"
+    },
+    "monitors": [
+      {"name": "R", "kind": "power"},
+      {"name": "T", "kind": "power"},
+      {"name": "R_field", "kind": "field", "n_freq": 101}
+    ]
+  },
+  "targets": [
+    {
+      "quantity": "R_co",
+      "value": 0.0,
+      "at_wavelength": 1.0e-06,
+      "tolerance": 0.05,
+      "where": "Fig. 1b: copolarized reflection is almost zero"
+    },
+    {
+      "quantity": "R_cr",
+      "value": 1.0,
+      "at_wavelength": 1.0e-06,
+      "tolerance": 0.10,
+      "where": "Fig. 1b: cross-polarized reflection is almost unity"
+    },
+    {
+      "quantity": "PCR",
+      "value": 0.95,
+      "at_wavelength": 1.0e-06,
+      "tolerance": 0.05,
+      "where": "Fig. 1c: PCR > 95% from 805 to 1672 nm"
+    },
+    {
+      "quantity": "dphi_deg",
+      "value": 180.0,
+      "at_wavelength": 1.0e-06,
+      "tolerance": 20.0,
+      "where": "Fig. 3b: u/v reflection phase difference is about pi"
+    }
+  ],
+  "assumptions": [
+    "Substrate is modelled as n=1.45 glass; the 150 nm Au ground plane is opaque, so its exact index does not affect reflection.",
+    "Ti adhesion layers are omitted for the Fig.1 unit cell; the paper only says they are included in the Fig.2 angle simulations.",
+    "Mesh accuracy 4 with 10 nm override over the metal/spacer region is a convergence choice, not a value stated in the paper.",
+    "The 390 x 165 nm brick is a polygon rotated 45 degrees counterclockwise from x; vertices are precomputed.",
+    "The field monitor sits on the same plane as R, so the plane average gives the zeroth reflected order."
+  ],
+  "missing": [
+    {
+      "field": "mesh",
+      "question": "What mesh accuracy / local mesh did the FEM simulation use? The paper does not state it."
+    },
+    {
+      "field": "Ti_thickness",
+      "question": "For Fig.1, are the 5 nm Ti adhesion layers included, or only for the Fig.2 angle sweep?"
+    }
+  ]
+}

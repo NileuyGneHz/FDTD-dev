@@ -1,0 +1,22 @@
+data = getsweepresult("sweep","E");
+E = data.E;
+L_lmd = data.L_lmd;
+
+data_num = length(L_lmd);
+Ey = zeros(data_num);
+Ey(1:data_num) = E(1,1,1,1,1:data_num,2);
+
+Ey_abs = abs(Ey/max(abs(Ey)));
+
+Ey = conj(Ey);
+Ey = Ey*exp(0.65*pi*1i);
+phase = angle(Ey);
+
+plot(L_lmd,Ey_abs,"L/lmd0","Esca","fig2a");
+holdon;
+plot(L_lmd,phase/pi,"L/lmd0","Esca","fig2a");
+
+legend("|Esca|","Phase(pi)");
+
+
+

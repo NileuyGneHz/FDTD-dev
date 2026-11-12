@@ -1,6 +1,7 @@
-{
-  "wide_angle.fsp": "wide angle.fsp",
-  "oblique_BFAST.fsp": "斜入射BFAST.fsp",
-  "oblique_Bloch.fsp": "斜入射Bloch.fsp",
-  "normal_incidence.fsp": "正入射.fsp"
+﻿{
+    "wide_angle.fsp":  "wide angle.fsp",
+    "oblique_BFAST.fsp":  "æ–œå…¥å°„BFAST.fsp",
+    "oblique_Bloch.fsp":  "æ–œå…¥å°„Bloch.fsp",
+    "normal_incidence.fsp":  "æ­£å…¥å°„.fsp",
+    "wide_angle_course.fsp":  "wide angle.fsp"
 }

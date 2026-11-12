@@ -1,0 +1,18 @@
+wl_start = getnamed("source","wavelength start");
+wl_stop = getnamed("source","wavelength stop");
+nf = getglobalmonitor("frequency points");
+lmd = linspace(wl_start,wl_stop,nf);
+
+res = 100;
+
+E2 = farfield3d("R_method2",1:nf,res,res); # 计算远场投影
+ux = farfieldux("R_method2",1,res,res); # 创建远场投影的x坐标网格
+uy = farfielduy("R_method2",1,res,res); # 创建远场投影的y坐标网格
+
+theta = linspace(35,90,50); # 极角
+phi = 0; # 方位角
+intensity = farfieldspherical(E2,ux,uy,theta,phi);
+intensity = transpose(intensity);
+
+image(lmd*1e9, theta, intensity, 
+      "Wavelength (nm)", "thetar (deg)", "fig5e");

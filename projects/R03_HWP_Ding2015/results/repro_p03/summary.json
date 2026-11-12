@@ -1,0 +1,44 @@
+{
+  "fsp": "F:\\Lumercial_WS\\FDTD_WS\\projects\\R03_HWP_Ding2015\\model\\p03_hwp.fsp",
+  "pol": [
+    0.0
+  ],
+  "band_um": [
+    0.8,
+    1.6
+  ],
+  "R_co_mean": 0.013098733309031297,
+  "R_co_max": 0.030504303735455644,
+  "R_cr_mean": 0.903072966922257,
+  "R_cr_min": 0.8101234884586418,
+  "PCR_mean": 0.9857652426136696,
+  "PCR_min": 0.9667661855453571,
+  "PCR_max": 0.9999803604031248,
+  "PCR_gt_95_range_um": [
+    0.7899999999999999,
+    1.6600000000000001
+  ],
+  "shutoff": {
+    "0.0": 8.82129e-06
+  },
+  "dphi_uv_deg": {
+    "mod360_mean": 181.7218404855898,
+    "mod360_std": 13.523157761308957,
+    "min": 158.9927246258967,
+    "max": 198.7073035908665,
+    "at_1um": 164.44584637957718,
+    "cos_mean": -0.9719037272204218,
+    "note": "reported modulo 360 to avoid the +/-180 branch cut"
+  },
+  "R_u_mean": 0.9025733535533036,
+  "R_v_mean": 0.9297700469092731,
+  "R_uv_ratio_mean": 0.985400111073677,
+  "convergence": {
+    "iterations": 10371,
+    "simulation_time_s": 1.977309e-13,
+    "final_auto_shutoff": 8.82129e-06,
+    "threshold": 1e-05,
+    "diverging": false,
+    "completed": true
+  }
+}

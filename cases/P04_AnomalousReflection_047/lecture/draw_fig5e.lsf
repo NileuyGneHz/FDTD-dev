@@ -1,0 +1,26 @@
+data = getresult("R","E");
+x = data.x;
+f = data.f;
+E = data.E;
+
+lenx = length(x);
+lenf = length(f);
+
+len_thetar = 50;
+thetar = linspace(35, 89, len_thetar);
+
+P_matrix = matrix(lenf, len_thetar);
+
+for(fi = 1:lenf)
+{
+    Ey_list = matrix(lenx);
+    Ey_list(:) = real(E(:, 1, 1, fi, 2));
+    
+    k0 = 2*pi/(c/f(fi));
+    kx_list = k0*sin(thetar*pi/180);
+    
+    E_k = czt(Ey_list, x, kx_list)/lenx*sqrt(2);
+    P_k = abs(E_k)^2;
+    P_matrix(fi, :) = P_k;
+}
+image(c/f*1e9, thetar, P_matrix);

@@ -1,0 +1,15 @@
+clear;
+
+h0 = getsweepdata("sweep_h0","h0");
+delta = getsweepdata("sweep_h0","delta");
+E = getsweepdata("sweep_h0","E");
+
+n_h0 = length(h0);
+n_delta = length(delta);
+
+Ex = matrix(n_delta,n_h0);
+Ex(1:n_delta, 1:n_h0) = E(1,1:n_delta, 1:n_h0);
+
+Ex = conj(Ex) * exp(-1i*4.7);
+
+image(delta,h0,angle(Ex)*180/pi);

@@ -1,0 +1,20 @@
+{
+  "exp": "EXP-66",
+  "verdict": "pass",
+  "metrics": {
+    "round_trip_rel_err": 1.667e-14,
+    "threshold": 1e-06,
+    "energy_correct": 1890.0,
+    "energy_no_decay": 1953.0,
+    "relative_gap": 0.032
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "把倏逝分支写成 H[~prop]=1 后保留能量 1953，正确解 1890（差 3.2%），负对照按预期被区分"
+  },
+  "artifacts": [
+    "_scratch/regress/2026-11-12/EXP-66/self_test.txt"
+  ],
+  "ran_at": "2026-11-12T23:25:45+08:00",
+  "wall_s": 0.35
+}

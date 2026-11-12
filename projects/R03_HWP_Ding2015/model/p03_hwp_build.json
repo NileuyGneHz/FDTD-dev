@@ -2,9 +2,9 @@
   "ok": true,
   "fsp": "F:\\Lumercial_WS\\FDTD_WS\\projects\\R03_HWP_Ding2015\\model\\p03_hwp.fsp",
   "bytes": 477683,
-  "wall_s": 6.59,
+  "wall_s": 6.98,
   "layoutmode": 1.0,
-  "p0_log": false,
+  "p0_log": true,
   "spec_sha256": "694c218c19e04b3a",
   "monitors": [
     {

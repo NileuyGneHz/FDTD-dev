@@ -1,4 +1,4 @@
-﻿---
+---
 name: fdtd-lumerical-fsp-build
 description: >
   从 JSON model spec 一键生成 Lumerical FDTD 工程（.fsp），**不跑仿真**。
@@ -187,7 +187,8 @@ inspect_fsp.py --config <cfg> --out ... --json        # 对象树 / 材料 / 存
 
 | 文件 | 什么时候读 |
 |---|---|
-| `references/spec_extensions.md` | 写新材料 / 新监视器 / 频域源之前；含每条的读回证据与坑 |
+| `references/spec_extensions.md` | 写新材料 / 新监视器 / 频域源 / gaussian·mode 源之前；含每条的读回证据与坑 |
+| `references/finite-device.md` | 建有限口径器件（透镜/衍射层）之前：PML 怎么配、为什么 `A=1−R−T` 失效、网格预算 |
 | `library/py/fsp_build.py` | 要改建模行为时（唯一实现） |
 | `skills/fdtd-lumerical-fsp-introspection/SKILL.md` | 建完要核对对象树 / 材料 / 存谱时 |
 

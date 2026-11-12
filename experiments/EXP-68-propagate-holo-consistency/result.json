@@ -1,0 +1,18 @@
+{
+  "exp": "EXP-68",
+  "verdict": "pass",
+  "metrics": {
+    "max_abs_diff": 0.0,
+    "threshold": 1e-12,
+    "wrong_sign_diff": 0.3386
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "把负距离当正向（符号反）时与 holo 的差为 3.386e-01，远超 1e-12，符号错误被抓住"
+  },
+  "artifacts": [
+    "_scratch/regress/2026-11-12/EXP-66/self_test.txt"
+  ],
+  "ran_at": "2026-11-12T23:25:45+08:00",
+  "wall_s": 0.35
+}

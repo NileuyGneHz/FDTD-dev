@@ -13,6 +13,7 @@
 | `fdtd-lumerical-unitcell-simulation` | 2 / 3 | `run_fdtd_sweep.py` | 已校验的 spec | `point_*.csv`、`summary.csv`、`.fsp`、`_p0.log` | `fdtd-lumerical-phase-retrieval`（验收量是相位时）/ 否则 `fdtd-lumerical-figure` | 逐点重建会话，参数扫描型；单点微调转 `session-control` |
 | `fdtd-lumerical-phase-retrieval` | 4 | `run_phase_sweep.py` | spec + 偏振角 | `phase.csv`、`dphi_deg` | `fdtd-lumerical-figure` | 只想要功率谱时不要用 |
 | `fdtd-lumerical-field-map` | 3.5 | `field_map.py` | 场监视器（`.fsp` 或 npz dump）+ 可选背景组 | `field_metrics.json`、`field_map.npz`、曲线 csv | `fdtd-lumerical-figure`（`--kind field` 直接吃 `field_map.npz`） | 只算不画；不报聚焦效率；x-z 剖面不能算 OAM |
+| `fdtd-lumerical-field-propagate` | 3.6 | `propagate_field.py` | 场监视器 npz / `.fsp` + 传播距离 | `propagated.npz`、`propagate_metrics.json` | `fdtd-lumerical-field-map`（下一段重新测） | 只传播；不加透镜相位、不做近远场；`dx>λ/2` 直接 exit 2 |
 | `fdtd-lumerical-figure` | 5 | `make_figure.py` | csv / npz / spec.json | `*.png` + meta json | 报告撰写 | 零引擎；不建模型、不跑仿真、不读 `.fsp`；缺列会 exit 2 而不是画空白 |
 | `fdtd-lumerical-headless` | X | `run_lsf.py` | 任意 `.lsf` + config | 执行结果、`_p0.log` | —— | 它是横切能力，不单独构成流程 |
 | `fdtd-lumerical-session-control` | X | `session_control.py` | 既有 `.fsp` + 白名单 `params` | `iteration_NNN.fsp` / `.json` / `_p0.log` | `fdtd-lumerical-design-loop` | 不建模、不判读、不选参数；Reproduce 模式禁止注入参数 |

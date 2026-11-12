@@ -1,0 +1,25 @@
+{
+  "exp": "EXP-69",
+  "verdict": "pass",
+  "metrics": {
+    "p01_bytes": 474963,
+    "p01_check_mismatches": 0,
+    "p01_checked_properties": 39,
+    "gaussian_source_type": "GaussianSource",
+    "gaussian_waist_w0_um": 5.0,
+    "mode_source_type": "ModeSource",
+    "negative_exit_code": 1
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "source.type='hologram' 时 build 退出码 1 并报 unsupported source.type，没有静默退化成平面波"
+  },
+  "artifacts": [
+    "_scratch/regress/2026-11-12/EXP-69/p01/p01.fsp",
+    "_scratch/regress/2026-11-12/EXP-69/gauss/gauss.fsp",
+    "_scratch/regress/2026-11-12/EXP-69/mode/mode.fsp",
+    "_scratch/regress/2026-11-12/EXP-69/negative.txt"
+  ],
+  "ran_at": "2026-11-12T23:30:00+08:00",
+  "wall_s": 42.0
+}

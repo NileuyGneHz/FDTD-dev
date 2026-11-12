@@ -115,3 +115,33 @@ in setnamed, the value supplied is not acceptable for the property 'material'
 EXP-25 证明监视器压进 PML **仍会返回数据**，只是非物理，只有几何闸能拦。
 
 旧式 dict 写法 `{"R": {"z": "auto"}, "T": {"z": "auto"}}` 仍然支持（P01 就是这种）。
+
+## 源：plane / gaussian / mode（2026-11-12 新增）
+
+```json
+"source": {
+  "type": "plane | gaussian | mode",
+  "direction": "Backward",
+  "polarization_deg": 0,
+  "wavelength_range": [1.5e-6, 1.6e-6],
+  "gaussian": {"waist_radius_um": 5.0, "distance_from_waist_um": 2.0,
+               "lens_diameter_um": 0, "fill_lens": false},
+  "mode": {"mode_selection": "fundamental TE", "n_trial_modes": 1}
+}
+```
+
+| type | 建法 | 写入的属性 |
+|---|---|---|
+| `plane`（旧名 `plane_wave` 仍认） | `addplane` | injection axis / direction / 位置 / 偏振角 / 波长或频率 / 横向 span |
+| `gaussian` | `addgaussian` | 以上 + `waist radius w0`、`distance from waist`、可选 `lens diameter` / `fill lens` |
+| `mode` | `addmode` | injection axis / direction / `mode selection` / `number of trial modes` / `frequency start`,`stop` |
+
+**两个实测坑（v251）**：
+
+1. `beam radius wz` 在默认 `beam parameters='Waist size and position'` 下**只读**，
+   `setnamed` 抛 `property 'beam radius wz' is inactive`。要写 **`waist radius w0`**。
+2. `mode selection` 传 `"fundamental TE"`，引擎会归一成 **`"fundamental TE mode"`**；
+   读回比对时别按输入字符串逐字比。
+
+**回归**：旧的 `plane` 路径逐字节不变——P01 spec 重建仍是 **474963 B / 11 对象 / `--check` 39 项 0 mismatch**（EXP-69）。
+

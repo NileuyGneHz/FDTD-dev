@@ -689,24 +689,69 @@ def build_simulation(f, spec, params, p_bottom, p_top, axes=None):
         p_T = p_bottom - 0.60 * below
         default_dir = "Backward"
 
-    f.addplane(name="source")
-    src_props = [("injection axis", p), ("direction", src.get("direction", default_dir)),
-                 (p, p_src), ("polarization angle", ev(src.get("polarization_deg", 0), params)),
-                 ("amplitude", 1), ("override global source settings", 1)]
-    for a in lateral:
-        src_props += [(a, 0), ("%s span" % a, span[a])]
-    if src.get("plane_wave_type"):
-        # Only when the spec asks: 3D runs with periodic BCs have always used the default.
-        src_props.append(("plane wave type", src["plane_wave_type"]))
+    stype = str(src.get("type", "plane")).lower()
+    if stype in ("plane", "plane_wave", "planewave"):
+        stype = "plane"                     # 旧 spec 写的是 plane_wave，保持兼容
+    elif stype not in ("gaussian", "mode"):
+        raise ValueError("unsupported source.type: %r（可用 plane / gaussian / mode）" % stype)
+
+    # 频率/波长口径先统一算出来；plane 分支仍按原来的写法落属性，保证旧的 spec 逐字节不变
     if src.get("frequency_range_thz"):
-        # THz papers quote frequency.  Setting `frequency` directly is inactive on PlaneSource
-        # (EXP-28), so the supported route is frequency start/stop, in Hz.
         f0, f1 = [float(v) * 1e12 for v in src["frequency_range_thz"]]
-        src_props += [("frequency start", min(f0, f1)), ("frequency stop", max(f0, f1))]
-        lam_lo, lam_hi = C0 / max(f0, f1), C0 / min(f0, f1)
+        f_lo, f_hi = min(f0, f1), max(f0, f1)
+        lam_lo, lam_hi = C0 / f_hi, C0 / f_lo
     else:
         lam_lo, lam_hi = src["wavelength_range"]
-        src_props += [("wavelength start", lam_lo), ("wavelength stop", lam_hi)]
+        f_lo, f_hi = C0 / lam_hi, C0 / lam_lo
+
+    if stype == "plane":
+        f.addplane(name="source")
+        src_props = [("injection axis", p), ("direction", src.get("direction", default_dir)),
+                     (p, p_src), ("polarization angle", ev(src.get("polarization_deg", 0), params)),
+                     ("amplitude", 1), ("override global source settings", 1)]
+        for a in lateral:
+            src_props += [(a, 0), ("%s span" % a, span[a])]
+        if src.get("plane_wave_type"):
+            # Only when the spec asks: 3D runs with periodic BCs have always used the default.
+            src_props.append(("plane wave type", src["plane_wave_type"]))
+        if src.get("frequency_range_thz"):
+            # THz papers quote frequency.  Setting `frequency` directly is inactive on PlaneSource
+            # (EXP-28), so the supported route is frequency start/stop, in Hz.
+            src_props += [("frequency start", f_lo), ("frequency stop", f_hi)]
+        else:
+            src_props += [("wavelength start", lam_lo), ("wavelength stop", lam_hi)]
+    elif stype == "gaussian":
+        g = src.get("gaussian") or {}
+        f.addgaussian(name="source")
+        src_props = [
+            ("injection axis", p), ("direction", src.get("direction", default_dir)),
+            (p, p_src), ("amplitude", 1), ("override global source settings", 1),
+            ("polarization angle", ev(src.get("polarization_deg", 0), params)),
+            # 用 "waist radius w0"：默认 beam parameters='Waist size and position' 时
+            # "beam radius wz" 是只读的（inactive），直接写会抛 LumApiError。
+            ("waist radius w0", ev(g.get("waist_radius_um", 5.0), params) * 1e-6),
+            ("distance from waist",
+             ev(g.get("distance_from_waist_um", 0.0), params) * 1e-6),
+            ("wavelength start", lam_lo), ("wavelength stop", lam_hi),
+        ]
+        for a in lateral:
+            src_props += [(a, 0), ("%s span" % a, span[a])]
+        if g.get("lens_diameter_um"):
+            src_props.append(("lens diameter",
+                              ev(g["lens_diameter_um"], params) * 1e-6))
+        if g.get("fill_lens"):
+            src_props.append(("fill lens", 1))
+    else:                                   # mode
+        m = src.get("mode") or {}
+        f.addmode(name="source")
+        src_props = [
+            ("injection axis", p), ("direction", src.get("direction", default_dir)),
+            (p, p_src),
+            ("mode selection", m.get("mode_selection", "fundamental TE")),
+            ("number of trial modes", int(m.get("n_trial_modes", 1))),
+            ("frequency start", f_lo), ("frequency stop", f_hi),
+        ]
+
     for k, v in src_props:
         f.setnamed("source", k, v)
 

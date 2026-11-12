@@ -1,0 +1,20 @@
+{
+  "exp": "EXP-67",
+  "verdict": "pass",
+  "metrics": {
+    "ratio_measured": 1.17391,
+    "ratio_analytic": 1.17488,
+    "rel_err": 8.256e-04,
+    "threshold": 0.01,
+    "ratio_without_lambda_term": 1.0
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "漏掉 1/lambda^2 项后比值退化为 1.0000（解析 1.1749，差 15%），公式错误被抓住"
+  },
+  "artifacts": [
+    "_scratch/regress/2026-11-12/EXP-66/self_test.txt"
+  ],
+  "ran_at": "2026-11-12T23:25:45+08:00",
+  "wall_s": 0.35
+}

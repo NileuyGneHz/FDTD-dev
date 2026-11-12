@@ -1,4 +1,4 @@
-﻿# skills.yaml — which skill to load, when, and what it hands to the next stage.
+# skills.yaml — which skill to load, when, and what it hands to the next stage.
 # Paths are relative to this agent directory.
 # 2026-11-06: skills renamed with the fdtd- prefix; ids and paths updated to match.
 
@@ -162,6 +162,24 @@ skills:
     note: >-
       compute only, never plots; `figure --kind field` consumes field_map.npz directly.
       Does not report focusing efficiency (needs incident-power normalisation, stage 2/3).
+
+  - id: fdtd-lumerical-field-propagate
+    path: ../../skills/fdtd-lumerical-field-propagate
+    stage: 3.6
+    load_when:
+      - a 4f / lens-mask-lens / cascaded-metasurface layout needs the free-space gap between FDTD segments
+      - a field dump must be moved to the next plane with an angular-spectrum propagator that checks sampling
+      - the sampling window and evanescent content have to be reported before the propagated field is trusted
+    consumes: field dump (npz or .fsp monitor) + propagation distance
+    produces: propagated.npz, propagate_metrics.json
+    exit_criteria:
+      - dx <= lambda/2 is enforced (exit 2 otherwise) and the sampling window covers the distance
+      - energy_ratio and evanescent_fraction are reported for every propagation
+      - the output npz is accepted unchanged as input by a second run (chainable)
+    hands_to: fdtd-lumerical-field-map
+    note: >-
+      free space only: no lens phase, no near-to-far transform, no plotting.
+      Component-wise propagation is a paraxial approximation; keep NA below ~0.5.
 
   - id: fdtd-lumerical-figure
     path: ../../skills/fdtd-lumerical-figure

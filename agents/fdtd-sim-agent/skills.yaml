@@ -111,7 +111,33 @@ skills:
       - build exits 0 and the .fsp exists with layoutmode == 1
       - --check reports 0 mismatches against the spec
     hands_to: fdtd-lumerical-unitcell-simulation
-    note: build-only by design; dimension "2D" is not supported yet (defects/D-008)
+    note: >-
+      build-only by design. 2D IS supported (EXP-71/75 real 2D BFAST runs); what is still
+      unsupported is 2D field-phase extraction (defects/D-008 narrowed to that boundary).
+
+  - id: fdtd-lumerical-oblique-incidence
+    path: ../../skills/fdtd-lumerical-oblique-incidence
+    stage: 2.5
+    load_when:
+      - the incidence angle must change / be swept (0, 30, 40 degrees etc.)
+      - a broadband oblique-incidence run needs a BFAST vs Bloch/periodic decision
+      - an angle-resolved A(lambda,theta) matrix and per-angle convergence evidence are wanted
+      - asked "oblique incidence", "angle sweep", "BFAST", "Bloch BC", "angle theta"
+    consumes: validated spec + angle/polarization grid
+    produces: angle_sweep_plan.json, spec_angles.json, angle_matrix.csv, angle_metrics.json, angle_check.json
+    exit_criteria:
+      - --self-test is 50/50 and plan/collect never open a lumapi session
+      - every point has a _p0.log with no 'diverging' and a final Auto Shutoff below the spec threshold
+      - A(lambda,theta) has no duplicate curves across different angles and stays inside [0,1]
+      - spec_angles.json is the driver input (never the raw spec, which lacks parameters.theta)
+    hands_to: fdtd-lumerical-unitcell-simulation
+    note: >-
+      zero-engine: planning and aggregation only. Wideband oblique incidence REQUIRES BFAST
+      (Bloch drifts with wavelength); angle is written ONLY to source.angle theta; angle phi is
+      inactive in 2D and is never written. Measure the convergence ceiling before fixing the angle
+      grid: on P08 v251 BFAST 0/30/40 deg converge, 45-55 deg give non-physical R>1, 60 deg
+      diverges (reproduced on the course's own wide_angle.fsp). Out of scope: editing an existing
+      .fsp's angle (slice 2), 3D phi != 0, figure --kind angle_map.
 
   - id: fdtd-lumerical-unitcell-simulation
     path: ../../skills/fdtd-lumerical-unitcell-simulation

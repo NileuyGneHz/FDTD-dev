@@ -9,7 +9,8 @@
 | `fdtd-lumerical-fsp-introspection` | 1.5 / X | `inspect_fsp.py` | 既有 `.fsp`（+ 可选 spec） | `manifest.json`、`spectra.json`、`diff.json`、`summary.json` | `fdtd-lumerical-unitcell-simulation` | 没有参考工程、只需从零建模时不要用；只读，不代替建模 |
 | `fdtd-holo-phase-retrieval` | 1.8 | `gs_retrieval.py` | 目标强度图 + 采样参数 | `phase_map.npz`、`holo_metrics.json`、`quantized_phase*.csv`、`library_map.json` | `fdtd-lumerical-figure`（相位热图）/ `fdtd-metasurface-assembly` | 只设计相位：不建阵列、不跑仿真；要仿真后提取 Δφ 请走 stage 4，方向相反 |
 | `fdtd-metasurface-assembly` | 1.9 | `assemble_spec.py` | `quantized_phase*.csv` + `library_map.json` + geometry.json | fsp-build array spec（`cell_params` 逐格参数） | `fdtd-lumerical-fsp-build`（array 类型建 `.fsp`） | 只查表装配：不开引擎、不反演相位、不标定单元库；缺档报错不硬凑；`--mode crop` 保单元周期，`stride` 会放大成光栅（EXP-64） |
-| `fdtd-lumerical-fsp-build` | 2 | `build_fsp.py` | 已校验的 spec | `.fsp`、`<tag>_build.json` | `fdtd-lumerical-unitcell-simulation` | **只建不跑**（无 `_p0.log`、layoutmode=1）；要谱请转 stage 2/3；`dimension: 2D` 暂不支持（D-008） |
+| `fdtd-lumerical-fsp-build` | 2 | `build_fsp.py` | 已校验的 spec | `.fsp`、`<tag>_build.json` | `fdtd-lumerical-unitcell-simulation` | **只建不跑**（无 `_p0.log`、layoutmode=1）；要谱请转 stage 2/3。2D 已支持（EXP-71/75 实测），但 2D 相位提取仍不支持（D-008 收窄后的边界） |
+| `fdtd-lumerical-oblique-incidence` | 2.5 | `angle_sweep.py` | spec + 角度/偏振网格 | `angle_sweep_plan.json`、`spec_angles.json`、`angle_matrix.csv`、`angle_metrics.json`、`angle_check.json` | `fdtd-lumerical-unitcell-simulation`（runner 真正开引擎）/ `fdtd-lumerical-figure` | **零引擎**：只做角度计划与结果聚合，不建 `.fsp`、不跑仿真；不改已有 `.fsp` 的角度（slice 2）；3D φ≠0 不做；大角度先测收敛上限（P08 实测上限 40°，60° BFAST 发散，课程工程同样） |
 | `fdtd-lumerical-unitcell-simulation` | 2 / 3 | `run_fdtd_sweep.py` | 已校验的 spec | `point_*.csv`、`summary.csv`、`.fsp`、`_p0.log` | `fdtd-lumerical-phase-retrieval`（验收量是相位时）/ 否则 `fdtd-lumerical-figure` | 逐点重建会话，参数扫描型；单点微调转 `session-control` |
 | `fdtd-lumerical-phase-retrieval` | 4 | `run_phase_sweep.py` | spec + 偏振角 | `phase.csv`、`dphi_deg` | `fdtd-lumerical-figure` | 只想要功率谱时不要用 |
 | `fdtd-lumerical-field-map` | 3.5 | `field_map.py` | 场监视器（`.fsp` 或 npz dump）+ 可选背景组 | `field_metrics.json`、`field_map.npz`、曲线 csv | `fdtd-lumerical-figure`（`--kind field` 直接吃 `field_map.npz`） | 只算不画；不报聚焦效率；x-z 剖面不能算 OAM |
@@ -25,6 +26,7 @@
 |---|---|---|
 | 1.8 | `fdtd-holo-phase-retrieval` | 2026-11-11 落地（EXP-52…59）：目标图 → 连续/N 阶相位 + 重建指标 |
 | 1.9 | `fdtd-metasurface-assembly` | 2026-11-11 落地（EXP-60…65）：相位 CSV + 单元库 → per-cell array spec；`fsp-build` 新增 `type: array`（objects 引擎，64×64 实测） |
+| 2.5 | `fdtd-lumerical-oblique-incidence` | 2026-11-13 落地（EXP-70…76）：入射角成为 spec 一等公民；P08 0/30/40° BFAST 端到端，60° 发散留 N/A 证据 |
 | 3.5+ | 近远场/全息重建 | **仍缺**：`farfield3d`/角谱远场 + 全息效率/SNR 的统一口径（技能C） |
 
 2026-11-10：stage 3.5 已由 `fdtd-lumerical-field-map` 补上（EXP-50），收编了 P05

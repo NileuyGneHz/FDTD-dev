@@ -18,6 +18,7 @@ only place that decides this, and every geometry/BC/source/monitor placement ask
 """
 from __future__ import annotations
 
+import math
 import re
 import sys
 
@@ -606,6 +607,177 @@ def build_one(f, o, spec, params, p, invariant):
 
 
 
+# ----------------------------------------------------------------------------- incidence
+# Oblique incidence (EXP-71).  ``angle theta`` is a SOURCE property.  FDTD."angle theta" is
+# inactive in BOTH Bloch/periodic and BFAST on v251 (N1, measured 2026-11-13); BFAST syncs it
+# automatically, Bloch/periodic leaves it at 0.  The builder therefore NEVER writes it.
+# ``angle phi`` is inactive in 2D even for the value 0 — writing it raises LumApiError, so it is
+# never written at all (and phi != 0 is rejected outright in this slice).
+INCIDENCE_MODES = ("normal", "bloch_single", "bfast", "auto")
+_PW_BLOCH = "Bloch/periodic"
+_PW_BFAST = "BFAST"
+_ANGLE_WARN_DEG = 60.0
+_ANGLE_REJECT_DEG = 85.0
+_DRIFT_TOL_DEG = 2.0
+
+
+def source_wavelength_range(src):
+    """(lam_lo, lam_hi, f_lo, f_hi) in SI units — the single place this is computed.
+
+    Factored out so ``build_simulation`` and ``incidence_expected`` cannot drift apart
+    (one implementation, not two copies — D-005 / D-006 / EXP-02).
+    """
+    if src.get("frequency_range_thz"):
+        f0, f1 = [float(v) * 1e12 for v in src["frequency_range_thz"]]
+        f_lo, f_hi = min(f0, f1), max(f0, f1)
+        return C0 / f_hi, C0 / f_lo, f_lo, f_hi
+    lam_lo, lam_hi = src["wavelength_range"]
+    return lam_lo, lam_hi, C0 / lam_hi, C0 / lam_lo
+
+
+def bloch_angle_drift(theta_deg, lam_sim, lam):
+    """Bloch/periodic injection angle at wavelength ``lam`` when the source is set at ``lam_sim``.
+
+    Ansys: theta(f) = asin( sin(theta_sim) * f_sim / f ) = asin( sin(theta_sim) * lam/lam_sim ).
+    Measured on v251 with lam_sim=600 nm, theta_sim=30 deg:
+      750 nm -> 38.650 deg, 600 nm -> 29.977 deg, 400 nm -> 19.457 deg
+    Returns NaN when the wave goes beyond grazing (|sin| > 1).
+    """
+    s = math.sin(math.radians(theta_deg)) * (float(lam) / float(lam_sim))
+    if abs(s) > 1.0:
+        return float("nan")
+    return math.degrees(math.asin(s))
+
+
+def resolve_incidence(sim, params, dim, p, lateral, lam_lo, lam_hi):
+    """Decide how oblique incidence is expressed in the model. Pure function, no lumapi.
+
+    Returns ``None`` for a legacy spec (no ``incidence`` block and no angle expression):
+    those must stay byte-for-byte identical.  Otherwise returns the decision dict consumed
+    by ``build_simulation`` and by the ``--check`` assertions.
+    """
+    src = sim.get("source") or {}
+    inc_raw = sim.get("incidence")
+    declares_angle = (src.get("angle_theta_deg") is not None
+                      or src.get("angle_phi_deg") is not None)
+    if inc_raw is None and not declares_angle:
+        return None
+
+    inc = dict(inc_raw or {})
+    theta = ev(src.get("angle_theta_deg", 0), params)
+    phi = ev(src.get("angle_phi_deg", 0), params)
+    band_is_single = abs(float(lam_hi) - float(lam_lo)) <= 1e-12 * max(1.0, float(lam_hi))
+
+    mode = str(inc.get("mode", "auto")).strip().lower()
+    if mode not in INCIDENCE_MODES:
+        raise ValueError("simulation.incidence.mode 只支持 %s，收到 %r"
+                         % ("/".join(INCIDENCE_MODES), mode))
+    if mode == "auto":
+        # Physics, not convenience: Bloch/periodic can only hold ONE angle across the band.
+        if abs(theta) < 1e-12 and abs(phi) < 1e-12:
+            mode = "normal"
+        elif band_is_single:
+            mode = "bloch_single"
+        else:
+            mode = "bfast"
+
+    warnings = []
+    if abs(theta) >= _ANGLE_REJECT_DEG:
+        raise ValueError("|angle theta|=%.1f° >= %.0f°：BFAST 在掠入射下不可靠，拒绝建模"
+                         % (abs(theta), _ANGLE_REJECT_DEG))
+    if abs(theta) > _ANGLE_WARN_DEG:
+        warnings.append("|angle theta|=%.1f° > %.0f°：课程经验上限；60° 机时约 7.5×，"
+                        "掠入射 PML 反射风险高" % (abs(theta), _ANGLE_WARN_DEG))
+    if dim == "2D" and abs(phi) > 1e-12:
+        raise ValueError("2D 仿真只有 angle theta：angle phi 在 v251 2D 里是 inactive "
+                         "（连 0 都不能写），φ≠0 本期不支持")
+
+    lam_sim = (float(lam_lo) + float(lam_hi)) / 2.0
+    drift = None
+    if mode == "bloch_single" and not band_is_single:
+        drift = [{"lam_um": l * 1e6,
+                  "theta_deg": bloch_angle_drift(theta, lam_sim, l)}
+                 for l in (float(lam_lo), lam_sim, float(lam_hi))]
+        if not inc.get("allow_drift"):
+            spread = max(d["theta_deg"] for d in drift) - min(d["theta_deg"] for d in drift)
+            raise ValueError(
+                "bloch_single 只能用于单波长：400–800 nm 下边界相位差随波长变，"
+                "实际入射角从 %.1f° 漂到 %.1f°（跨度 %.1f° > %.1f°）。"
+                "请改用 incidence.mode='bfast'（宽带），或把波长范围收成单频点；"
+                "确需保留请显式 allow_drift=true 并在台账记录逐频点角度"
+                % (drift[0]["theta_deg"], drift[-1]["theta_deg"], spread, _DRIFT_TOL_DEG))
+
+    if dim == "2D":
+        tilt_axis = lateral[0] if lateral else None
+    elif p == "z" and abs(phi) < 1e-12:
+        tilt_axis = "x"
+    else:
+        raise ValueError("3D 斜入射本期只支持 propagation_axis='z' 且 angle_phi=0；"
+                         "收到 p=%r phi=%.1f°（3D φ≠0 属 slice 2）" % (p, phi))
+
+    bc_tilt = None
+    if mode != "normal" and tilt_axis:
+        declared = (sim.get("bc") or {}).get(tilt_axis)
+        if declared in ("PML", "Metal"):
+            raise ValueError("斜入射倾斜面 %s 的 BC=%r 会破坏横向 Bloch 相位，"
+                             "必须是 'Bloch'（BFAST 会自行覆盖横向边界）"
+                             % (tilt_axis, declared))
+        if declared == "Periodic":
+            warnings.append("倾斜面 %s BC=Periodic：Bloch/BFAST 需要 Bloch，已改回 Bloch"
+                            % tilt_axis)
+        bc_tilt = "Bloch"
+
+    plane_wave_type = {None: None, "normal": None,
+                       "bloch_single": _PW_BLOCH, "bfast": _PW_BFAST}[mode]
+    if plane_wave_type and src.get("plane_wave_type") \
+            and str(src["plane_wave_type"]) != plane_wave_type:
+        raise ValueError("source.plane_wave_type=%r 与 incidence.mode=%r 冲突（应为 %r）；"
+                         "角度口径只能有一个真相源"
+                         % (src["plane_wave_type"], mode, plane_wave_type))
+
+    bfast = inc.get("bfast") or {}
+    return dict(mode=mode, theta=theta, phi=phi, tilt_axis=tilt_axis,
+                plane_wave_type=plane_wave_type, bc_tilt=bc_tilt,
+                pml_layers=inc.get("pml_layers"), bfast_alpha=bfast.get("alpha"),
+                band_is_single=band_is_single, allow_drift=bool(inc.get("allow_drift")),
+                drift=drift, warnings=warnings,
+                sign_convention=inc.get("sign_convention",
+                                        "paper_theta_i = -lumerical_angle_theta"))
+
+
+def incidence_expected(spec, params=None):
+    """(object, property, value) assertions for the incidence block (used by --check).
+
+    Values may be strings (BC / plane wave type); ``run_check`` compares those verbatim.
+    Returning [] for legacy specs keeps the old assertion set byte-for-byte unchanged.
+    """
+    sim = spec.get("simulation") or {}
+    src = sim.get("source") or {}
+    if sim.get("incidence") is None and src.get("angle_theta_deg") is None \
+            and src.get("angle_phi_deg") is None:
+        return []
+    params = spec.get("parameters") or {} if params is None else params
+    dim, p, lateral, _inv = resolve_axes(sim)
+    lam_lo, lam_hi, _f_lo, _f_hi = source_wavelength_range(src)
+    inc = resolve_incidence(sim, params, dim, p, lateral, lam_lo, lam_hi)
+    if inc is None:
+        return []
+    out = []
+    if inc["mode"] != "normal":
+        out.append(("source", "angle theta", inc["theta"]))
+    if inc["plane_wave_type"]:
+        out.append(("source", "plane wave type", inc["plane_wave_type"]))
+    if inc["bc_tilt"]:
+        out.append(("FDTD", "%s min bc" % inc["tilt_axis"], inc["bc_tilt"]))
+        out.append(("FDTD", "%s max bc" % inc["tilt_axis"], inc["bc_tilt"]))
+    if inc["pml_layers"] is not None:
+        out.append(("FDTD", "pml layers", float(inc["pml_layers"])))
+    if inc["bfast_alpha"] is not None and inc["mode"] == "bfast":
+        out.append(("FDTD", "bfast alpha", float(inc["bfast_alpha"])))
+    # Honest degradation: angle phi is never written (inactive in 2D), so it is never asserted.
+    return out
+
+
 def check_monitor_gap(sim: dict) -> None:
     """监视器到 PML 的最小间距校验（纯函数，可脱机单测）。
 
@@ -649,14 +821,34 @@ def build_simulation(f, spec, params, p_bottom, p_top, axes=None):
         region["%s_span" % a] = span[a]
     f.addfdtd(**region)
 
+    # Wavelength/frequency range is needed by BOTH the source and the incidence decision.
+    # Computed once, before the BCs, so resolve_incidence() can enforce "Bloch = single
+    # wavelength only" without a second evaluator (single implementation rule).
+    src = sim["source"]
+    lam_lo, lam_hi, f_lo, f_hi = source_wavelength_range(src)
+    inc = resolve_incidence(sim, params, dim, p, lateral, lam_lo, lam_hi)
+    if inc:
+        for w in inc["warnings"]:
+            print("WARNING incidence: %s" % w, file=sys.stderr)
+
     bc = sim["bc"]
     for a in lateral:                     # 不变轴（2D 的 z）没有可写的边界
-        f.setnamed("FDTD", "%s min bc" % a, bc[a])
-        f.setnamed("FDTD", "%s max bc" % a, bc[a])
+        b = (inc["bc_tilt"] if inc and a == inc["tilt_axis"] and inc["bc_tilt"]
+             else bc[a])
+        f.setnamed("FDTD", "%s min bc" % a, b)
+        f.setnamed("FDTD", "%s max bc" % a, b)
     f.setnamed("FDTD", "mesh accuracy", sim.get("mesh_accuracy", 4))
     f.setnamed("FDTD", "auto shutoff min", sim.get("auto_shutoff", 1e-4))
     if sim.get("simulation_time"):
         f.setnamed("FDTD", "simulation time", sim["simulation_time"])
+    # EXP-75: BFAST at large theta can diverge with the default 0.99 (measured at 60 deg).
+    # Opt-in so legacy specs keep their exact call sequence (EXP-71 A/B equivalence).
+    if sim.get("dt_stability_factor") is not None:
+        f.setnamed("FDTD", "dt stability factor", float(sim["dt_stability_factor"]))
+    if inc and inc["pml_layers"] is not None:
+        f.setnamed("FDTD", "pml layers", inc["pml_layers"])
+    if inc and inc["mode"] == "bfast" and inc["bfast_alpha"] is not None:
+        f.setnamed("FDTD", "bfast alpha", inc["bfast_alpha"])
 
     mo = sim.get("mesh_override")
     if mo:
@@ -674,7 +866,6 @@ def build_simulation(f, spec, params, p_bottom, p_top, axes=None):
             if mo.get(k):
                 f.setnamed("mesh_fine", k, mo[k])
 
-    src = sim["source"]
     mode = sim.get("mode", "reflection")
     if mode == "transmission":
         # light enters through the substrate (bottom) and is collected in air (top)
@@ -695,15 +886,6 @@ def build_simulation(f, spec, params, p_bottom, p_top, axes=None):
     elif stype not in ("gaussian", "mode"):
         raise ValueError("unsupported source.type: %r（可用 plane / gaussian / mode）" % stype)
 
-    # 频率/波长口径先统一算出来；plane 分支仍按原来的写法落属性，保证旧的 spec 逐字节不变
-    if src.get("frequency_range_thz"):
-        f0, f1 = [float(v) * 1e12 for v in src["frequency_range_thz"]]
-        f_lo, f_hi = min(f0, f1), max(f0, f1)
-        lam_lo, lam_hi = C0 / f_hi, C0 / f_lo
-    else:
-        lam_lo, lam_hi = src["wavelength_range"]
-        f_lo, f_hi = C0 / lam_hi, C0 / lam_lo
-
     if stype == "plane":
         f.addplane(name="source")
         src_props = [("injection axis", p), ("direction", src.get("direction", default_dir)),
@@ -714,6 +896,16 @@ def build_simulation(f, spec, params, p_bottom, p_top, axes=None):
         if src.get("plane_wave_type"):
             # Only when the spec asks: 3D runs with periodic BCs have always used the default.
             src_props.append(("plane wave type", src["plane_wave_type"]))
+        if inc and inc["plane_wave_type"]:
+            # The mode decides the plane wave type. Keep exactly one entry and make sure it
+            # is set BEFORE angle theta (BFAST exposes angle theta only after the type switch).
+            src_props = [t for t in src_props if t[0] != "plane wave type"]
+            src_props.append(("plane wave type", inc["plane_wave_type"]))
+        if inc and inc["mode"] != "normal":
+            # v251 (N1): angle theta is a SOURCE property. FDTD."angle theta" is inactive;
+            # BFAST syncs it automatically, Bloch/periodic keeps it at 0. angle phi is
+            # inactive in 2D even for 0, so it is deliberately never written.
+            src_props.append(("angle theta", inc["theta"]))
         if src.get("frequency_range_thz"):
             # THz papers quote frequency.  Setting `frequency` directly is inactive on PlaneSource
             # (EXP-28), so the supported route is frequency start/stop, in Hz.
@@ -850,6 +1042,9 @@ def build_simulation(f, spec, params, p_bottom, p_top, axes=None):
                 pos_src=p_src, pos_R=p_R, pos_T=p_T,
                 p_min=p_min, p_max=p_max, monitors=made,
                 wavelength_range=[lam_lo, lam_hi])
+    if inc:
+        # Recorded in the build manifest so an angle scan is auditable without reopening the .fsp.
+        info["incidence"] = {k: v for k, v in inc.items() if k != "warnings"}
     if p == "z":                          # 3D 老调用方（build_fsp / run_phase_sweep）的键
         info.update(z_src=p_src, z_R=p_R, z_T=p_T, z_min=p_min, z_max=p_max)
     return info

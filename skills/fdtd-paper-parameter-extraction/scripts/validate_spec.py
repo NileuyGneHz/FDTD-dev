@@ -18,8 +18,22 @@ from __future__ import annotations
 
 import argparse
 import json
+import pathlib
 import re
 import sys
+
+# Incidence rules have ONE implementation: library/py/fsp_build.py (EXP-73).
+# Do not restate the physics here — call resolve_incidence() and turn its verdict into issues.
+_ROOT = pathlib.Path(__file__).resolve()
+for _cand in [p / "library" / "py" for p in _ROOT.parents]:
+    if (_cand / "fsp_build.py").is_file():
+        if str(_cand) not in sys.path:
+            sys.path.insert(0, str(_cand))
+        break
+else:
+    raise ImportError("library/py/fsp_build.py not found; validate_spec needs the shared builder")
+
+from fsp_build import resolve_axes, resolve_incidence, source_wavelength_range  # noqa: E402
 
 REQUIRED_TOP = ["schema_version", "meta", "parameters", "lattice", "materials",
                 "objects", "simulation", "targets"]
@@ -167,6 +181,52 @@ def main() -> int:
         warn("bc.x and bc.y are both PML while the spec defines a lattice period — "
              "PML simulates one isolated element. For a periodic array use Periodic, or add "
              "'isolated_element' to assumptions to record that this is deliberate.")
+
+    # ---- oblique incidence consistency (EXP-73) -------------------------------------
+    # Only specs that DECLARE an angle are checked: legacy specs must stay untouched.
+    # The validator is stricter than the builder on purpose: the builder tolerates
+    # bc="Periodic" with a warning (wd_BFASK.fsp converges), but a spec that says
+    # Periodic while the .fsp is built with Bloch is a lie and must be rejected here (N4).
+    src = sim.get("source") or {}
+    declares_incidence = (sim.get("incidence") is not None
+                          or src.get("angle_theta_deg") is not None
+                          or src.get("angle_phi_deg") is not None)
+    if declares_incidence:
+        try:
+            dim, p, lateral, _inv = resolve_axes(sim)
+            lam_lo, lam_hi, _f0, _f1 = source_wavelength_range(src)
+            decision = resolve_incidence(sim, params, dim, p, lateral, lam_lo, lam_hi)
+            if decision:
+                for w in decision["warnings"]:
+                    warn("incidence: %s" % w)
+                tilt = decision["tilt_axis"]
+                if decision["mode"] != "normal" and tilt and bc.get(tilt) != "Bloch":
+                    err("斜入射倾斜面 bc.%s=%r 必须写成 'Bloch'：builder 按 Bloch 建模，"
+                        "spec 写别的值会让 spec 与 .fsp 不一致（N4）"
+                        % (tilt, bc.get(tilt)))
+        except Exception as exc:                               # noqa: BLE001
+            err("incidence 配置非法: %s" % str(exc).splitlines()[0][:220])
+
+    # ---- opaque backplane contract (EXP-75 deviation, PLAN §11) ----------------------
+    # Declaring T==0 is a physical claim about the device, not a tolerance knob. It is only
+    # legal for a reflection-mode device; a transmission-mode device must measure T.
+    # dt stability factor is only legal in (0, 1]; 0.99 is v251's default, 0.95 is the
+    # measured stable value for BFAST at large theta (EXP-75).
+    if sim.get("dt_stability_factor") is not None:
+        try:
+            dsf = float(sim["dt_stability_factor"])
+        except (TypeError, ValueError):
+            err("simulation.dt_stability_factor must be a number")
+        else:
+            if not 0 < dsf <= 1.0:
+                err("simulation.dt_stability_factor = %g 不在 (0, 1] 内" % dsf)
+
+    if sim.get("opaque_ground_plane"):
+        if not isinstance(sim["opaque_ground_plane"], bool):
+            err("simulation.opaque_ground_plane must be a boolean true/false")
+        elif sim.get("mode", "reflection") == "transmission":
+            err("simulation.opaque_ground_plane=true 与 mode='transmission' 矛盾："
+                "透射式器件必须实测 T，不能按 0 代入")
 
     targets = spec.get("targets") or []
     if not targets:

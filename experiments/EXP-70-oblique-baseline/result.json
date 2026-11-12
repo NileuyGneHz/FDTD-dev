@@ -1,0 +1,36 @@
+{
+  "exp": "EXP-70",
+  "verdict": "pass",
+  "metrics": {
+    "baseline_commit": "2f49a7d",
+    "dirty_files_after_commit": 0,
+    "gates_exit": {
+      "check_skill_contract": 1,
+      "skills-doctor": 0,
+      "check_scripts": 0,
+      "check_experiments": 0
+    },
+    "k15_fail_count": 1,
+    "planned_exp_unaccounted": 7,
+    "video_frames": 45010,
+    "video_duration_s": 1500.3,
+    "transcript_segments": 1027,
+    "p08_course_fsp": 7,
+    "p08_course_logs": 3,
+    "nk_data_rows": 40
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "计划声明 angle_sweep.py 但脚本未创建时，check_skill_contract K15 正确 FAIL(exit=1)；没有静默放行「文档声称存在、磁盘上却没有」的脚本"
+  },
+  "artifacts": [
+    "_scratch/regress/2026-11-13/oblique/baseline/check_skill_contract.txt",
+    "_scratch/regress/2026-11-13/oblique/baseline/skills-doctor.txt",
+    "_scratch/regress/2026-11-13/oblique/baseline/check_scripts.txt",
+    "_scratch/regress/2026-11-13/oblique/baseline/check_experiments.txt",
+    "_scratch/regress/2026-11-13/lecture_transcript.txt",
+    "_scratch/regress/2026-11-13/lecture_frames/"
+  ],
+  "ran_at": "2026-11-13T00:40:00+08:00",
+  "wall_s": 25.0
+}

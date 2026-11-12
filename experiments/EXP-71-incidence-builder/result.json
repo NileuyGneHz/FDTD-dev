@@ -1,0 +1,39 @@
+{
+  "exp": "EXP-71",
+  "verdict": "pass",
+  "metrics": {
+    "p01_bytes": 474963,
+    "p01_checked_properties": 39,
+    "p01_check_mismatches": 0,
+    "legacy_3d_call_sequence_diffs": 0,
+    "legacy_3d_calls": 67,
+    "legacy_2d_call_sequence_diffs": 0,
+    "legacy_2d_calls": 59,
+    "p08_30_bytes": 477778,
+    "p08_30_check_mismatches": 0,
+    "source_angle_theta_deg": 30.0,
+    "fdtd_angle_theta_deg": 30.0,
+    "bfast_getsourceangle_deg": [30.0, 30.0, 30.0],
+    "bloch_measured_drift_deg": [38.65045900521081, 29.97711785710141, 19.457207231568542],
+    "bloch_analytic_drift_deg": [38.68218745348944, 30.0, 19.471220634490695],
+    "illegal_configs_rejected": 5,
+    "old_builder_writes_angle": false
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "N1: 在新建的 p08_30.fsp 上 setnamed('FDTD','angle theta',45) 抛 inactive；A/B 阴性：旧 builder 吃带 incidence 的 spec 时完全不写 angle theta，证明新分支 load-bearing"
+  },
+  "artifacts": [
+    "_scratch/regress/2026-11-13/oblique/probe/probe_api.py",
+    "_scratch/regress/2026-11-13/oblique/probe/probe_report.json",
+    "_scratch/regress/2026-11-13/oblique/probe/probe2_report.json",
+    "_scratch/regress/2026-11-13/oblique/make_p08_spec.py",
+    "_scratch/regress/2026-11-13/oblique/spec_p08.json",
+    "_scratch/regress/2026-11-13/oblique/EXP-71/p08/p08_30.fsp",
+    "_scratch/regress/2026-11-13/oblique/EXP-71/p08_readback.json",
+    "_scratch/regress/2026-11-13/oblique/EXP-71/equiv_legacy.py",
+    "_scratch/regress/2026-11-13/oblique/EXP-71/equiv_legacy.json"
+  ],
+  "ran_at": "2026-11-13T01:05:00+08:00",
+  "wall_s": 180.0
+}

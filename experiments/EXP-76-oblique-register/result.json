@@ -1,0 +1,48 @@
+{
+  "exp": "EXP-76",
+  "verdict": "pass",
+  "metrics": {
+    "skills_total": 15,
+    "index_stage": 2.5,
+    "skills_yaml_entries": 14,
+    "skills_yaml_safe_load_ok": true,
+    "load_order_unchanged": true,
+    "wire_actions": 2,
+    "wire_errors": 0,
+    "agents_skills_junctions": 15,
+    "workbuddy_skills_junctions": 15,
+    "user_level_junction_created": true,
+    "user_level_junction_is_dir": true,
+    "user_level_junction_is_symlink": false,
+    "k17_negative_exit": 1,
+    "k17_negative_message": "INDEX 标了数字 stage 但没进编排: fdtd-lumerical-oblique-incidence(stage 2.5)",
+    "k17_restore_exit": 0,
+    "gate_check_skill_contract_exit": 0,
+    "gate_check_skill_contract_ok": 149,
+    "gate_check_skill_contract_warn": 0,
+    "gate_check_skill_contract_fail": 0,
+    "gate_skills_doctor_exit": 0,
+    "gate_check_scripts_exit": 0,
+    "gate_check_experiments_exit": 0,
+    "self_test_assertions": 50,
+    "self_test_passed": 50,
+    "pyc_artifacts_removed": 12
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "N6: 临时从 skills.yaml 删掉 fdtd-lumerical-oblique-incidence 条目，check_skill_contract.py 报 [K17] FAIL 且 exit 1；恢复后 [K17] OK 且 exit 0。另继承 EXP-73 amendment 的 A/I 两条：旧 spec 的 T=-0.003 仍被拒、diverging 日志仍被拒。"
+  },
+  "artifacts": [
+    "skills/INDEX.md",
+    "agents/fdtd-sim-agent/skills.yaml",
+    "skills/fdtd-lumerical-oblique-incidence/SKILL.md",
+    "skills/fdtd-lumerical-oblique-incidence/scripts/angle_sweep.py",
+    "skills/fdtd-lumerical-oblique-incidence/references/angle-physics.md",
+    "docs/plans/PLAN-2026-11-13-oblique-incidence.md",
+    "journal/2026-11-13.md",
+    "experiments/EXP-76-oblique-register/design.md",
+    "_scratch/regress/2026-11-13/oblique/EXP-76/k17_negative.py"
+  ],
+  "ran_at": "2026-11-13T02:20:00+08:00",
+  "wall_s": 180.0
+}

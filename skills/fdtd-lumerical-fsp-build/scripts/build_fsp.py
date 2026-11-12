@@ -39,7 +39,7 @@ if str(ROOT / "library" / "py") not in sys.path:
 
 from fsp_build import (  # noqa: E402
     _MAX_CELLS_OBJECTS, array_cells, array_element_center, array_plan, build_materials,
-    build_objects, build_simulation, ev, resolve_axes,
+    build_objects, build_simulation, ev, incidence_expected, resolve_axes,
 )
 
 DEFAULT_ENV = dict(
@@ -114,6 +114,12 @@ def expected_properties(spec: dict) -> list:
         want.append(("FDTD", "y span", ev(lat["period_y"], params) * int(sc.get("ny", 1))))
     if sim.get("mesh_accuracy") is not None:
         want.append(("FDTD", "mesh accuracy", float(sim["mesh_accuracy"])))
+    # EXP-75: high-angle BFAST stability is a declared, checkable property.
+    if sim.get("dt_stability_factor") is not None:
+        want.append(("FDTD", "dt stability factor", float(sim["dt_stability_factor"])))
+    # EXP-72: angles / BCs / plane wave type are the properties a legacy check was blind to.
+    # Values may be strings — run_check() compares those verbatim instead of float()-ing them.
+    want.extend(incidence_expected(spec, params))
     return want
 
 
@@ -217,6 +223,23 @@ def run_check(fsp: Path, spec: dict, tol: float = 1e-9, built: dict = None) -> d
     try:
         f.load(str(fsp.resolve()))
         for obj, prop, want in want_all:
+            if isinstance(want, str):
+                # BC / plane wave type are enumerated strings, not numbers. float() would
+                # raise and get filed as "missing" — a false mismatch (the K11 mistake).
+                try:
+                    got_s = str(f.getnamed(obj, prop)).strip()
+                    ok = got_s == want
+                    row = {"object": obj, "property": prop, "expected": want,
+                           "actual": got_s, "status": "ok" if ok else "mismatch"}
+                except Exception as e:                 # noqa: BLE001
+                    ok = False
+                    row = {"object": obj, "property": prop, "expected": want,
+                           "actual": None,
+                           "status": "missing: %s" % str(e).splitlines()[0][:60]}
+                rows.append(row)
+                if not ok:
+                    bad.append(row)
+                continue
             try:
                 got = float(f.getnamed(obj, prop))
             except Exception as e:                 # noqa: BLE001

@@ -55,6 +55,15 @@ DEFAULT_ENV = dict(
     api_path=r"F:\Lumercial_WS\ANSYS Inc\v251\Lumerical\api\python",
 )
 
+# EXP-75 deviation (PLAN-2026-11-13 §11): an opaque metal ground plane makes T physically
+# zero, but the DFT power monitor below it returns a small NEGATIVE noise floor. Measured on
+# v251: our P08 theta=0 gave T in [-0.00305, -0.00007], mean -0.00106; the course's own
+# finished wd.fsp / wd_BFASK.fsp gave [-0.00420, -0.00009] / [-0.00365, -0.00007].
+# Two A/B controls (T monitor 4x further from the boundary; pml layers 8->4) changed |T| by
+# <1e-5, so this is NOT a monitor-in-PML error. 5e-3 is a HARD bound on that noise: a real
+# broken monitor (e.g. T=-0.80, the P07 event) is still rejected.
+OPAQUE_T_NOISE_MAX = 5e-3
+
 
 def open_session(env, retries=4):
     os.environ.setdefault("ANSYSLMD_LICENSE_FILE", env["license"])
@@ -85,6 +94,33 @@ def read_power(f, name):
     raise ValueError("unexpected getresult layout for %s: %r" % (name, type(item)))
 
 
+def check_engine_log(save_path):
+    """Reject a solve whose engine log says the fields diverged.
+
+    v251 prints ``Simulation completed successfully`` even after
+    ``ERROR: ... the electromagnetic fields are diverging`` (measured EXP-75 at theta=60 BFAST:
+    R stayed in [0,1] yet Auto Shutoff had blown up to 8966). So `completed` alone is NOT a
+    convergence criterion; the literal `diverging` must be checked.
+
+    A log older than the .fsp is stale (left over from an earlier run) and is reported as
+    N/A rather than being silently read as "converged".
+    """
+    if not save_path:
+        return {"found": False, "reason": "no save_path, engine log location unknown"}
+    fsp = pathlib.Path(save_path)
+    log = fsp.with_name(fsp.stem + "_p0.log")
+    if not log.is_file() or (fsp.is_file() and log.stat().st_mtime < fsp.stat().st_mtime):
+        return {"found": False, "reason": "no fresh _p0.log beside the saved .fsp"}
+    text = log.read_text(encoding="utf-8", errors="ignore")
+    if "diverging" in text.lower():
+        raise RuntimeError(
+            "引擎在 %s 报 'fields are diverging'：本点不算结果。"
+            "别把 R/T 仍在 [0,1] 当成收敛，先查 BFAST 角度 / dt stability factor / PML"
+            % log.name)
+    return {"found": True, "diverging": False,
+            "completed": "simulation completed successfully" in text.lower()}
+
+
 def run_point(spec, params, env, save_path=None):
     f = open_session(env)
     try:
@@ -95,6 +131,7 @@ def run_point(spec, params, env, save_path=None):
         if save_path:
             f.save(save_path)
         f.run()
+        check_engine_log(save_path)
         lam, R = read_power(f, "R")
         _, T = read_power(f, "T")
         lam = np.asarray(lam).flatten() * 1e6
@@ -104,7 +141,7 @@ def run_point(spec, params, env, save_path=None):
             # The R monitor sits BELOW the source, so the reflected wave travels in -z and the
             # monitor's net flux is negative. Its magnitude is the reflectance.
             R = -R
-        return dict(lam=lam, R=R, T=T, A=1.0 - R - T)
+        return apply_opaque_ground_plane(dict(lam=lam, R=R, T=T, A=1.0 - R - T), spec)
     finally:
         try:
             f.close()
@@ -130,6 +167,34 @@ def check_physical_range(name, arr, tol=None):
     return lo, hi
 
 
+def apply_opaque_ground_plane(res, spec):
+    """Reflection device on an opaque metal backplane: use T == 0, but keep the raw evidence.
+
+    Opt-in via ``simulation.opaque_ground_plane: true``. Legacy specs take the unchanged path,
+    so the A/B call-sequence equivalence (EXP-71) is preserved bit-for-bit.
+
+    The raw monitor trace is NOT discarded: it is kept in ``res["T_raw"]`` and its peak is
+    checked against ``OPAQUE_T_NOISE_MAX``. A truly misplaced / broken monitor therefore still
+    fails here instead of being hidden by the zero substitution.
+    """
+    if not (spec.get("simulation") or {}).get("opaque_ground_plane"):
+        return res
+    raw = np.asarray(res["T"], dtype=float)
+    peak = float(np.nanmax(np.abs(raw))) if raw.size else 0.0
+    if peak > OPAQUE_T_NOISE_MAX:
+        raise ValueError(
+            "opaque_ground_plane 声明下 T 监视器噪声 |T|max=%.5f > 上界 %.0e："
+            "这不是不透明背板的 DFT 零点，检查监视器/几何/源归一化。"
+            "原始 T 范围 [%.5f, %.5f]" %
+            (peak, OPAQUE_T_NOISE_MAX, float(np.nanmin(raw)), float(np.nanmax(raw))))
+    out = dict(res)
+    out["T_raw"] = raw
+    out["T_raw_abs_max"] = peak
+    out["T"] = np.zeros_like(raw)
+    out["A"] = 1.0 - np.asarray(out["R"]) - out["T"]
+    return out
+
+
 def metrics(res, mode="reflection", quantity=None):
     """Peak metric chosen by the declared quantity, not by the device type.
 
@@ -140,16 +205,23 @@ def metrics(res, mode="reflection", quantity=None):
     key = {"peak_transmittance": "T", "transmittance": "T",
            "peak_reflectance": "R", "reflectance": "R"}.get(
                str(quantity or ""), "T" if mode == "transmission" else "A")
-    for name in ("R", "T"):
+    # EXP-73: the course's Bloch+broadband run produced A<0 near 700 nm while R and T
+    # both stayed inside [0,1]. Checking only R/T let a wrong result through silently.
+    # A = 1 - R - T is a physical quantity too and must pass the same range gate.
+    for name in ("R", "T", "A"):
         check_physical_range(name, res[name])
     lam = res["lam"]
     arr = res[key]
     i = int(np.argmax(arr))
     half = arr >= arr[i] / 2.0
-    return dict(metric=key,
-                peak_value=float(arr[i]), peak_lam_um=float(lam[i]),
-                R_at_peak=float(res["R"][i]), T_at_peak=float(res["T"][i]),
-                fwhm_um=float(lam[half].max() - lam[half].min()) if half.sum() > 1 else float("nan"))
+    m = dict(metric=key,
+             peak_value=float(arr[i]), peak_lam_um=float(lam[i]),
+             R_at_peak=float(res["R"][i]), T_at_peak=float(res["T"][i]),
+             fwhm_um=float(lam[half].max() - lam[half].min()) if half.sum() > 1 else float("nan"))
+    # Evidence for the opaque-backplane substitution travels with the row (EXP-75 §11).
+    if "T_raw_abs_max" in res:
+        m["T_raw_abs_max"] = round(float(res["T_raw_abs_max"]), 6)
+    return m
 
 
 def expand(sweep):
@@ -217,9 +289,13 @@ def main():
                         save_path=os.path.join(out_dir, "point_%02d_%s.fsp" % (i, tag)))
         m = metrics(res, (spec.get("simulation") or {}).get("mode", "reflection"),
                     (spec.get("target") or {}).get("quantity"))
+        cols = [res["lam"], res["R"], res["T"], res["A"]]
+        header = "lam_um,R,T,A"
+        if "T_raw" in res:
+            cols.append(res["T_raw"])
+            header += ",T_raw"
         np.savetxt(os.path.join(out_dir, "point_%02d_%s.csv" % (i, tag)),
-                   np.column_stack([res["lam"], res["R"], res["T"], res["A"]]),
-                   delimiter=",", header="lam_um,R,T,A", comments="")
+                   np.column_stack(cols), delimiter=",", header=header, comments="")
         rows.append(dict(point=i, **over, **m))
         say("   peak %s = %.4f @ %.3f um   FWHM = %.3f um"
             % (m["metric"], m["peak_value"], m["peak_lam_um"], m["fwhm_um"]))

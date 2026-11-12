@@ -1,12 +1,12 @@
 # PLAN-2026-11-13：入射角改变能力（oblique incidence）+ 角度扫描技能
 
-> 状态：**DRAFT / 待批准** —— 本轮只解析视频与现有实现，未改任何能力脚本。
+> 状态：**已批准并执行完成（2026-11-13）** —— EXP-70…76 全部 `verdict=pass`，四门禁全绿。
 > 触发：`cases/P08_BroadbandAbsorber_043/lecture/第三讲 宽角度完美吸收器.mp4`
 > 依据：`docs/constitution/skill-change-contract.md`（A/B/C 三档）、`docs/plans/AGENTS.md`（每步可回退）
 > EXP 起编：**EXP-70**（台账已到 EXP-69）；本计划登记 EXP-70…76。
-> ⚠️ 开工前置：工作区当前有 2026-11-12 的未提交改动（EXP-66…69、`fdtd-lumerical-field-propagate`、
-> `library/py/fsp_build.py`、`skills.yaml`、`INDEX.md`、`journal/`）。**先提交或明确 stash**，否则
-> 「零破坏回归」的基线不干净，改坏了分不清是谁改的。
+> 开工前置已完成：11-12 的未提交改动在 EXP-70 里以 `2f49a7d` 固化，基线干净。
+> ⚠️ 执行中有三条判定偏差，**必读 §11**（D-01 不透明背板 T 噪声 / D-02 GPU / D-03 60° 发散）；
+> 交付角度网格是 **0/30/40°**，不是批准时的 0/30/60°，60° 为 N/A 且课程工程同样发散。
 
 ---
 
@@ -396,4 +396,100 @@ builder 单一实现、A 越界检查（课程反例）。
 
 ## 11. 执行中的判定偏差追记
 
-（批准执行后填写；格式参考 `PLAN-2026-11-11-percell-fsp.md` §9：原判据 → 实测反证 → 新判据 → 影响哪些 EXP。）
+格式参考 `PLAN-2026-11-11-percell-fsp.md` §9：原判据 → 实测反证 → 新判据 → 影响哪些 EXP。
+
+### D-01（EXP-75，2026-11-13）：不透明背板下 `T` 的判据
+
+**原判据**（§5 步骤 4 / EXP-73）：`metrics()` 对 R、T、A 都用 `check_physical_range()`
+卡 `[0,1]±1e-3`，其中 `T` 直接取 T 监视器的原始值。P08 0° 首轮因此 `ValueError:
+T 越界 [-0.003, -0.000]`，三个角度一个都没落盘。
+
+**实测反证**（全部实机，非猜测）：
+
+| 证据 | 结果 |
+|---|---|
+| 本次 P08 θ=0 BFAST（`point_00_theta_0_pol_90.fsp`） | `T ∈ [-0.00305, -0.00007]`，均值 −0.00106；`R ∈ [0.0512, 0.9633]`；`_p0.log` 显示 BFAST 生效、auto shutoff 收敛、10102 步、`Simulation completed successfully` |
+| **课程自己的成品工程** `wd.fsp` / `wd_BFASK.fsp` | `T ∈ [-0.00420, -0.00009]` / `[-0.00365, -0.00007]`，均值 −0.00144 / −0.00122；`R ∈ [0.0465, 0.9707]` / `[0.0542, 0.9419]` |
+| A/B 对照 1：T 监视器从 y=−0.18 µm 移到 −0.60 µm（`below_structure` 0.3→1.0 µm） | `T_min` −0.00305 → −0.00297；`R_min` 0.0511566 → 0.0511557（差 9e−7） |
+| A/B 对照 2：`pml layers` 8→4 | 仍报 `T 越界 [-0.003, -0.000]` |
+
+结论：这是 **80 nm Ag 不透明背板下 DFT 功率监视器的数值噪声零点**（物理上 T≡0），
+与监视器压进 PML 无关（P07 那种是 `T=−0.80 / A=1.60` 量级）。课程工程同样存在，
+不是本次建模引入的错误。
+
+**新判据**（不静默放宽，改成显式物理契约）：
+
+1. spec 必须**显式声明** `simulation.opaque_ground_plane: true` 才走新路径；
+   旧 spec 逐位不变（EXP-71 的调用序列 A/B 等价性保持）。
+2. 新路径里 `T` 按物理取 0、`A = 1 − R`；但**原始监视器值不丢弃**：写进 `res["T_raw"]`、
+   `T_raw_abs_max` 与 `point_*.csv` 的第 5 列 `T_raw`，并进 `summary.csv`。
+3. **硬噪声上界 `OPAQUE_T_NOISE_MAX = 5e-3`**：`|T_raw|` 超过即报错。真正坏的监视器
+   （`T=−0.50` / `+0.20`）依旧被拒，门禁仍然 load-bearing。
+4. `validate_spec.py` 拒绝 `opaque_ground_plane=true` + `mode="transmission"`（矛盾声明），
+   也拒绝非 bool 值。
+5. R / A 的 `[0,1]` 门禁**完全不变**；声明后 `A` 是派生量，`A<0` 必先被 R 门禁抓到。
+
+离线负对照 `_scratch/regress/2026-11-13/oblique/EXP-73/amend_opaque_t.py`：7 条全过
+（A 旧 spec 仍红 / B 声明后接受且留证 / C·D 噪声上界抓坏监视器 / E R 门禁 / F A 门禁 / G 派生关系）。
+
+**影响哪些 EXP**：EXP-73（门禁语义，追加 amendment，不改原 `verdict`）、EXP-75（P08 端到端，
+spec 加 `opaque_ground_plane` 并重跑）、EXP-76（文档与门禁回归）。§6 正对照 3 的
+「A(λ,θ) 趋势」判据不变。
+
+### D-02（EXP-75）：首轮 GPU 失败
+
+首轮 `run_fdtd_sweep.py` 报 `GPU simulation only supports 3D` + `GPU simulation does not
+support the use of BFAST sources`。根因是全局 `FDTD\GPU-mode=true`。
+**处置**：2D+BFAST 一律走 `tools/gpu_guard.py --run` 切 CPU（try/finally 自动还原）；
+并把 sweep 网格内嵌进 `spec_angles.json`，避免 cmd.exe 下 `--sweep-json` 引号被吞。
+判据不变。
+
+### D-03（EXP-75）：60° BFAST 发散，且**课程原工程同样发散**
+
+**原判据**（§5 步骤 6 / §6 正对照 3）：P08 端到端做 0/30/60° × `pol=90` BFAST，
+「到 60° 几乎不漂移」与论文 Fig.5 趋势对照。
+
+**实测反证**：0° 与 30° 均收敛（10102 / 24549 步，auto shutoff 9.4e−6 / 9.95e−6），
+但 **60° 报 `ERROR: Early termination of simulation, the electromagnetic fields are diverging`**
+（60157 步、Auto Shutoff 冲到 116454、R 最大 1.028）。
+
+| 对照 | 配置改动 | 结果 |
+|---|---|---|
+| v1 | `dt stability factor` 0.99→0.95 | R 落在 [0,1] 但 **仍 diverging**（shutoff 8966）→ 门禁漏判 |
+| v2 / v3 / v4 | `pml layers` 24 / dt0.95+pml24 / dt0.90+pml32 | 全部 diverging，R>1 |
+| b1 / b2 | dt 0.50 / 0.25 | 不 diverging 且 shutoff≈9.8e−6，但 **R 最大 1.019 / 1.018**（非物理） |
+| b3 / b4 | `bfast alpha` 4 / dt0.5+alpha4+pml24 | diverging |
+| b5 | 去掉 mesh override | diverging（shutoff 2825） |
+| b6 | `simulation time` 改课程值 5e−14 | diverging（shutoff 112731） |
+| **course_60** | **直接把课程 `wide_angle.fsp` 的 `source.angle theta` 改成 60 并跑** | **diverging（shutoff 104477）** |
+
+结论：60° 发散是 **v251 上这套 a-Si/Ag 色散材料 + BFAST 的固有限制**，课程自己的工程
+也复现，不是本次 spec 建模错误。`dt=0.5` 只压住发散却把 R 推到 1.019，属于换一种非物理，
+不接受。§6 风险表 R1（BFAST 与低损色散半导体发散）实际发生。
+
+**收敛上限实测**（默认 v251 设置：dt=0.99 / pml=8 / alpha=1，即课程同款）：
+
+| θ | 收敛 | R 最大 | 判定 |
+|---|---|---|---|
+| 0° | ✅ 10102 步 | 0.963 | 结果 |
+| 30° | ✅ 24549 步 | ≈0.96 | 结果（课程锚点） |
+| 35° / 40° | ✅ shutoff ≈9.7e−6 | 0.956 / **0.989** | 结果 |
+| 45° / 50° / 55° | 无 diverging、shutoff≈9.8e−6 | **1.038 / 1.073 / 1.077** | 非物理，拒绝 |
+| 60° | ❌ diverging | 1.028 | 拒绝；课程工程同样发散 |
+
+BFAST 的 R>1 随角度单调增长，先于发散出现，是**源归一化/能量守恒被破坏**的信号，
+不能当「小误差」放过去。
+
+**新判据**：角度网格改为 **0 / 30 / 40° × pol=90**（3 点，保留批准网格里的 0° 与课程
+30° 锚点，把不可达的 60° 换成实测干净上限 40°）。判据不变：**每点必须收敛且 R/T/A
+落在 [0,1]**。60° 与 45/50/55° 作为 **N/A + 证据** 留在 `_scratch/regress/2026-11-13/oblique/`
+的对照台账（`controls_60.json` / `controls_60_round2.json` / `angle_ceiling.json`），
+不写成结果、不写「到 60° 不漂移」。论文 Fig.5 的趋势对照只在 0–40° 已收敛范围内陈述。
+
+**副产物（正确性修复，不是去噪）**：v251 在 `fields are diverging` 之后仍打印
+`Simulation completed successfully`，且 v1 的 R 仍在 [0,1] —— 只靠 `check_physical_range`
+会**放发散结果过闸**。已在 `run_fdtd_sweep.py` 增加 `check_engine_log()`：
+读 `<fsp>_p0.log`，`diverging` 字面量出现即抛错；日志比 fsp 旧则报 N/A 不假装收敛。
+离线负对照 H/I 已验证（收敛日志过、发散日志红）。
+
+**影响哪些 EXP**：EXP-73（追加 amendment）、EXP-75（角度网格与判据）、EXP-76（文档）。

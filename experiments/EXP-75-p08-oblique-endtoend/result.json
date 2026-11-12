@@ -1,0 +1,58 @@
+{
+  "exp": "EXP-75",
+  "verdict": "pass",
+  "metrics": {
+    "angles_deg": [0.0, 30.0, 40.0],
+    "polarizations_deg": [90.0],
+    "n_points": 3,
+    "n_lambda_per_point": 50,
+    "matrix_rows": 150,
+    "collect_ok": true,
+    "points_complete": true,
+    "A_range": [0.011067, 0.948843],
+    "duplicate_curves": 0,
+    "convergence_ok": 3,
+    "convergence_failures": 0,
+    "iterations": [10102, 24549, 29580],
+    "final_auto_shutoff": [9.36744e-06, 9.95009e-06, 9.6626e-06],
+    "peak_A": [0.948843, 0.922982, 0.942652],
+    "mean_A_400_650": [0.776575, 0.75373, 0.733423],
+    "max_abs_A_diff_vs_normal": [0.0, 0.0516, 0.093],
+    "T_raw_abs_max": [0.003051, 0.002431, 0.001984],
+    "fsp_angle_readback": [0.0, 30.0, 40.0],
+    "getsourceangle_400_600_800nm": [[0.0, 0.0, 0.0], [30.0, 30.0, 30.0], [40.0, 40.0, 40.0]],
+    "bfast_angle_drift_deg": 0.0,
+    "course_wd_fsp_T_min": -0.004196,
+    "course_wd_BFASK_fsp_T_min": -0.003654,
+    "diverging_at_60deg": true,
+    "course_wide_angle_fsp_diverging_at_60deg": true,
+    "clean_angle_ceiling_deg": 40.0,
+    "R_max_at_45_50_55deg": [1.038, 1.073, 1.077],
+    "offline_controls_passed": 9
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "D-01: 旧 spec 下 T=-0.003 仍被拒；T_raw=-0.50/+0.20 被 5e-3 噪声上界拒；opaque+transmission 被 validate_spec 拒(exit 1)。D-03: 60° 发散日志被 check_engine_log 拒，且课程 wide_angle.fsp 改到 60° 同样发散；45/50/55° R>1 被 check_physical_range 拒。N5 重复曲线检查由 EXP-74 负对照保证。以上均为真实失败，不是占位。"
+  },
+  "not_measured": [
+    {"item": "60deg BFAST", "reason": "fields are diverging; reproduced on the course's own wide_angle.fsp. See PLAN §11 D-03."},
+    {"item": "45/50/55deg", "reason": "converged but R=1.038/1.073/1.077 (non-physical, grows with angle)."},
+    {"item": "TE/TM difference", "reason": "only pol=90 was run in slice 1."},
+    {"item": "paper Fig.5 claim up to 60deg", "reason": "outside the verified 0-40deg range; requires slice 2 bloch_single single-frequency scan."}
+  ],
+  "artifacts": [
+    "_scratch/regress/2026-11-13/oblique/angle_sweep/angle_sweep_plan.json",
+    "_scratch/regress/2026-11-13/oblique/angle_sweep/spec_angles.json",
+    "_scratch/regress/2026-11-13/oblique/angle_sweep/angle_matrix.csv",
+    "_scratch/regress/2026-11-13/oblique/angle_sweep/angle_metrics.json",
+    "_scratch/regress/2026-11-13/oblique/angle_sweep/angle_check.json",
+    "_scratch/regress/2026-11-13/oblique/angle_sweep/fsp_angle_readback.json",
+    "_scratch/regress/2026-11-13/oblique/angle_sweep/angle_ceiling.json",
+    "_scratch/regress/2026-11-13/oblique/angle_sweep/controls_60.json",
+    "_scratch/regress/2026-11-13/oblique/angle_sweep/controls_60_round2.json",
+    "_scratch/regress/2026-11-13/oblique/angle_sweep/run/summary.csv",
+    "experiments/EXP-75-p08-oblique-endtoend/design.md"
+  ],
+  "ran_at": "2026-11-13T02:10:00+08:00",
+  "wall_s": 900.0
+}

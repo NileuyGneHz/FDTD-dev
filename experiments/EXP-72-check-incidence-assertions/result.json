@@ -1,0 +1,27 @@
+{
+  "exp": "EXP-72",
+  "verdict": "pass",
+  "metrics": {
+    "positive_checked": 33,
+    "positive_mismatches": 0,
+    "new_incidence_assertions": 6,
+    "string_assertions": 3,
+    "n3_exit_code": 1,
+    "n3_mismatches": 1,
+    "reverse_exit_code": 1,
+    "reverse_mismatches": 1,
+    "p01_legacy_checked": 34,
+    "p01_legacy_mismatches": 0,
+    "n2_analysis_mode_rejected": true
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "N3 改 spec 角度 30->35 不重建，--only-check exit 1 并指名 source.angle theta expected=35 actual=30；反向篡改 .fsp 同样 exit 1"
+  },
+  "artifacts": [
+    "_scratch/regress/2026-11-13/oblique/spec_p08_mut35.json",
+    "_scratch/regress/2026-11-13/oblique/EXP-72/p08_fsp_mut35.fsp"
+  ],
+  "ran_at": "2026-11-13T01:20:00+08:00",
+  "wall_s": 60.0
+}

@@ -1,0 +1,48 @@
+{
+  "exp": "EXP-73",
+  "verdict": "pass",
+  "metrics": {
+    "n4_rejected": 3,
+    "n4_exit_codes": [1, 1, 1],
+    "legal_p08_errors": 0,
+    "legal_p08_warnings": 0,
+    "p01_legacy_errors": 0,
+    "p01_legacy_warnings": 0,
+    "n7_min_A": -0.2,
+    "n7_R_min": 0.1,
+    "n7_R_max": 0.9,
+    "n7_T_max": 0.3,
+    "n7_reports_A_not_R": true
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "三条违规配置全部 exit 1；N7 构造 R/T 合法但 A=-0.2 时 metrics() 报 'A 越界' 而非 R，证明新增的 A 检查确实 load-bearing"
+  },
+  "artifacts": [
+    "_scratch/regress/2026-11-13/oblique/EXP-73/n4_periodic_bc.json",
+    "_scratch/regress/2026-11-13/oblique/EXP-73/n4_bloch_broadband.json",
+    "_scratch/regress/2026-11-13/oblique/EXP-73/n4_2d_phi.json",
+    "_scratch/regress/2026-11-13/oblique/EXP-73/n4_periodic_bc.txt",
+    "_scratch/regress/2026-11-13/oblique/EXP-73/n4_bloch_broadband.txt",
+    "_scratch/regress/2026-11-13/oblique/EXP-73/n4_2d_phi.txt"
+  ],
+  "amendment_2026_11_13": {
+    "reason": "EXP-75 端到端实测发现不透明 Ag 背板下 T 监视器有 -0.003 量级噪声零点（课程 wd.fsp/wd_BFASK.fsp 同样为负），原 T 的 [0,1]±1e-3 判据对此器件不可达。详见 PLAN-2026-11-13 §11 D-01。",
+    "change": "新增显式契约 simulation.opaque_ground_plane:true -> T 按物理取 0、A=1-R；原始 T 留 T_raw 并受 OPAQUE_T_NOISE_MAX=5e-3 硬闸；validate_spec 拒绝该字段与 mode=transmission 共存。R/A 门禁不变，旧 spec 路径逐位不变。",
+    "controls_script": "_scratch/regress/2026-11-13/oblique/EXP-73/amend_opaque_t.py",
+    "controls_passed": 7,
+    "controls": [
+      "A: legacy spec + T=-0.003 -> 仍报 T 越界（门禁未被削弱）",
+      "B: 声明后 T=0 / A=1-R / T_raw_abs_max=0.003 留证",
+      "C: T=-0.50 -> 噪声上界拒绝",
+      "D: T=+0.20 -> 噪声上界拒绝",
+      "E: R=-0.2 -> R 门禁拒绝",
+      "F: legacy + A=-0.2 -> A 门禁拒绝（N7 复现）",
+      "G: 声明后 A 为派生量，A<0 必先被 R 门禁抓到"
+    ],
+    "validator_negative_control": "EXP-73/opaque_transmission_bad.json -> exit 1",
+    "original_verdict_unchanged": true
+  },
+  "ran_at": "2026-11-13T01:30:00+08:00",
+  "wall_s": 45.0
+}

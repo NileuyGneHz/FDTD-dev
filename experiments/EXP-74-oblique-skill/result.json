@@ -1,0 +1,41 @@
+{
+  "exp": "EXP-74",
+  "verdict": "pass",
+  "metrics": {
+    "self_test_assertions": 49,
+    "self_test_passed": 49,
+    "plan_dry_run_files_written": 0,
+    "plan_n_points": 3,
+    "plan_tilt_axis": "x",
+    "plan_cost_factor": 10.5,
+    "spec_angles_validator_errors": 0,
+    "spec_angles_validator_warnings": 0,
+    "runner_dry_run_points": 3,
+    "build_check_checked": 38,
+    "build_check_mismatches": 0,
+    "n5_duplicate_curve_pairs": 3,
+    "n5_exit_code": 1,
+    "positive_control_exit_code": 0,
+    "positive_control_rows": 15,
+    "scripts_in_skill": 1
+  },
+  "negative_control": {
+    "failed": true,
+    "detail": "N5 三个角度的 CSV 完全相同时 collect 检出 3 对重复曲线、ok=false、exit 1；self-test 的重复角度/θ>=85/bloch+宽带/A<0/diverging 五类负例也全部被抓"
+  },
+  "artifacts": [
+    "skills/fdtd-lumerical-oblique-incidence/SKILL.md",
+    "skills/fdtd-lumerical-oblique-incidence/scripts/angle_sweep.py",
+    "skills/fdtd-lumerical-oblique-incidence/references/angle-physics.md",
+    "_scratch/regress/2026-11-13/oblique/angle_sweep/angle_sweep_plan.json",
+    "_scratch/regress/2026-11-13/oblique/angle_sweep/spec_angles.json",
+    "_scratch/regress/2026-11-13/oblique/angle_sweep/angle_check.json"
+  ],
+  "amendment_2026_11_13": {
+    "note": "EXP-74 落账时为 49/49；随后修 driver 命令（必须指向 spec_angles.json 而非 raw spec）时补了 1 条 self-test 断言，当前为 50/50。EXP-76 复测 50/50。",
+    "current_self_test": "50/50",
+    "plan_grid_note": "EXP-74 的 plan 用 0/30/60 网格（cost_factor 10.5）；EXP-75 因 D-03 把交付网格改为 0/30/40（cost_factor 6.833）。原记录保留为当时事实。"
+  },
+  "ran_at": "2026-11-13T01:45:00+08:00",
+  "wall_s": 150.0
+}

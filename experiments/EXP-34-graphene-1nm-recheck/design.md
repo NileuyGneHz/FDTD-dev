@@ -6,7 +6,7 @@
 ## 输入
 
 - `_scratch/regress/2026-11-10/EXP-46/p09_2d_spec.json`（2D，x=周期，y=传播，石墨烯 1 nm box）
-- 基准：`cases/P09_GrapheneAbsorber_044/model/graphene_perfect_absorber.fsp` 的存谱
+- 基准：`cases/metasurface/P09_GrapheneAbsorber_044/model/graphene_perfect_absorber.fsp` 的存谱
   （手建，石墨烯用 `Sampled 2D data` 表面电导率）
 
 ## 方法

@@ -6,7 +6,7 @@ P07 initial_trial 的监视器叫 monitor/field/time：旧版兜底把 monitor �
 
 ## 输入
 
-`cases/P07_BrokenSymmetry_041/model/initial_trial.fsp`
+`cases/metasurface/P07_BrokenSymmetry_041/model/initial_trial.fsp`
 
 ## 负对照
 

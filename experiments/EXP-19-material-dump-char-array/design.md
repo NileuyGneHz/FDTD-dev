@@ -6,7 +6,7 @@ getmaterial() 返回字符数组未 join 时整张表丢失；现在 user_Au 带
 
 ## 输入
 
-`cases/P09_GrapheneAbsorber_044/model/graphene_perfect_absorber.fsp`
+`cases/metasurface/P09_GrapheneAbsorber_044/model/graphene_perfect_absorber.fsp`
 
 ## 负对照
 

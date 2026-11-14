@@ -32,5 +32,5 @@ PHYS_TOL 1e-6 -> 1e-3（EXP-09 引入的守卫误伤正常运行）；抽出纯�
 
 ## 可重跑命令
 ```bash
-python skills/fdtd-lumerical-unitcell-simulation/scripts/run_fdtd_sweep.py --spec cases/P01_Absorber_042/config/spec_p01.json --out _scratch/regress/2026-11-09/EXP-26/run
+python skills/fdtd-lumerical-unitcell-simulation/scripts/run_fdtd_sweep.py --spec cases/metasurface/P01_Absorber_042/config/spec_p01.json --out _scratch/regress/2026-11-09/EXP-26/run
 ```

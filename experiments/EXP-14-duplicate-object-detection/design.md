@@ -6,7 +6,7 @@ P05 的 group 内 21 个同名 rectangle：旧版逐条写进 manifest（unique 
 
 ## 输入
 
-`cases/P05_Metalens_048/model/RCP.fsp`
+`cases/metasurface/P05_Metalens_048/model/RCP.fsp`
 
 ## 负对照
 

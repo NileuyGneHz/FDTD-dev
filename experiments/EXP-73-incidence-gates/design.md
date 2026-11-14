@@ -35,7 +35,7 @@ for c in n4_periodic_bc n4_bloch_broadband n4_2d_phi; do
   "$PY" "$V" "$S/EXP-73/$c.json" --strict; echo "$c exit=$?"
 done
 "$PY" "$V" "$S/spec_p08.json" --strict
-"$PY" "$V" cases/P01_Absorber_042/config/spec_p01.json
+"$PY" "$V" cases/metasurface/P01_Absorber_042/config/spec_p01.json
 ```
 
 ## 实测结果

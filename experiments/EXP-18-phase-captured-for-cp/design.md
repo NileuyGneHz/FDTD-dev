@@ -6,7 +6,7 @@
 
 ## 输入
 
-`cases/P05_Metalens_048/model/RCP.fsp`
+`cases/metasurface/P05_Metalens_048/model/RCP.fsp`
 
 ## 负对照
 

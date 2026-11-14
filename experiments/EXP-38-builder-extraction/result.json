@@ -20,8 +20,8 @@
     "detail": "把 _shared/fsp_build.py 移走后经 run_fdtd_sweep 导入 -> ImportError: _shared/fsp_build.py not found"
   },
   "artifacts": [
-    "python _scratch/regress/2026-11-09/EXP-38/build_probe.py --spec cases/P01_Absorber_042/config/spec_p01.json --out _scratch/regress/2026-11-09/EXP-38/after --impl shared",
-    "python skills/fdtd-lumerical-unitcell-simulation/scripts/run_fdtd_sweep.py --spec cases/P01_Absorber_042/config/spec_p01.json --out _scratch/regress/2026-11-09/EXP-26/run --dry-run"
+    "python _scratch/regress/2026-11-09/EXP-38/build_probe.py --spec cases/metasurface/P01_Absorber_042/config/spec_p01.json --out _scratch/regress/2026-11-09/EXP-38/after --impl shared",
+    "python skills/fdtd-lumerical-unitcell-simulation/scripts/run_fdtd_sweep.py --spec cases/metasurface/P01_Absorber_042/config/spec_p01.json --out _scratch/regress/2026-11-09/EXP-26/run --dry-run"
   ],
   "ran_at": "2026-11-09T16:20:00+08:00"
 }

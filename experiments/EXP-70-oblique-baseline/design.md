@@ -46,10 +46,10 @@ done
 
 ## 取证清单
 
-- 视频：`cases/P08_BroadbandAbsorber_043/lecture/第三讲 宽角度完美吸收器.mp4`
+- 视频：`cases/metasurface/P08_BroadbandAbsorber_043/lecture/第三讲 宽角度完美吸收器.mp4`
   25:00.3 / 30 fps / 45010 帧 / 1280×720 / 531,609,288 B
 - 音频转写：`_scratch/regress/2026-11-13/lecture_transcript.txt`（1027 段）
 - 抽帧：`_scratch/regress/2026-11-13/lecture_frames/`（35 采样 + 21 全分辨率 + 3 总览）
-- 课程工程 7 个 `.fsp` + 3 个 `_p0.log`：`cases/P08_BroadbandAbsorber_043/model/`
+- 课程工程 7 个 `.fsp` + 3 个 `_p0.log`：`cases/metasurface/P08_BroadbandAbsorber_043/model/`
 - 材料实测 nk：`model/Ag-nk.txt`、`model/aSi-nk.txt`（40 行，400–790 nm，列 = λ[nm]/n/k）
 - 配套 PPT / 论文 / 自测题：`lecture/`、`paper/`

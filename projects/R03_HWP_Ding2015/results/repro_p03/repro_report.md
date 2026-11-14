@@ -103,7 +103,7 @@
 因此：**10 nm 是本轮交付网格，且已达到 auto-shutoff；但没有完成 5 nm 细化，网格收敛未被证明。**
 20 nm 的失败说明 10 nm 已接近该几何可用的下限，不能再用更粗的网格。
 
-**对照**：`cases/P03_HWP_Ding2015/model/fig1_hwp_paper_materials_p0.log` 是旧工程在 GPU 上跑出的
+**对照**：`cases/metasurface/P03_HWP_Ding2015/model/fig1_hwp_paper_materials_p0.log` 是旧工程在 GPU 上跑出的
 `ERROR: ... fields are diverging`，虽然它也写 `Simulation completed successfully`，但结果不可用。
 本次强制 CPU（`gpu_guard` 判定 Au Drude → CPU），所以这是一次可用的双精度结果。
 

@@ -19,7 +19,7 @@
 ```bash
 PY="C:/Users/saber/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
 "$PY" skills/fdtd-lumerical-fsp-build/scripts/build_fsp.py \
-    --spec cases/P01_Absorber_042/config/spec_p01.json \
+    --spec cases/metasurface/P01_Absorber_042/config/spec_p01.json \
     --out _scratch/regress/2026-11-12/EXP-69/p01 --tag p01 --check
 "$PY" skills/fdtd-lumerical-fsp-build/scripts/build_fsp.py \
     --spec _scratch/regress/2026-11-12/EXP-69/spec_gauss.json \

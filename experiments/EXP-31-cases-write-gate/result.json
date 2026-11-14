@@ -8,10 +8,10 @@
   },
   "negative_control": {
     "failed": true,
-    "detail": "--out cases/P01_Absorber_042/tmp_out -> --out 落在只读参考语料 cases/ 内 ... ; exit 2"
+    "detail": "--out cases/metasurface/P01_Absorber_042/tmp_out -> --out 落在只读参考语料 cases/ 内 ... ; exit 2"
   },
   "artifacts": [
-    "python skills/fdtd-lumerical-session-control/scripts/session_control.py --config _scratch/regress/2026-11-09/sc_repro.json --out cases/P01_Absorber_042/tmp_out --dry-run --json"
+    "python skills/fdtd-lumerical-session-control/scripts/session_control.py --config _scratch/regress/2026-11-09/sc_repro.json --out cases/metasurface/P01_Absorber_042/tmp_out --dry-run --json"
   ],
   "ran_at": "2026-11-09T16:20:00+08:00"
 }

@@ -6,7 +6,7 @@ P06 的涡旋真值（八个八分圆各一种 V 天线）写在 structure group
 
 ## 输入
 
-`cases/P06_Vortex_049/model/fig5.fsp`
+`cases/metasurface/P06_Vortex_049/model/fig5.fsp`
 
 ## 负对照
 

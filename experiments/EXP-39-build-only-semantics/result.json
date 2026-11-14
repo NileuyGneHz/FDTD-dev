@@ -16,7 +16,7 @@
     "detail": "旧路径 run_fdtd_sweep.py 是否支持 --build-only -> argparse 无 --build-only；P01 全流程实测 5987 次迭代（EXP-26），也就是说旧路径要拿到 .fsp 必须先付一次完整求解"
   },
   "artifacts": [
-    "python skills/fdtd-lumerical-fsp-build/scripts/build_fsp.py --spec cases/P01_Absorber_042/config/spec_p01.json --out _scratch/regress/2026-11-09/EXP-39 --tag p01 --check --json"
+    "python skills/fdtd-lumerical-fsp-build/scripts/build_fsp.py --spec cases/metasurface/P01_Absorber_042/config/spec_p01.json --out _scratch/regress/2026-11-09/EXP-39 --tag p01 --check --json"
   ],
   "ran_at": "2026-11-09T17:20:00+08:00"
 }

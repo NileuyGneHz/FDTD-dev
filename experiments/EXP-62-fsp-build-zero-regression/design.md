@@ -25,7 +25,7 @@ P01 的表达式里若真出现 `i` 就会静默取 0 —— 用一条 P01 变�
 
 ```bash
 python skills/fdtd-lumerical-fsp-build/scripts/build_fsp.py \
-  --spec cases/P01_Absorber_042/config/spec_p01.json \
+  --spec cases/metasurface/P01_Absorber_042/config/spec_p01.json \
   --out _scratch/regress/2026-11-11/array/p01 --tag p01_after --check --json
 python tools/check_scripts.py
 ```

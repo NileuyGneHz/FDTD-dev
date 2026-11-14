@@ -9,7 +9,7 @@ D-007 只点了第一处，两处都要量。
 
 ## 输入
 
-`cases/P06_Vortex_049/model/fig5.fsp`（4500 叶子、30×30 structure group）
+`cases/metasurface/P06_Vortex_049/model/fig5.fsp`（4500 叶子、30×30 structure group）
 
 ## 方法
 

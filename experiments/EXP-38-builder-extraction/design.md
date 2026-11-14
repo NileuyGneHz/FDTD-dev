@@ -35,6 +35,6 @@ ev / resolve_material / build_materials / build_objects / check_monitor_gap / bu
 
 ## 可重跑命令
 ```bash
-python _scratch/regress/2026-11-09/EXP-38/build_probe.py --spec cases/P01_Absorber_042/config/spec_p01.json --out _scratch/regress/2026-11-09/EXP-38/after --impl shared
-python skills/fdtd-lumerical-unitcell-simulation/scripts/run_fdtd_sweep.py --spec cases/P01_Absorber_042/config/spec_p01.json --out _scratch/regress/2026-11-09/EXP-26/run --dry-run
+python _scratch/regress/2026-11-09/EXP-38/build_probe.py --spec cases/metasurface/P01_Absorber_042/config/spec_p01.json --out _scratch/regress/2026-11-09/EXP-38/after --impl shared
+python skills/fdtd-lumerical-unitcell-simulation/scripts/run_fdtd_sweep.py --spec cases/metasurface/P01_Absorber_042/config/spec_p01.json --out _scratch/regress/2026-11-09/EXP-26/run --dry-run
 ```

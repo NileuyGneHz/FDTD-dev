@@ -17,7 +17,7 @@
     "detail": "P07 的越界数据 T=-0.80 / A=1.60 用新容差 1e-3 重判 -> raise ValueError（差值比噪声大 4 个数量级）"
   },
   "artifacts": [
-    "python skills/fdtd-lumerical-unitcell-simulation/scripts/run_fdtd_sweep.py --spec cases/P01_Absorber_042/config/spec_p01.json --out _scratch/regress/2026-11-09/EXP-26/run"
+    "python skills/fdtd-lumerical-unitcell-simulation/scripts/run_fdtd_sweep.py --spec cases/metasurface/P01_Absorber_042/config/spec_p01.json --out _scratch/regress/2026-11-09/EXP-26/run"
   ],
   "ran_at": "2026-11-09T16:20:00+08:00"
 }

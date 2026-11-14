@@ -31,5 +31,5 @@
 
 ## 可重跑命令
 ```bash
-python skills/fdtd-lumerical-fsp-build/scripts/build_fsp.py --spec cases/P01_Absorber_042/config/spec_p01.json --out _scratch/regress/2026-11-09/EXP-39 --tag p01 --check --json
+python skills/fdtd-lumerical-fsp-build/scripts/build_fsp.py --spec cases/metasurface/P01_Absorber_042/config/spec_p01.json --out _scratch/regress/2026-11-09/EXP-39 --tag p01 --check --json
 ```

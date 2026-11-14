@@ -34,7 +34,7 @@ S="_scratch/regress/2026-11-13/oblique"
 "$PY" "$B" --only-check "$S/EXP-71/p08/p08_30.fsp" --spec "$S/spec_p08_mut35.json" --json; echo $?
 "$PY" "$B" --only-check "$S/EXP-72/p08_fsp_mut35.fsp" --spec "$S/spec_p08.json" --json; echo $?
 "$PY" "$B" --only-check "$S/EXP-71/p01/p01.fsp" \
-  --spec cases/P01_Absorber_042/config/spec_p01.json --json
+  --spec cases/metasurface/P01_Absorber_042/config/spec_p01.json --json
 ```
 
 ## 实测结果

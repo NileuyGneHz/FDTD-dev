@@ -6,7 +6,7 @@ P06 fig5 的 30x30 组已折叠（只读 number/period），但整轮仍 273 s �
 
 ## 输入
 
-`cases/P06_Vortex_049/model/fig5.fsp`
+`cases/metasurface/P06_Vortex_049/model/fig5.fsp`
 
 ## 负对照
 

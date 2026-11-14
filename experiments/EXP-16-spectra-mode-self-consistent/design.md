@@ -6,7 +6,7 @@
 
 ## 输入
 
-`cases/P01_Absorber_042/model/d2_perfectCross.fsp`
+`cases/metasurface/P01_Absorber_042/model/d2_perfectCross.fsp`
 
 ## 负对照
 

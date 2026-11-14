@@ -6,7 +6,7 @@ P09 的 2D 工程线监视器类型是 Linear X，旧白名单只认 z-normal/po
 
 ## 输入
 
-`cases/P09_GrapheneAbsorber_044/model/graphene_perfect_absorber.fsp`
+`cases/metasurface/P09_GrapheneAbsorber_044/model/graphene_perfect_absorber.fsp`
 
 ## 负对照
 

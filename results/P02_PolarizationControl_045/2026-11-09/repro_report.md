@@ -10,7 +10,7 @@
 "Broadband highly efficient dielectric metadevices for polarization control",
 APL Photonics 1, 030801 (2016), DOI 10.1063/1.4948946 —— 与任务书给定的默认论文一致。**
 
-- 本地 `cases/P02_PolarizationControl_045/paper/` 下确有该 PDF（16 页，含补充材料 S1–S5），已用 PyMuPDF 提取正文逐条核对参数（HWP/QWP 尺寸在 p.5 = 030801-5，Fig.2 尺寸在 p.4，公式在 p.3，Palik 材料说明在补充材料 p.13）。
+- 本地 `cases/metasurface/P02_PolarizationControl_045/paper/` 下确有该 PDF（16 页，含补充材料 S1–S5），已用 PyMuPDF 提取正文逐条核对参数（HWP/QWP 尺寸在 p.5 = 030801-5，Fig.2 尺寸在 p.4，公式在 p.3，Palik 材料说明在补充材料 p.13）。
 - 因此**不触发**「论文来源为默认值，待用户确认」；也**不是** Chen 2012《Dual-polarity plasmonic metalens》，故不触发「实际论文为 X，与默认不同」。
 - 但发现论文内部**两组尺寸自相矛盾**（Fig.2 用 285/450/860，Fig.3 用 280/430/850），这项已在 §5 作为阻塞项 `B-1` 上报，并在 §4 做了定量口径诊断。
 
@@ -22,8 +22,8 @@ APL Photonics 1, 030801 (2016), DOI 10.1063/1.4948946 —— 与任务书给定�
 
 | 文件 | 内容 | 状态 |
 |---|---|---|
-| `cases/P02_PolarizationControl_045/P02_PolarizationControl_045_repro.fsp` | **HWP 主复现工程**（a=280, b=430, c=850, D=750 nm） | 481,920 B，`layoutmode=1.0`，**可直接打开/加载/运行** |
-| `cases/P02_PolarizationControl_045/P02_PolarizationControl_045_qwp.fsp` | **QWP 工程**（a=310, b=370, c=850, D=750 nm），验收表需要 QWP 的 Δφ | 481,920 B，`layoutmode=1.0` |
+| `cases/metasurface/P02_PolarizationControl_045/P02_PolarizationControl_045_repro.fsp` | **HWP 主复现工程**（a=280, b=430, c=850, D=750 nm） | 481,920 B，`layoutmode=1.0`，**可直接打开/加载/运行** |
+| `cases/metasurface/P02_PolarizationControl_045/P02_PolarizationControl_045_qwp.fsp` | **QWP 工程**（a=310, b=370, c=850, D=750 nm），验收表需要 QWP 的 Δφ | 481,920 B，`layoutmode=1.0` |
 
 两份工程都从论文参数**从零建模**，未使用 `model/` 下的课件 `.fsp`（其 `circle.radius=0`、周期 1 µm，与论文不符，README §0 已有警示）。
 

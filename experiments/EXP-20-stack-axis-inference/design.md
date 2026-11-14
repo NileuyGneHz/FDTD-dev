@@ -6,7 +6,7 @@ P09 是 2D 工程（堆栈沿 y），旧逻辑只按 z 取位置 → derived=nul
 
 ## 输入
 
-`cases/P09_GrapheneAbsorber_044/model/graphene_perfect_absorber.fsp`
+`cases/metasurface/P09_GrapheneAbsorber_044/model/graphene_perfect_absorber.fsp`
 
 ## 负对照
 

@@ -20,7 +20,7 @@
 |---|---|
 | 三包结果文件（mtime 全为 2026-11-09） | `results/P0{2,3,4}_*/` |
 | 四份复现报告的验收表 | `docs/P02…/repro_report.md`、`docs/P03…/`、`docs/P04…/`、`cases/P01…/results/repro_2026-11-09_fsp/repro_report_2026-11-09.md` |
-| P01 的复现卡（`target.quantity = peak_absorption`） | `cases/P01_Absorber_042/notes/repro-card.md` |
+| P01 的复现卡（`target.quantity = peak_absorption`） | `cases/metasurface/P01_Absorber_042/notes/repro-card.md` |
 
 ## 方法
 

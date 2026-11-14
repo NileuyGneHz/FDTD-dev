@@ -16,7 +16,7 @@ assert_writable_out() 拒绝 cases/ 内的产物目录，与 run_lsf.py 的 conf
 ```
 
 ## 负对照
-- 做法：--out cases/P01_Absorber_042/tmp_out
+- 做法：--out cases/metasurface/P01_Absorber_042/tmp_out
 - 预期：exit 2 并说明 cases/ 只读
 - 实测：--out 落在只读参考语料 cases/ 内 ... ; exit 2
 - 负对照是否按预期失败：是
@@ -26,5 +26,5 @@ assert_writable_out() 拒绝 cases/ 内的产物目录，与 run_lsf.py 的 conf
 
 ## 可重跑命令
 ```bash
-python skills/fdtd-lumerical-session-control/scripts/session_control.py --config _scratch/regress/2026-11-09/sc_repro.json --out cases/P01_Absorber_042/tmp_out --dry-run --json
+python skills/fdtd-lumerical-session-control/scripts/session_control.py --config _scratch/regress/2026-11-09/sc_repro.json --out cases/metasurface/P01_Absorber_042/tmp_out --dry-run --json
 ```

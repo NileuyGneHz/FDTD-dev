@@ -1,7 +1,7 @@
 # R03_HWP_Ding2015 — 等离激元半波片复现（P03）
 
 > 目标：复现 Ding et al., ACS Nano 9, 4111 (2015) 的 Figure 1b/1c 与 Figure 3b。
-> 本单元是可写的复现工程；`cases/P03_HWP_Ding2015` 保留为只读参照。
+> 本单元是可写的复现工程；`cases/metasurface/P03_HWP_Ding2015` 保留为只读参照。
 
 ## §0 目标与验收
 

@@ -23,7 +23,7 @@
 | 项 | 值 |
 |---|---|
 | 论文 | **Sun, Yang, Wang, …, Zhou, Tsai, *Nano Lett.* 2012, 12, 6223–6229**（DOI 10.1021/nl3032668） |
-| 本地文件 | `cases/P04_AnomalousReflection_047/paper/7论文-High-Efficiency_Broadband_Anomalous_Reflection_by_Gradient_Meta-Surfaces.pdf` |
+| 本地文件 | `cases/metasurface/P04_AnomalousReflection_047/paper/7论文-High-Efficiency_Broadband_Anomalous_Reflection_by_Gradient_Meta-Surfaces.pdf` |
 | 黄老师指定目标 | **Figure 2c / Figure 3a**（`paper/自测题_5问.md`） |
 | 目录名 `047` | **课程第七讲编号**，非年份 |
 | 任务单预设的 Yu 2011 | 在本文中是 **ref 28**，属于被对比、被改进的前人工作，**不是本 case 的论文** |

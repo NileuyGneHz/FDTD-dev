@@ -89,8 +89,19 @@ def main() -> int:
     ap.add_argument("--strict", action="store_true")
     args = ap.parse_args()
 
-    with open(args.spec, "r", encoding="utf-8") as fh:
-        spec = json.load(fh)
+    try:
+        with open(args.spec, "r", encoding="utf-8") as fh:
+            spec = json.load(fh)
+    except FileNotFoundError:
+        print("ERROR spec not found: %s" % args.spec)
+        return 2
+    except json.JSONDecodeError as exc:
+        # 空文件 / 非法 JSON 是输入错，不是脚本崩；裸 traceback 会被误读成 bug。
+        print("ERROR spec is not valid JSON: %s  (%s)" % (args.spec, exc))
+        return 2
+    except OSError as exc:
+        print("ERROR cannot read spec: %s  (%s)" % (args.spec, exc))
+        return 2
 
     # 占位值必须拦在门口。
     # 事件：P09 的 Au 用 PLACEHOLDER Drude 占位（论文写的是 σ=4e7 S/m），

@@ -242,8 +242,16 @@ def main():
                     help="machine-readable result on stdout; human progress lines are suppressed")
     args = ap.parse_args()
 
-    with open(args.spec, "r", encoding="utf-8") as fh:
-        spec = json.load(fh)
+    try:
+        with open(args.spec, "r", encoding="utf-8") as fh:
+            spec = json.load(fh)
+    except FileNotFoundError:
+        print("ERROR spec not found: %s" % args.spec, file=sys.stderr)
+        return 2
+    except json.JSONDecodeError as exc:
+        # 空文件 / 非法 JSON 是输入错，不是脚本崩；裸 traceback 会被误读成 bug。
+        print("ERROR spec is not valid JSON: %s  (%s)" % (args.spec, exc), file=sys.stderr)
+        return 2
 
     sweep = json.loads(args.sweep_json) if args.sweep_json else spec.get("sweep") or {}
     points = expand(sweep)

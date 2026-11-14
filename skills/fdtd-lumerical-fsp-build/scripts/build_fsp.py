@@ -305,7 +305,16 @@ def main(argv=None) -> int:
     if not spec_path.is_file():
         print("ERROR spec not found: %s" % spec_path)
         return 2
-    spec = json.loads(spec_path.read_text(encoding="utf-8"))
+    try:
+        spec = json.loads(spec_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        # 空文件 / 非法 JSON 属「输入错」，应与「找不到文件」同样 exit 2 并给人话；
+        # 裸 traceback 会让人以为是脚本 bug（实测：空 json 抛 JSONDecodeError）。
+        print("ERROR spec is not valid JSON: %s  (%s)" % (spec_path, exc))
+        return 2
+    except OSError as exc:
+        print("ERROR cannot read spec: %s  (%s)" % (spec_path, exc))
+        return 2
 
     if not (args.only_check or args.dry_run) and not args.out:
         ap.error("--out is required unless --only-check / --dry-run is given")

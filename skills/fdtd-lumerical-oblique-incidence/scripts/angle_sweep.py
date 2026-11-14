@@ -676,4 +676,9 @@ def main(argv=None) -> int:
 
 
 if __name__ == "__main__":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:  # noqa: BLE001 - older consoles
+        pass
     raise SystemExit(main())

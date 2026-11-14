@@ -43,8 +43,12 @@ from fsp_build import (  # noqa: E402
 )
 
 DEFAULT_ENV = dict(
-    license="1055@localhost",
-    api_path=r"F:\Lumercial_WS\ANSYS Inc\v251\Lumerical\api\python",
+    license=os.environ.get("ANSYSLMD_LICENSE_FILE", "1055@localhost"),
+    # 2026-11-14：改成环境变量优先。打包成 DSH 插件后导师机器的安装位置不同，
+    # 写死会让所有建工程调用直接失败。
+    api_path=os.environ.get(
+        "LUMERICAL_API_PATH",
+        r"F:\Lumercial_WS\ANSYS Inc\v251\Lumerical\api\python"),
 )
 
 

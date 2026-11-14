@@ -33,9 +33,13 @@ import sys
 import time
 from pathlib import Path
 
-# Lumerical 安装路径（本机实测）
-LUMERICAL_API = r"F:\Lumercial_WS\ANSYS Inc\v251\Lumerical\api\python"
-LICENSE_FILE = "1055@localhost"
+# Lumerical 安装路径。
+# 2026-11-14：改成环境变量优先——打包成 DSH 插件后，导师机器上的安装位置不同，
+# 写死会在 import 阶段就崩。其余技能脚本都已经是这个写法，这里补齐。
+LUMERICAL_API = os.environ.get(
+    "LUMERICAL_API_PATH",
+    r"F:\Lumercial_WS\ANSYS Inc\v251\Lumerical\api\python")
+LICENSE_FILE = os.environ.get("ANSYSLMD_LICENSE_FILE", "1055@localhost")
 
 _lumapi = None  # 模块级缓存
 

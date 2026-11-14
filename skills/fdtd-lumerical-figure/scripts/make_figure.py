@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -64,6 +65,33 @@ def need(cols: dict, *names) -> None:
 
 
 # --------------------------------------------------------------------------- kinds
+_SAFE_EXPR = re.compile(r"[0-9a-zA-Z_.+\-*/() ]+")
+
+
+def _safe_eval(expr, params: dict) -> float:
+    """求值 spec 里的算术表达式，**不给 builtins**。
+
+    首版写成 `eval(str(...), {}, params)`：空 globals 不会屏蔽 `__import__`，
+    spec 里一句 `__import__('os').system(...)` 就能执行任意命令（已实测可利用）。
+    fsp_build.py 用的是 `{"__builtins__": {}}` + 字符白名单，这里对齐它。
+    """
+    if isinstance(expr, (int, float)):
+        return float(expr)
+    s = str(expr)
+    if not _SAFE_EXPR.fullmatch(s):
+        raise FigureError("不支持的表达式字符：%r" % s)
+    scope = {}
+    for k, v in (params or {}).items():
+        try:
+            scope[k] = float(v)
+        except (TypeError, ValueError):
+            continue
+    try:
+        return float(eval(s, {"__builtins__": {}}, scope))  # noqa: S307 - 白名单
+    except Exception as e:                       # noqa: BLE001
+        raise FigureError("表达式求值失败 %r：%s" % (s, e)) from None
+
+
 def fig_stack(ax, payload: dict) -> dict:
     objs = payload.get("objects") or []
     if not objs:
@@ -74,9 +102,9 @@ def fig_stack(ax, payload: dict) -> dict:
         span = o.get("span") or [None, None, None]
         centre = o.get("center") or [0, 0, 0]
         try:
-            z0 = float(eval(str(centre[2]), {}, payload.get("parameters") or {}))
-            dz = abs(float(eval(str(span[2]), {}, payload.get("parameters") or {})))
-        except Exception:                       # noqa: BLE001 - 2D objects legitimately lack z
+            z0 = _safe_eval(centre[2], payload.get("parameters") or {})
+            dz = abs(_safe_eval(span[2], payload.get("parameters") or {}))
+        except FigureError:                     # 2D objects legitimately lack z
             continue
         ax.add_patch(plt.Rectangle((0, z0 - dz / 2), 1, dz,
                                    facecolor="#9ecae1", edgecolor="k", lw=0.8))

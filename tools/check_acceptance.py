@@ -70,9 +70,34 @@ def warn(msg: str) -> None:
     issues.append(("WARN", msg))
 
 
+TRACK_DIRS = {"metasurface", "photonic"}
+
+
+def iter_pkgs() -> list[tuple[str, Path]]:
+    """枚举所有包，兼容扁平（cases/P01_xxx）与双轨（cases/<track>/P01_xxx）。"""
+    out: list[tuple[str, Path]] = []
+    if not CASES.is_dir():
+        return out
+    for entry in sorted(CASES.iterdir()):
+        if not entry.is_dir() or entry.name.startswith("_"):
+            continue
+        if entry.name in TRACK_DIRS:
+            for sub in sorted(entry.iterdir()):
+                if sub.is_dir() and not sub.name.startswith("_"):
+                    out.append((entry.name, sub))
+        else:
+            out.append(("", entry))
+    return out
+
+
 def find_pkg(case: str) -> Path | None:
-    hits = sorted(CASES.glob(f"{case}*"))
-    return hits[0] if hits else None
+    """`P03` 或 `metasurface/P03` 都能定位。"""
+    want = case.replace("\\", "/").strip("/")
+    for track, d in iter_pkgs():
+        label = f"{track}/{d.name}" if track else d.name
+        if label.startswith(want) or d.name.startswith(want.split("/")[-1]):
+            return d
+    return None
 
 
 def parse_card_target(pkg: Path) -> dict | None:
@@ -246,9 +271,11 @@ def main() -> int:
         print("需要 --case 或 --all（或 --self-test）", file=sys.stderr)
         return 2
 
-    pkgs = sorted(d for d in CASES.iterdir() if d.is_dir() and d.name.startswith("P"))
+    pkgs = [d for _, d in iter_pkgs() if d.name.startswith("P")]
     if args.case:
-        pkgs = [d for d in pkgs if d.name.startswith(args.case)]
+        want = args.case.replace("\\", "/").strip("/")
+        frag = want.split("/")[-1]
+        pkgs = [d for d in pkgs if d.name.startswith(frag)]
         if not pkgs:
             print(f"没有匹配 {args.case} 的包", file=sys.stderr)
             return 2

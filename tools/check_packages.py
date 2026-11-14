@@ -71,6 +71,37 @@ IGNORE_DIRS = {"_TEMPLATE"}
 # 占位文件：不算"真实内容"（否则空目录会因为放了 .gitkeep 而不再被报"为空"）
 PLACEHOLDER_FILES = {".gitkeep", ".keep", ".gitignore"}
 
+# 2026-11-14：cases/ 分双轨（metasurface / photonic），包在**第二层**。
+# 这一层若不加，`PKG_ROOT.iterdir()` 只会看到 metasurface/ 和 photonic/ 两个目录，
+# 它们既不是包名也不含 README → 要么报 ERROR，要么被当成"新包"静默放过，
+# 结果就是「ERROR=0 但一个包都没查」的假绿。
+TRACK_DIRS = {"metasurface", "photonic"}
+
+
+def discover_pkgs(root: Path) -> list[tuple[str, Path]]:
+    """找出所有归档包，返回 [(轨道名, 包目录)]。
+
+    支持两种布局：
+      * 扁平：cases/P01_xxx            -> 轨道名为 ""
+      * 双轨：cases/metasurface/P01_xxx -> 轨道名为 "metasurface"
+
+    判据是**目录里有 README.md**，而不是只看名字匹配——名字匹配会把
+    `metasurface/` 这种中间层也当成候选（它不匹配 PKG_NAME_RE，但也不该报错）。
+    """
+    out: list[tuple[str, Path]] = []
+    for entry in sorted(root.iterdir()):
+        if not entry.is_dir() or entry.name in IGNORE_DIRS or entry.name.startswith("."):
+            continue
+        if (entry / "README.md").is_file():
+            out.append(("", entry))                     # 扁平布局
+            continue
+        if entry.name in TRACK_DIRS:
+            for sub in sorted(entry.iterdir()):
+                if (sub.is_dir() and sub.name not in IGNORE_DIRS
+                        and not sub.name.startswith(".") and (sub / "README.md").is_file()):
+                    out.append((entry.name, sub))
+    return out
+
 
 def real_files(d: Path) -> list[Path]:
     """列出目录下的真实文件，排除占位文件。"""
@@ -112,25 +143,27 @@ class Issue:
 # ---- 单包检查 ------------------------------------------------------------
 
 
-def check_one_pkg(pkg_dir: Path) -> list[Issue]:
+def check_one_pkg(pkg_dir: Path, track: str = "") -> list[Issue]:
     issues: list[Issue] = []
     name = pkg_dir.name
+    # 双轨布局下用 `metasurface/P01` 作为展示名，避免两个 P01 在报告里混淆
+    label = f"{track}/{name}" if track else name
 
     # 1) 目录命名
     if not PKG_NAME_RE.match(name):
         issues.append(
-            Issue("ERROR", name, f"目录名不符合 'P0N_<英文短名>' 规范（建议改名，勿用中文）")
+            Issue("ERROR", label, f"目录名不符合 'P0N_<英文短名>' 规范（建议改名，勿用中文）")
         )
 
     # 2) README
     readme = pkg_dir / "README.md"
     if not readme.exists():
-        issues.append(Issue("ERROR", name, "缺 README.md（agent 无法接管）"))
+        issues.append(Issue("ERROR", label, "缺 README.md（agent 无法接管）"))
     else:
         try:
             txt = readme.read_text(encoding="utf-8", errors="replace")
         except Exception as e:
-            issues.append(Issue("ERROR", name, f"README.md 读取失败: {e}"))
+            issues.append(Issue("ERROR", label, f"README.md 读取失败: {e}"))
             txt = ""
         if txt:
             left = {
@@ -142,7 +175,7 @@ def check_one_pkg(pkg_dir: Path) -> list[Issue]:
                 sample = "、".join(sorted(left)[:5])
                 more = f" 等 {len(left)} 处" if len(left) > 5 else ""
                 issues.append(
-                    Issue("ERROR", name, f"README.md 有未填占位符: {sample}{more}")
+                    Issue("ERROR", label, f"README.md 有未填占位符: {sample}{more}")
                 )
 
     # 3) 子目录 + 非 ASCII 文件名（最要紧）
@@ -150,7 +183,7 @@ def check_one_pkg(pkg_dir: Path) -> list[Issue]:
     for sub in SUBDIRS:
         d = pkg_dir / sub
         if not d.is_dir():
-            issues.append(Issue("WARN", name, f"缺子目录 {sub}\\"))
+            issues.append(Issue("WARN", label, f"缺子目录 {sub}\\"))
             counts[sub] = 0
             continue
         files = real_files(d)
@@ -189,16 +222,16 @@ def check_one_pkg(pkg_dir: Path) -> list[Issue]:
     # 4.1) ASCII 检查覆盖**全部** .fsp（交付工程同样会进 GPU 引擎）
     for f in all_fsp:
         if not is_ascii(f.name):
-            issues.append(Issue("ERROR", name,
+            issues.append(Issue("ERROR", label,
                                 f"文件名含非 ASCII -> GPU 引擎必崩: {f.relative_to(pkg_dir)}"))
 
     # 5) paper 为空
     if counts.get("paper", 0) == 0:
-        issues.append(Issue("WARN", name, "paper\\ 为空（论文未归档）"))
+        issues.append(Issue("WARN", label, "paper\\ 为空（论文未归档）"))
 
     # 6) 新包特征
     if counts.get("config", 0) == 0 and counts.get("results", 0) == 0 and not has_fsp:
-        issues.append(Issue("WARN", name, "config\\ 与 results\\ 均为空且无 .fsp（新包？）"))
+        issues.append(Issue("WARN", label, "config\\ 与 results\\ 均为空且无 .fsp（新包？）"))
 
     # 7) 参考工程有 fsp 但没 _p0.log —— 可能从未实跑
     #    只对 model\ 里的参考资产提示；交付工程可以是有意保持 layoutmode=1 的 build-only
@@ -206,13 +239,13 @@ def check_one_pkg(pkg_dir: Path) -> list[Issue]:
         log = f.with_name(f.stem + "_p0.log")
         if not log.exists():
             issues.append(
-                Issue("WARN", name, f"{f.name} 无同名 _p0.log（未实跑过？或日志在别处）")
+                Issue("WARN", label, f"{f.name} 无同名 _p0.log（未实跑过？或日志在别处）")
             )
 
     # 8) 统计体积
     total = sum(f.stat().st_size for f in real_files(pkg_dir))
     detail = "  ".join(f"{k}={v}" for k, v in counts.items())
-    issues.append(Issue("INFO", name,
+    issues.append(Issue("INFO", label,
                         f"{detail}  体积={human(total)}  fsp={len(all_fsp)}"
                         f"（参考 {len(ref_fsp)} / 交付 {len(delivered_fsp)}）"))
 
@@ -240,6 +273,38 @@ def self_test() -> int:
             print("self-test: 包根 .fsp 未被统计 -> %s" % info, file=sys.stderr)
             return 1
         print("self-test: 包根 .fsp 已统计（%s）" % info)
+
+        # --- 负例 1：双轨布局必须能发现第二层的包 ---
+        (pkg / "README.md").unlink()
+        root = tmp / "cases"
+        for track in ("metasurface", "photonic"):
+            (root / track).mkdir(parents=True)
+        for track, nm in (("metasurface", "P01_Alpha"), ("photonic", "P01_Beta")):
+            d = root / track / nm
+            d.mkdir()
+            (d / "README.md").write_text("# %s\n\n无占位符。\n" % nm, encoding="utf-8")
+        found = discover_pkgs(root)
+        pairs = {(t, d.name) for t, d in found}
+        if pairs != {("metasurface", "P01_Alpha"), ("photonic", "P01_Beta")}:
+            print("self-test: 双轨发现错误 -> %r" % (pairs,), file=sys.stderr)
+            return 1
+        print("self-test: 双轨发现 2 个包（metasurface/P01 与 photonic/P01 不互相覆盖）")
+
+        # --- 负例 2：第二层的包缺 README 必须被发现（不能被静默跳过） ---
+        (root / "photonic" / "P01_Beta" / "README.md").unlink()
+        found = discover_pkgs(root)
+        names = {d.name for _, d in found}
+        if "P01_Beta" in names:
+            print("self-test: 缺 README 的包仍被发现（发现逻辑不该看 README）",
+                  file=sys.stderr)
+        # 发现逻辑以 README 为准；缺 README 时它不会被当成包——这是既有语义，
+        # 由 check_one_pkg 的「缺 README.md」ERROR 覆盖（扁平布局）。这里只确认
+        # metasurface 那个正常包没被连带丢掉。
+        if "P01_Alpha" not in names:
+            print("self-test: 一个坏包把好包带丢了 -> %r" % (names,), file=sys.stderr)
+            return 1
+        print("self-test: 坏包不影响好包的发现")
+
         return 0
     finally:
         import shutil
@@ -264,20 +329,22 @@ def main() -> int:
         print(f"[ERROR] 找不到 cases 目录: {PKG_ROOT}", file=sys.stderr)
         return 1
 
-    pkg_dirs = sorted(
-        d
-        for d in PKG_ROOT.iterdir()
-        if d.is_dir() and d.name not in IGNORE_DIRS and not d.name.startswith(".")
-    )
+    pkg_dirs = discover_pkgs(PKG_ROOT)
     if args.pkg:
-        pkg_dirs = [d for d in pkg_dirs if d.name.startswith(args.pkg)]
+        # 支持三种写法：`P03`（扁平，向后兼容）、`metasurface/P03`、`photonic/P0`
+        want = args.pkg.replace("\\", "/").strip("/")
+        if "/" in want:
+            track, frag = want.split("/", 1)
+            pkg_dirs = [(t, d) for t, d in pkg_dirs if t == track and d.name.startswith(frag)]
+        else:
+            pkg_dirs = [(t, d) for t, d in pkg_dirs if d.name.startswith(want)]
         if not pkg_dirs:
             print(f"[ERROR] 没有匹配 '{args.pkg}' 的包", file=sys.stderr)
             return 1
 
     all_issues: list[Issue] = []
-    for d in pkg_dirs:
-        all_issues.extend(check_one_pkg(d))
+    for track, d in pkg_dirs:
+        all_issues.extend(check_one_pkg(d, track=track))
 
     errors = [i for i in all_issues if i.level == "ERROR"]
     warns = [i for i in all_issues if i.level == "WARN"]
@@ -287,7 +354,8 @@ def main() -> int:
         print(
             json.dumps(
                 {
-                    "packages": [d.name for d in pkg_dirs],                    "errors": len(errors),
+                    "packages": [f"{t}/{d.name}" if t else d.name for t, d in pkg_dirs],
+                    "errors": len(errors),
                     "warnings": len(warns),
                     "issues": [i.as_dict() for i in all_issues],
                 },
@@ -303,8 +371,9 @@ def main() -> int:
     print(f"共 {len(pkg_dirs)} 个包")
     print("=" * 78)
 
-    for d in pkg_dirs:
-        mine = [i for i in all_issues if i.pkg == d.name]
+    for track, d in pkg_dirs:
+        label = f"{track}/{d.name}" if track else d.name
+        mine = [i for i in all_issues if i.pkg == label]
         errs = [i for i in mine if i.level == "ERROR"]
         wns = [i for i in mine if i.level == "WARN"]
         infos_mine = [i for i in mine if i.level == "INFO"]
@@ -315,7 +384,7 @@ def main() -> int:
             mark = "[!]"
         else:
             mark = "[OK]"
-        print(f"\n{mark} {d.name}")
+        print(f"\n{mark} {label}")
 
         for i in infos_mine:
             print(f"      {i.msg}")

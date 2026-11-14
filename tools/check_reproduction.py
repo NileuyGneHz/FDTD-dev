@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """check_reproduction.py — 复现约束体检（机器可读语料门禁）。
 
     python tools/check_reproduction.py --case P01
@@ -59,7 +59,14 @@ ROOT = Path(__file__).resolve().parents[1]
 DRAFT_RE = re.compile(r"draft", re.I)
 # 正式卡落在包内 notes/（cases/AGENTS.md 允许补记）；草稿卡落在隔离回归目录，
 # 避免多 agent 并行写同一包、也避免碰只读资产。
-FORMAL_PATTERNS = ("cases/*/notes/repro-card.md", "projects/*/notes/repro-card.md")
+# 2026-11-14：cases/ 分双轨（metasurface / photonic），卡片在第三层。
+# 只保留一层 glob 会让 2 张已存在的卡变成 0 张 —— 门禁显示 ALL GREEN 但其实没查任何东西。
+FORMAL_PATTERNS = (
+    "cases/*/notes/repro-card.md",              # 扁平布局（兼容）
+    "cases/*/*/notes/repro-card.md",            # 双轨布局
+    "projects/*/notes/repro-card.md",
+    "projects/*/*/notes/repro-card.md",
+)
 DRAFT_PATTERNS = ("_scratch/regress/**/repro-card*.md",)
 # 默认全量门禁只认正式卡（草稿在 _scratch/，gitignored，不算已提交证据）；
 # --case / --card 时才把草稿纳入检查，供并行 agent 自检。

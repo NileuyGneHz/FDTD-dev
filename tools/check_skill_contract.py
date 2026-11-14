@@ -52,7 +52,10 @@ REL_REF_RE = re.compile(
 )
 CROSS_SKILL_RE = re.compile(r"(fdtd-[a-z0-9-]+)/scripts/([A-Za-z0-9_.-]+\.py)")
 AGENT_PATH_RE = re.compile(r"^\s*path:\s*(\S+)\s*$", re.M)
-NAME_SHAPE_RE = re.compile(r"^fdtd-[a-z0-9]+(?:-[a-z0-9]+)+$")
+# 2026-11-14：仓库从单一 FDTD 主题扩到「超表面 + 光计算」双轨，
+# 技能命名不再全是 fdtd- 前缀。仍要求：全小写 kebab-case、至少两段、
+# 且带一个已知前缀，防止随手起名。
+NAME_SHAPE_RE = re.compile(r"^(fdtd|lit|core|cut|office)-[a-z0-9]+(?:-[a-z0-9]+)+$")
 # 文档里对脚本的声明：`skills/fdtd-x/scripts/y.py` 或 `fdtd-x/scripts/y.py`
 DOC_SCRIPT_RE = re.compile(
     r"(?:skills/)?(fdtd-[a-z0-9-]+)/scripts/([A-Za-z0-9_.-]+\.py)")
@@ -153,8 +156,8 @@ def check_skill(d: Path) -> None:
         bad("K2", f"name={name} 与目录名 {name_dir} 不一致",
             "宿主按 name 注册、按目录找文件；两者必须相同（改名字=破坏性变更）")
     elif not NAME_SHAPE_RE.match(name):
-        bad("K2", f"name={name} 不符合 fdtd-<scope>-<thing> 形状",
-            "scope ∈ lumerical/paper/model/result/package；全小写 kebab-case")
+        bad("K2", f"name={name} 不符合 <前缀>-<thing> 形状",
+            "前缀 ∈ fdtd/lit/core/cut/office；全小写 kebab-case，至少两段")
     elif len(name) > 64:
         bad("K2", f"name 长度 {len(name)} > 64")
     else:

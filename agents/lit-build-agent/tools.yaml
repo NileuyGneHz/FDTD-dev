@@ -1,0 +1,58 @@
+# tools.yaml — lit-build-agent
+
+tools:
+  - id: read
+    kind: builtin
+    gives: file content with line numbers
+  - id: write
+    kind: builtin
+    requires: read the existing file before replacing it
+    gives: create or replace a UTF-8 file
+  - id: edit
+    kind: builtin
+    requires: read the file in this session first
+    gives: literal text replacement
+  - id: glob
+    kind: builtin
+    gives: file paths by pattern
+  - id: grep
+    kind: builtin
+    gives: matching lines with file and line numbers
+  - id: shell
+    kind: builtin
+    entry: pwsh
+    requires:
+      - the command runs inside the workspace root
+    gives: run scripts, inspect PDFs, check the tree
+
+  - id: lit_paper_intake
+    kind: repo-script
+    entry: ../../skills/lit-paper-intake/scripts/paper_intake.py
+    flags: ["--config", "--out", "--dry-run", "--json"]
+    note: refuses to overwrite an existing package
+  - id: lit_quote_verify
+    kind: repo-script
+    entry: ../../skills/lit-quote-verify/scripts/quote_verify.py
+    flags: ["--config", "--out", "--dry-run", "--json"]
+    note: read-only; requires pypdf on PYTHONPATH
+  - id: lit_claim_audit
+    kind: repo-script
+    entry: ../../skills/lit-claim-audit/scripts/claim_audit.py
+    flags: ["--config", "--out", "--dry-run", "--json"]
+    note: read-only; flags placeholder values marked as verified
+
+network:
+  allowed: true
+  scope:
+    - fetching open-access PDFs (arXiv, PMC, CC BY publisher endpoints)
+    - fetching metadata (Crossref, OpenAlex, Unpaywall, arXiv API)
+  denied:
+    - bypassing paywalls or bot challenges
+    - scraping sites that forbid it
+    - sending credentials anywhere
+
+denied:
+  - writing outside the workspace
+  - installing packages without asking
+  - editing paper/*.pdf once archived
+  - marking a claim yes without a PDF-backed check

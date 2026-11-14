@@ -50,7 +50,7 @@ PY="C:/Users/saber/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
 
 # 正常 spec 仍能画
 & $PY skills/fdtd-lumerical-figure/scripts/make_figure.py --kind stack `
-    --input cases/P01_Absorber_042/config/spec_p01.json `
+    --input cases/metasurface/P01_Absorber_042/config/spec_p01.json `
     --out _scratch/figtest/p01_stack.png --json
 # -> {"layers": 5, "z_min_m": -2.285e-06, "z_max_m": 1e-07, "bytes": 21820}
 

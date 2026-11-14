@@ -1,0 +1,7 @@
+metric,value_paper,value_checked,match,source,note
+commercial_feasibility_criterion,"optical advantage > IO overhead","the advantages of optical computation outweigh the cost of their input–output overhead",yes,Abstract,"定性判据，无数值阈值"
+reconfigurability_role,"prerequisite for in situ training","enabling in situ training and accommodating non-stationary use cases that require fine-tuning or transfer learning",yes,Abstract,"原文表述"
+scalability_paths,3 条,"Co- integration with electronics, 3D stacking, and large-scale manufacturing",yes,Abstract,"原文列举三项"
+own_experimental_numbers,none,none,unverified,全文,"Perspective article, no experiments"
+io_overhead_threshold,not quantified,not found,unverified,Abstract + 全文,"qualitative criterion only; no numeric threshold"
+journal_volume_issue,7(6) 331-347,not in PDF,unverified,Crossref DOI 10.1038/s42254-025-00831-7,"书目元数据来自 Crossref；本地 PDF 是 arXiv v1"

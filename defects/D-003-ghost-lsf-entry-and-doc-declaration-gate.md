@@ -23,7 +23,7 @@
      `<skill>/scripts/*.py`，必须实存。
    - `[K16]` 文档同一行写在该脚本后的 `--flag`，必须被该脚本 argparse 接受。
 3. 同轮修掉安全闸的正则漏洞：`.lsf` 允许无参语句式 `run;`，原正则只匹配 `run(`，
-   导致 `cases/P03_HWP_Ding2015/model/build_tio2_unitcell.lsf:311` 的真求解
+   导致 `cases/metasurface/P03_HWP_Ding2015/model/build_tio2_unitcell.lsf:311` 的真求解
    在 `allow_run=false` 下被静默放过。改为 `CALL_RE + BARE_RE` 双模式，并先剥 `#` 注释。
 
 ## 验证
@@ -41,7 +41,7 @@ mv skills/fdtd-lumerical-headless/scripts/run_lsf.py{.bak,}
 
 # ② 安全闸：裸 run; 必须被拦
 "$PY" skills/fdtd-lumerical-headless/scripts/run_lsf.py \
-      --lsf cases/P03_HWP_Ding2015/model/build_tio2_unitcell.lsf --out _scratch/regress/_gate/gateA
+      --lsf cases/metasurface/P03_HWP_Ding2015/model/build_tio2_unitcell.lsf --out _scratch/regress/_gate/gateA
 #   期望: exit 2，stderr 含 `["deleteall", "run", "save"]`
 
 # ③ 阴性对照：注释掉的 #run; 不得触发
@@ -53,5 +53,5 @@ printf '#run;\nx = 1;\n' > _scratch/regress/_gate/lsf_probe/commented.lsf
 
 ## 影响面
 
-`cases/P03_HWP_Ding2015`（裸 `run;`）、`cases/P06_Vortex_049/model/fig2g_modify_run.lsf`（裸 `run;`）；
+`cases/metasurface/P03_HWP_Ding2015`（裸 `run;`）、`cases/metasurface/P06_Vortex_049/model/fig2g_modify_run.lsf`（裸 `run;`）；
 任何「照 script-contract §3 去调用 `.lsf` 入口」的 agent 都会直接撞空。

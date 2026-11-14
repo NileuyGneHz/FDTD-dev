@@ -1,0 +1,25 @@
+{
+  "id": "P03",
+  "slug": "P03_MatrixMultiplication_Zhou2022",
+  "track": "A_review",
+  "title": "Photonic matrix multiplication lights up photonic accelerator and beyond",
+  "authors": ["Hailong Zhou", "Jianji Dong", "Junwei Cheng", "Wenchan Dong",
+              "Chaoran Huang", "Yichen Shen", "Qiming Zhang", "Min Gu",
+              "Chao Qian", "Hongsheng Chen", "Zhichao Ruan", "Xinliang Zhang"],
+  "venue": "Light: Science & Applications",
+  "volume": "11",
+  "issue": "1",
+  "pages": "30",
+  "year": 2022,
+  "doi": "10.1038/s41377-022-00717-8",
+  "pdf": {
+    "present": true,
+    "file": "Zhou2022_LSA.pdf",
+    "version": "published (CC BY)",
+    "source_url": "https://www.nature.com/articles/s41377-022-00717-8.pdf",
+    "retrieved": "2026-11-12",
+    "license": "CC BY 4.0"
+  },
+  "topics": ["matrix-multiplication-methods", "PLC", "MZI-mesh", "WDM"],
+  "reading_order": 1
+}

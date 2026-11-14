@@ -1,0 +1,26 @@
+{
+  "id": "P06",
+  "slug": "P06_DiffractiveMultimodal_Cheng2024",
+  "track": "B_training",
+  "title": "Multimodal deep learning using on-chip diffractive optics with in situ training capability",
+  "authors": ["Junwei Cheng", "Chaoran Huang", "Jialong Zhang", "Bo Wu",
+              "Wenkai Zhang", "Xinyu Liu", "Jiahui Zhang", "Yiyi Tang",
+              "Hailong Zhou", "Qiming Zhang", "Min Gu", "Jianji Dong",
+              "Xinliang Zhang"],
+  "venue": "Nature Communications",
+  "volume": "15",
+  "issue": "1",
+  "pages": "6209",
+  "year": 2024,
+  "doi": "10.1038/s41467-024-50677-3",
+  "pdf": {
+    "present": true,
+    "file": "Cheng2024_NatCommun.pdf",
+    "version": "published (CC BY)",
+    "source_url": "https://www.nature.com/articles/s41467-024-50677-3.pdf",
+    "retrieved": "2026-11-12",
+    "license": "CC BY 4.0"
+  },
+  "topics": ["diffractive-optics", "in-situ-training", "multimodal", "SGD"],
+  "reading_order": 6
+}

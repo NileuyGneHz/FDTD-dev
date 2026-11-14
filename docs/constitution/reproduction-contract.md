@@ -262,7 +262,7 @@ cd F:/Lumercial_WS/FDTD_WS
 "$PY" tools/check_reproduction.py --self-test       # 负对照：确认门禁没退化
 "$PY" tools/check_reproduction.py --json            # 机器可读，便于流水线串接
 "$PY" tools/check_reproduction.py --emit-template   # 打印新卡骨架
-"$PY" tools/check_reproduction.py --card cases/P01_Absorber_042/notes/repro-card.md  # 草稿卡自检
+"$PY" tools/check_reproduction.py --card cases/metasurface/P01_Absorber_042/notes/repro-card.md  # 草稿卡自检
 "$PY" tools/check_acceptance.py --all               # 验收表（§7.1），与卡做双向比对
 "$PY" tools/check_acceptance.py --case P02          # 只看一个包
 "$PY" tools/check_acceptance.py --self-test         # 验收表门禁自己的负对照
@@ -322,6 +322,6 @@ cd F:/Lumercial_WS/FDTD_WS
 
 | 日期 | 变更 |
 |---|---|
-| 2026-11-07 | 初版，从 P01 参考 FSP 复现中提炼：口径声明、真相源优先级、锁定/数值边界、三层回归、收敛三判据、复现卡与训练条目；配套 `tools/check_reproduction.py`（R1–R12）。首张卡为 `cases/P01_Absorber_042/notes/repro-card.md` |
+| 2026-11-07 | 初版，从 P01 参考 FSP 复现中提炼：口径声明、真相源优先级、锁定/数值边界、三层回归、收敛三判据、复现卡与训练条目；配套 `tools/check_reproduction.py`（R1–R12）。首张卡为 `cases/metasurface/P01_Absorber_042/notes/repro-card.md` |
 | 2026-11-09 | 补 `unrun` 豁免（带 `layoutmode: 1` 自证）、`repeat_cost_s` 成本分级、`[R3]` 改比求解器族、`[R13]` 指标必须在产物里；`caliber{}` 声明块。 |
 | 2026-11-10 | **补齐门禁先行造成的契约缺口**：新增 §7.1 验收表 `config/acceptance.json`（此前 `tools/check_acceptance.py` 已在要求这个文件，但没有任何规范定义它，4 个包因此只能靠猜），逐项区分「机器判 / 靠自觉」；`target.definition` 与 `[R14]`、`rerun_commands` 引用实存与 `[R16]` 补进 §7 字段表 —— 这两条规则早就在 `check_reproduction.py` 里生效，但文件头 docstring 与本契约都只写到 `[R13]`。明确 `R15` 为历史跳号、禁止复用（已核 `git log -S'R15' -- '*.md' '*.py'` 全历史为空）。§9 命令块补 `check_acceptance` / `check_results_layout`。 |

@@ -29,12 +29,12 @@ agent_created: true
 ```bash
 # ① 先看计划（不开会话，0.2 s）
 python skills/fdtd-lumerical-fsp-build/scripts/build_fsp.py \
-  --spec cases/P01_Absorber_042/config/spec_p01.json \
+  --spec cases/metasurface/P01_Absorber_042/config/spec_p01.json \
   --out _scratch/build/p01 --dry-run --json
 
 # ② 建 + 自检（读回文件，逐字段与 spec 比对）
 python skills/fdtd-lumerical-fsp-build/scripts/build_fsp.py \
-  --spec cases/P01_Absorber_042/config/spec_p01.json \
+  --spec cases/metasurface/P01_Absorber_042/config/spec_p01.json \
   --out _scratch/build/p01 --tag p01 --check --json
 
 # ③ 只检查一个已有工程与 spec 是否一致（不重建）

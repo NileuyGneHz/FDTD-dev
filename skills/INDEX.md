@@ -20,6 +20,18 @@
 | `fdtd-lumerical-session-control` | X | `session_control.py` | 既有 `.fsp` + 白名单 `params` | `iteration_NNN.fsp` / `.json` / `_p0.log` | `fdtd-lumerical-design-loop` | 不建模、不判读、不选参数；Reproduce 模式禁止注入参数 |
 | `fdtd-lumerical-design-loop` | X | `design_loop.py` | L1 spec（`targets`/`locked`/`search_space`）+ observation | `next_params.json`、`search_log.csv`、`fom_curve.csv`、`verdict.json` | `fdtd-lumerical-session-control` | 不开会话、不建模；复现模式禁用；不做伴随法/拓扑优化 |
 
+## 光计算轨（lit-* / core-*，2026-11-14 从 L&E_ws 并入）
+
+> 这四个技能服务 `cases/photonic/` 下的文献包，**不进 FDTD 流水线的 stage 编排**，
+> 也不进 `agents/fdtd-sim-agent/skills.yaml` 的 `load_order`。它们是横切能力。
+
+| name | stage | scripts | consumes | produces | 边界（什么时候别用） |
+|---|---|---|---|---|---|
+| `lit-paper-intake` | L1 | `intake.py` | 新论文 PDF | 论文包骨架 + `config/paper.json` | 只建包与登记，不读内容、不抽参数 |
+| `lit-quote-verify` | L2 | `verify_quotes.py` | 包内 README §2 引用块 + PDF | `found/missed` 清单 | 只核「能否 grep 到原句」，不判断语义是否支持结论 |
+| `lit-claim-audit` | L3 | `audit_claims.py` | `results/claims.csv` + PDF | 核数报告 | 只核数字与出处，不评价方法 |
+| `core-skill-authoring` | L0 | `new_skill.py` | 技能名 + 描述 | 技能骨架 + INDEX 登记行 | 只建骨架，不替人写正文 |
+
 ## 空位
 
 | stage | 建议技能 | 现状 |

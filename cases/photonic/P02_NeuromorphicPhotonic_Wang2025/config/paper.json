@@ -1,0 +1,25 @@
+{
+  "id": "P02",
+  "slug": "P02_NeuromorphicPhotonic_Wang2025",
+  "track": "A_review",
+  "title": "Integrated Neuromorphic Photonic Computing for AI Acceleration: Emerging Devices, Network Architectures, and Future Paradigms",
+  "authors": ["Gaofei Wang", "Junyan Che", "Chen Gao", "Zhou Han",
+              "Jiabin Shen", "Zengguang Cheng", "Peng Zhou"],
+  "venue": "Advanced Materials",
+  "volume": "38",
+  "issue": "50",
+  "pages": "e08029",
+  "year": 2025,
+  "doi": "10.1002/adma.202508029",
+  "pdf": {
+    "present": true,
+    "file": "Wang2025_AdvMater.pdf",
+    "version": "published (PMC accepted manuscript)",
+    "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13549287/",
+    "retrieved": "2026-11-12",
+    "license": "Wiley / PMC 收录（开放获取状态以出版社为准）"
+  },
+  "topics": ["neuromorphic-photonics", "linear-synaptic-devices",
+             "nonlinear-neuron-devices", "packaging"],
+  "reading_order": 3
+}

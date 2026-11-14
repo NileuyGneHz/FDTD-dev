@@ -1,0 +1,50 @@
+# skills.yaml — lit-build-agent
+# 只登记真实存在的技能；K12 会验证 path。
+
+skills:
+  - id: lit-paper-intake
+    path: ../../skills/lit-paper-intake
+    stage: 1
+    load_when:
+      - a new paper must be archived into cases/
+      - config/paper.json must be created for an existing PDF
+    consumes: an intake spec JSON with id, slug, track, title, doi and pdf block
+    produces: cases/P0N_*/ skeleton + config/paper.json + paper/*.pdf
+    exit_criteria:
+      - config/paper.json exists with all required fields
+      - paper/ content matches pdf.present
+    hands_to: lit-build-agent
+
+  - id: lit-quote-verify
+    path: ../../skills/lit-quote-verify
+    stage: 2
+    load_when:
+      - README section 2 has been written and needs verification
+      - a quote is suspected of being hand-typed rather than copied
+    consumes: package directory (README section 2 blockquotes + paper/*.pdf)
+    produces: found/missed report per quote
+    exit_criteria:
+      - missed total is 0 for every package that has a PDF
+    hands_to: lit-build-agent
+
+  - id: lit-claim-audit
+    path: ../../skills/lit-claim-audit
+    stage: 3
+    load_when:
+      - results/claims.csv has been written
+      - before delivery, to confirm no unverified row was laundered into yes
+    consumes: results/claims.csv + paper/*.pdf
+    produces: per-row audit report with yes/no/unverified stats
+    exit_criteria:
+      - problems total is 0
+    hands_to: core-lead-agent
+
+load_order:
+  - lit-paper-intake
+  - lit-quote-verify
+  - lit-claim-audit
+
+rules:
+  - Run the three stages in order; never skip quote verification to reach the claim audit.
+  - If a quote misses, re-copy it from the PDF. Never weaken the normalisation to pass.
+  - A package without a PDF must have every claim marked unverified.

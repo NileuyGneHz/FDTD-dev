@@ -22,7 +22,7 @@ if toks & METAL_WORDS:
 
 | 工程 | 修正前 | 修正后 |
 |---|---|---|
-| `cases/P03_HWP_Ding2015/model/t4_tio2_unitcell.fsp` | `gpu_risky`（金属 `TiO2 (Titanium Dioxide) - Siefke`） | **`gpu`**（3D + 平面波 + 介质） |
+| `cases/metasurface/P03_HWP_Ding2015/model/t4_tio2_unitcell.fsp` | `gpu_risky`（金属 `TiO2 (Titanium Dioxide) - Siefke`） | **`gpu`**（3D + 平面波 + 介质） |
 
 ## 修复
 
@@ -47,15 +47,15 @@ METAL_WORDS = {"au", "ag", "al", "cu", "ni", "cr", "gold", "silver",
 $PY="C:\Users\saber\.workbuddy\binaries\python\envs\default\Scripts\python.exe"
 
 # 正例：TiO2 现在应判 gpu
-& $PY tools/gpu_guard.py --fsp cases/P03_HWP_Ding2015/model/t4_tio2_unitcell.fsp --dry-run
+& $PY tools/gpu_guard.py --fsp cases/metasurface/P03_HWP_Ding2015/model/t4_tio2_unitcell.fsp --dry-run
 # 期望：GPU ... - 3D + 平面波源 + 介质/低显存 -> 可走 GPU
 
 # 负例：真金属仍须被抓住（分类没被带偏）
-& $PY tools/gpu_guard.py --fsp cases/P01_Absorber_042/model/d2_perfectCross.fsp --dry-run
+& $PY tools/gpu_guard.py --fsp cases/metasurface/P01_Absorber_042/model/d2_perfectCross.fsp --dry-run
 # 期望：CPU ... - 金属/有损材料 ['user_Au']
-& $PY tools/gpu_guard.py --fsp cases/P03_HWP_Ding2015/model/fig1_hwp_paper_materials.fsp --dry-run
+& $PY tools/gpu_guard.py --fsp cases/metasurface/P03_HWP_Ding2015/model/fig1_hwp_paper_materials.fsp --dry-run
 # 期望：CPU ... - 金属/有损材料 ['Au_Drude']
-& $PY tools/gpu_guard.py --fsp cases/P05_Metalens_048/model/LCP.fsp --dry-run
+& $PY tools/gpu_guard.py --fsp cases/metasurface/P05_Metalens_048/model/LCP.fsp --dry-run
 # 期望：CPU ... - 含 TFSFSource -> GPU 引擎明确不支持（D-011）
 ```
 

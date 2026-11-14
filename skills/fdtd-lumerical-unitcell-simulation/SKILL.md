@@ -149,9 +149,9 @@ came from.
 ```bash
 PY="C:/Users/saber/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
 S="skills/fdtd-lumerical-unitcell-simulation/scripts/run_fdtd_sweep.py"
-"$PY" "$S" --spec cases/P01_Absorber_042/config/spec_p01.json \
+"$PY" "$S" --spec cases/metasurface/P01_Absorber_042/config/spec_p01.json \
   --out _scratch/regress/p01-20261107/baseline --dry-run
-"$PY" "$S" --spec cases/P01_Absorber_042/config/spec_p01.json \
+"$PY" "$S" --spec cases/metasurface/P01_Absorber_042/config/spec_p01.json \
   --out _scratch/regress/p01-20261107/baseline
 ```
 

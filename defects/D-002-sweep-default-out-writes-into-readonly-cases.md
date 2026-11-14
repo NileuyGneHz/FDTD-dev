@@ -17,8 +17,8 @@ out_dir = args.out or os.path.join(os.path.dirname(os.path.abspath(args.spec)),
 2026-11-07 实测 dry-run：
 
 ```
-$ python ... run_fdtd_sweep.py --spec cases/P01_Absorber_042/config/spec_p01.json --dry-run
-out_dir  : F:\Lumercial_WS\FDTD_WS\cases\P01_Absorber_042\config\P01_out
+$ python ... run_fdtd_sweep.py --spec cases/metasurface/P01_Absorber_042/config/spec_p01.json --dry-run
+out_dir  : F:\Lumercial_WS\FDTD_WS\cases\metasurface\P01_Absorber_042\config\P01_out
 ```
 
 ## 修复
@@ -42,12 +42,12 @@ cd F:/Lumercial_WS/FDTD_WS
 
 # ① 复现症状（不写盘）
 "$PY" skills/fdtd-lumerical-unitcell-simulation/scripts/run_fdtd_sweep.py \
-  --spec cases/P01_Absorber_042/config/spec_p01.json --dry-run
-# 期望输出含 cases/P01_Absorber_042/config/P01_out —— 证明默认路径确实指向只读区
+  --spec cases/metasurface/P01_Absorber_042/config/spec_p01.json --dry-run
+# 期望输出含 cases/metasurface/P01_Absorber_042/config/P01_out —— 证明默认路径确实指向只读区
 
 # ② 合规用法
 "$PY" skills/fdtd-lumerical-unitcell-simulation/scripts/run_fdtd_sweep.py \
-  --spec cases/P01_Absorber_042/config/spec_p01.json \
+  --spec cases/metasurface/P01_Absorber_042/config/spec_p01.json \
   --out _scratch/regress/p01-20261107/baseline --dry-run
 # 期望 out_dir = _scratch/regress/p01-20261107/baseline
 

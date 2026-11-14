@@ -1,7 +1,7 @@
 {
   "mode": "Design",
   "iteration": 1,
-  "base_fsp": "cases/P02_PolarizationControl_045/model/fig3_2.fsp",
+  "base_fsp": "cases/metasurface/P02_PolarizationControl_045/model/fig3_2.fsp",
   "targets": [
     {"metric": "T", "min": 0.90},
     {"metric": "dphi_deg_mod360", "kind": "phase", "value": 180.0, "tol_deg": 5.0}

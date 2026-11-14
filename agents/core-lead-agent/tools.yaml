@@ -1,0 +1,56 @@
+# tools.yaml — core-lead-agent
+# 每条都应该是实际用过的；不要写愿望清单。
+
+tools:
+  - id: read
+    kind: builtin
+    gives: file content with line numbers
+  - id: write
+    kind: builtin
+    requires: read the existing file before replacing it
+    gives: create or replace a UTF-8 file
+  - id: edit
+    kind: builtin
+    requires: read the file in this session first
+    gives: literal text replacement
+  - id: glob
+    kind: builtin
+    gives: file paths by pattern
+  - id: grep
+    kind: builtin
+    gives: matching lines with file and line numbers
+  - id: shell
+    kind: builtin
+    entry: pwsh
+    requires:
+      - the command runs inside the workspace root
+    gives: run gates, wire host entries, inspect the tree
+
+  - id: skills_wire
+    kind: repo-script
+    entry: ../../tools/skills_wire.py
+    flags: ["--apply", "--prune", "--json"]
+    note: dry-run first; --apply writes junctions
+  - id: skills_doctor
+    kind: repo-script
+    entry: ../../tools/skills_doctor.py
+    gives: six host-integration checks; exit 0 means ALL GREEN
+  - id: check_skill_contract
+    kind: repo-script
+    entry: ../../tools/check_skill_contract.py
+    gives: K1-K14 findings
+  - id: check_workspace
+    kind: repo-script
+    entry: ../../tools/check_workspace.py
+    gives: layout, naming, unit and task-state findings
+  - id: check_packages
+    kind: repo-script
+    entry: ../../tools/check_packages.py
+    gives: paper package structure, paper.json fields, claims.csv values
+
+denied:
+  - writing outside the workspace
+  - installing packages (pip/npm install)
+  - reading or writing secrets, tokens, personal identity data
+  - editing .git/, host entry directories, or docs/constitution/ unless the task is that
+  - fabricating citations or claims without a PDF-backed source

@@ -1,0 +1,125 @@
+[
+  {
+    "idx": 1,
+    "title": "Metapinhole: Planar Fourier Optics Without Lenses",
+    "doi": "",
+    "status": "no-doi",
+    "detail": "Missing DOI"
+  },
+  {
+    "idx": 7,
+    "title": "Metasurface enabled quantum edge detection",
+    "doi": "10.1126/sciadv.abc4385",
+    "status": "ok",
+    "detail": "1.10 MB (ctype=application/pdf)",
+    "file": "07_Metasurface enabled quantum edge detection.pdf",
+    "source": "scihub"
+  },
+  {
+    "idx": 5,
+    "title": "Optical edge detection based on high-efficiency dielectric metasurface",
+    "doi": "10.1073/pnas.1820636116",
+    "status": "ok",
+    "detail": "0.92 MB (ctype=application/pdf)",
+    "file": "05_Optical edge detection based on high-efficiency dielectric metasurface.pdf",
+    "source": "scihub"
+  },
+  {
+    "idx": 9,
+    "title": "Monolithic metasurface spatial differentiator enabled by asymmetric photonic spin-orbit interactions",
+    "doi": "10.1515/nanoph-2020-0366",
+    "status": "ok",
+    "detail": "1.96 MB (ctype=application/pdf)",
+    "file": "09_Monolithic metasurface spatial differentiator enabled by asymmetric photonic spin-orbit interactions.pdf",
+    "source": "scihub"
+  },
+  {
+    "idx": 10,
+    "title": "Fractional Fourier transforms and their optical implementation II",
+    "doi": "10.1364/josaa.10.002522",
+    "status": "ok",
+    "detail": "1.08 MB (ctype=application/pdf)",
+    "file": "10_Fractional Fourier transforms and their optical implementation II.pdf",
+    "source": "scihub"
+  },
+  {
+    "idx": 8,
+    "title": "Laplace metasurfaces for optical analog computing based on quasi-bound states in the continuum",
+    "doi": "10.1364/prj.426827",
+    "status": "scihub-fail",
+    "detail": "not-pdf (ctype=text/html, first=)",
+    "source": "scihub"
+  },
+  {
+    "idx": 3,
+    "title": "Study on processing synthetic aperture radar data based on an optical 4f system for fast imaging",
+    "doi": "10.1364/oe.471716",
+    "status": "scihub-fail",
+    "detail": "not-pdf (ctype=text/html, first=)",
+    "source": "scihub"
+  },
+  {
+    "idx": 6,
+    "title": "Optical computing metasurfaces: applications and advances",
+    "doi": "10.1515/nanoph-2023-0871",
+    "status": "scihub-fail",
+    "detail": "not-pdf (ctype=text/html, first=)",
+    "source": "scihub"
+  },
+  {
+    "idx": 2,
+    "title": "Advances in spatial analog optical computing devices",
+    "doi": "10.7498/aps.69.20200283",
+    "status": "scihub-fail",
+    "detail": "not-pdf (ctype=text/html, first=)",
+    "source": "scihub"
+  },
+  {
+    "idx": 4,
+    "title": "Optical analog computing of spatial differentiation and edge detection with dielectric metasurfaces",
+    "doi": "10.1364/ol.386986",
+    "status": "scihub-fail",
+    "detail": "not-pdf (ctype=text/html, first=)",
+    "source": "scihub"
+  },
+  {
+    "idx": 8,
+    "title": "Laplace metasurfaces for optical analog computing based on quasi-bound states in the continuum",
+    "doi": "10.1364/prj.426827",
+    "status": "closed-access",
+    "detail": "No OA version found",
+    "source": "none"
+  },
+  {
+    "idx": 4,
+    "title": "Optical analog computing of spatial differentiation and edge detection with dielectric metasurfaces",
+    "doi": "10.1364/ol.386986",
+    "status": "closed-access",
+    "detail": "No OA version found",
+    "source": "none"
+  },
+  {
+    "idx": 2,
+    "title": "Advances in spatial analog optical computing devices",
+    "doi": "10.7498/aps.69.20200283",
+    "status": "oa-fail",
+    "detail": "not-pdf (ctype=text/html;charset=UTF-8, first=<!DOC)",
+    "source": "unpaywall"
+  },
+  {
+    "idx": 6,
+    "title": "Optical computing metasurfaces: applications and advances",
+    "doi": "10.1515/nanoph-2023-0871",
+    "status": "oa-fail",
+    "detail": "not-pdf (ctype=text/html; charset=UTF-8, first=<!DOC)",
+    "source": "unpaywall"
+  },
+  {
+    "idx": 3,
+    "title": "Study on processing synthetic aperture radar data based on an optical 4f system for fast imaging",
+    "doi": "10.1364/oe.471716",
+    "status": "oa-fail",
+    "detail": "not-pdf (ctype=text/html; charset=UTF-8, first=<!DOC)",
+    "source": "unpaywall"
+  }
+]

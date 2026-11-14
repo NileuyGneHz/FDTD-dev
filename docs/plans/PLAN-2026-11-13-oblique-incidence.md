@@ -1,7 +1,7 @@
 # PLAN-2026-11-13：入射角改变能力（oblique incidence）+ 角度扫描技能
 
 > 状态：**已批准并执行完成（2026-11-13）** —— EXP-70…76 全部 `verdict=pass`，四门禁全绿。
-> 触发：`cases/P08_BroadbandAbsorber_043/lecture/第三讲 宽角度完美吸收器.mp4`
+> 触发：`cases/metasurface/P08_BroadbandAbsorber_043/lecture/第三讲 宽角度完美吸收器.mp4`
 > 依据：`docs/constitution/skill-change-contract.md`（A/B/C 三档）、`docs/plans/AGENTS.md`（每步可回退）
 > EXP 起编：**EXP-70**（台账已到 EXP-69）；本计划登记 EXP-70…76。
 > 开工前置已完成：11-12 的未提交改动在 EXP-70 里以 `2f49a7d` 固化，基线干净。
@@ -225,7 +225,7 @@ PY="C:/Users/saber/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
 S="skills/fdtd-lumerical-oblique-incidence/scripts/angle_sweep.py"
 
 # ① 计划态：零引擎、不开会话，产出 angle_sweep_plan.json
-"$PY" "$S" plan --spec cases/P08_BroadbandAbsorber_043/config/spec_p08.json \
+"$PY" "$S" plan --spec cases/metasurface/P08_BroadbandAbsorber_043/config/spec_p08.json \
   --angles 0,30,60 --pol 0,90 --mode bfast \
   --out _scratch/regress/2026-11-13/angle_sweep --dry-run --json
 

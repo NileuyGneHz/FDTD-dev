@@ -1,0 +1,98 @@
+{
+  "case": "P02",
+  "paper": {
+    "title": "Kruk et al., Broadband dielectric polarization control, APL Photonics 1, 030801 (2016)",
+    "doi": "10.1063/1.4948946",
+    "file": "cases/metasurface/P02_PolarizationControl_045/paper/"
+  },
+  "items": [
+    {
+      "id": "A1",
+      "claim": "工作波段总透射 ~90%",
+      "quantity": "total_transmission",
+      "paper_value": 90.0,
+      "unit": "%",
+      "source": "任务书 §5（引自论文）",
+      "definition": "C+L 带 1530-1625 nm、32 点，T 监视器平均",
+      "tolerance": "±8",
+      "measured": 96.48,
+      "status": "PASS"
+    },
+    {
+      "id": "A2",
+      "claim": "偏振转换效率 ~99%（HWP）",
+      "quantity": "pce_hwp",
+      "paper_value": 99.0,
+      "unit": "%",
+      "source": "任务书 §5（引自论文）",
+      "definition": "HWP：|E_cross|²/S₀，E_cross=(Ex-Ey)/√2（别多乘 2）",
+      "tolerance": "±5",
+      "measured": 91.21,
+      "status": "FAIL",
+      "cause": "Δφ=211° 使 cosΔφ=-0.857（理想 -1），单这一项把 PCE 上限压到 ~93%；不是吸收损耗"
+    },
+    {
+      "id": "A3",
+      "claim": "相位差 Δφ = π（HWP）",
+      "quantity": "dphi_hwp",
+      "paper_value": 180.0,
+      "unit": "deg",
+      "source": "Fig.2c p.5",
+      "definition": "arg⟨Ex⟩-arg⟨Ey⟩，同一监视器面空间平均，45° 单次 run",
+      "tolerance": "±18",
+      "measured": 211.13,
+      "status": "FAIL",
+      "cause": "D-002：论文 Fig.2 与 Fig.3 的 a/b/c 尺寸自相矛盾；换 Fig.2 标注 285/450/860 nm 后得 191.48°"
+    },
+    {
+      "id": "A4",
+      "claim": "相位差 Δφ = π/2（QWP）",
+      "quantity": "dphi_qwp",
+      "paper_value": 90.0,
+      "unit": "deg",
+      "source": "Fig.2c p.5",
+      "definition": "同 A3，QWP 几何 a/b=310/370 nm",
+      "tolerance": "±18",
+      "measured": 297.33,
+      "status": "FAIL",
+      "cause": "297.33° ≡ -62.67°，与 A3 同源的 +29° 共同偏移"
+    },
+    {
+      "id": "A5",
+      "claim": "后向散射/反射 ≈ 0（HWP）",
+      "quantity": "reflectance_hwp",
+      "paper_value": 0.0,
+      "unit": "%",
+      "source": "任务书 §5（引自论文）",
+      "definition": "R 监视器，HWP 波段平均；括号内为扣衬底",
+      "tolerance": "<5",
+      "measured": 3.5,
+      "status": "PASS"
+    },
+    {
+      "id": "A6",
+      "claim": "后向散射/反射 ≈ 0（QWP）",
+      "quantity": "reflectance_qwp",
+      "paper_value": 0.0,
+      "unit": "%",
+      "source": "任务书 §5（引自论文）",
+      "definition": "同 A5，QWP 几何",
+      "tolerance": "<5",
+      "measured": 6.6,
+      "status": "FAIL",
+      "cause": "6.60% 超 5%；扣衬底后 3.52%，超出的部分在衬底反射"
+    },
+    {
+      "id": "A7",
+      "claim": "多极子叠加后反射被抑制",
+      "quantity": "multipole_suppression",
+      "paper_value": 0.0,
+      "unit": "1",
+      "source": "p.4 正文",
+      "definition": "多极分解后各阶贡献",
+      "tolerance": "定性",
+      "status": "N/A",
+      "unmeasured_reason": "未做多极分解；只有「宽带低反射 + 平坦 Δφ」的间接证据"
+    }
+  ]
+}

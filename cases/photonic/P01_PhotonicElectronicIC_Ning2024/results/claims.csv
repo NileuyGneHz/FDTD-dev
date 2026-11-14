@@ -1,0 +1,8 @@
+metric,value_paper,value_checked,match,source,note
+precision_limitation_cause,finite control resolution + DAC/ADC overhead,"finite control resolution and the substantial overhead associated with high- precision DACs and ADCs",yes,Sec. III-A,"原文表述；这是全篇最可引用的一句"
+analysis_dimensions,3 个,"hardware implementation, accelerator architecture, and software-hardware co-design",yes,Abstract,"原文列举三项"
+co_design_as_circuit_level_approach,stated,"enhances hardware efficiency at the circuit level by software-hardware co-design approaches",yes,Sec. V 引言,"原文表述"
+dac_mention_count,not claimed,DAC x23,unverified,全文 grep,"我的计数，非论文自述数字"
+adc_mention_count,not claimed,ADC x25,unverified,全文 grep,"同上"
+own_experimental_numbers,none,none,unverified,全文,"综述文章，无自有实验数字；所有 TOPS/W 均为转述他人工作"
+journal_volume_issue,42(22) 7834-7859,not in PDF,unverified,Crossref DOI 10.1109/JLT.2024.3427716,"书目元数据来自 Crossref；本地 PDF 是 arXiv v2"

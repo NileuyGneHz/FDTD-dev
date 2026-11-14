@@ -68,7 +68,7 @@ DEFAULT_LICENSE = os.environ.get("ANSYSLMD_LICENSE_FILE", "1055@localhost")
 # Lumerical script commands that start a solve, add solver objects, or mutate disk.
 # MEASURED 2026-11-08: .lsf allows the no-arg statement form (`run;`) as well as
 # the call form (`run(...)`). An earlier regex matched only `run(` and therefore
-# let cases/P03_HWP_Ding2015/model/build_tio2_unitcell.lsf:311 `run;` through the
+# let cases/metasurface/P03_HWP_Ding2015/model/build_tio2_unitcell.lsf:311 `run;` through the
 # safety gate with allow_run=false -- a real solve, silently unchecked.
 MUTATING_CALL_RE = re.compile(
     r"(?<![\w.])(run|runanalysis|restart|save|saveas|deleteall|addfdtd|addmesh"

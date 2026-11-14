@@ -2,7 +2,7 @@
 **状态**：`resolved`（2026-11-07 反解析两工程后订正；见正文与 EXP 记录）
 ## 根因
 
-P01 的旧结论（`cases/P01_Absorber_042/README.md` §5.4、
+P01 的旧结论（`cases/metasurface/P01_Absorber_042/README.md` §5.4、
 `skills/fdtd-lumerical-unitcell-simulation/SKILL.md` Examples Step 2）把
 `0.808 @ ts=185 nm` 与论文 `0.97 @ 6.0 µm` 的 16 个百分点差异，归因于
 「`t = 0.185 µm` 的量取面可能是十字中面／地平面顶面，差 65 nm ≈ 0.2 rad 相位」，
@@ -37,7 +37,7 @@ P01 的旧结论（`cases/P01_Absorber_042/README.md` §5.4、
    - Examples Step 2 的「量取面」推断改为「已被 FSP 反解析证伪」，并给出新的偏差结论。
 2. 新增 `skills/fdtd-lumerical-fsp-introspection`：规定引用参考工程前必须先反解析
    对象树 / 层位 / 边界 / 网格 / 收敛日志，再与 spec 做结构化 diff。
-3. `cases/P01_Absorber_042/notes/` 补证据，`README.md` §5 补一条偏差诊断更正
+3. `cases/metasurface/P01_Absorber_042/notes/` 补证据，`README.md` §5 补一条偏差诊断更正
    （`cases/AGENTS.md` 允许的唯一两类补记）。
 
 ## 验证
@@ -54,13 +54,13 @@ cd F:/Lumercial_WS/FDTD_WS
 
 # ② 读工程内已存谱（不重跑）
 "$PY" _scratch/p01_fsp_results.py \
-  --fsp cases/P01_Absorber_042/model/infrared_perfect_absorber.fsp \
-  --fsp cases/P01_Absorber_042/results/repro_p01/point_00_base.fsp \
+  --fsp cases/metasurface/P01_Absorber_042/model/infrared_perfect_absorber.fsp \
+  --fsp cases/metasurface/P01_Absorber_042/results/repro_p01/point_00_base.fsp \
   --out _scratch/regress/fsp-20261107/spectra.json
 # 期望：A@6µm 分别为 0.7174 / 0.7163，差 < 0.002
 
 # ③ 收敛判据
-grep -E "Auto Shutoff|Completed" cases/P01_Absorber_042/model/infrared_perfect_absorber_p0.log | tail -2
+grep -E "Auto Shutoff|Completed" cases/metasurface/P01_Absorber_042/model/infrared_perfect_absorber_p0.log | tail -2
 # 期望：Auto Shutoff: 8.87508e-06（< 1e-5）；Completed 7039 iterations
 
 # ④ 材料对照
@@ -70,7 +70,7 @@ grep -E "Auto Shutoff|Completed" cases/P01_Absorber_042/model/infrared_perfect_a
 
 ## 影响面
 
-- `cases/P01_Absorber_042`：旧 README §5.4「待确认」项作废。
+- `cases/metasurface/P01_Absorber_042`：旧 README §5.4「待确认」项作废。
 - `skills/fdtd-lumerical-unitcell-simulation`：CRITICAL §4 与 Examples 结论订正。
 - **所有把课程 `.fsp` 当黄金对照的包（P02–P10）**：引用前必须区分「哪个工程、
   哪次运行、是否收敛」，不能只凭一个数字。

@@ -17,7 +17,7 @@ PKG_ROOT = WS_ROOT / "packages"   # packages/ 已改名为 cases/ → 目标目�
 pkg = PKG_ROOT / pkg_name / "fsp" # 包内 fsp/ 已改名为 model/
 ```
 
-实测：`packages/` 目录不存在（`[ -d packages ]` → NO），`cases/P01_Absorber_042/` 下是
+实测：`packages/` 目录不存在（`[ -d packages ]` → NO），`cases/metasurface/P01_Absorber_042/` 下是
 `config/ model/ notes/ paper/ results/`。所以脚本一跑就在第一道 `if not PKG_ROOT.is_dir()`
 处 `[ERROR] 包目录不存在` 退出 —— 它是**死代码**，但 INDEX.md 仍把它列为该技能的 scripts。
 

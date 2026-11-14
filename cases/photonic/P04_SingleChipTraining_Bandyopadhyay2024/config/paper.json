@@ -1,0 +1,27 @@
+{
+  "id": "P04",
+  "slug": "P04_SingleChipTraining_Bandyopadhyay2024",
+  "track": "B_training",
+  "title": "Single-chip photonic deep neural network with forward-only training",
+  "title_local": "Single chip photonic deep neural network with accelerated training",
+  "authors": ["Saumil Bandyopadhyay", "Alexander Sludds", "Stefan Krastanov",
+              "Ryan Hamerly", "Nicholas Harris", "Darius Bunandar",
+              "Matthew Streshinsky", "Michael Hochberg", "Dirk Englund"],
+  "venue": "Nature Photonics",
+  "volume": "18",
+  "issue": "12",
+  "pages": "1335-1343",
+  "year": 2024,
+  "doi": "10.1038/s41566-024-01567-z",
+  "pdf": {
+    "present": true,
+    "file": "Bandyopadhyay2024_arXiv.pdf",
+    "version": "arxiv-preprint",
+    "source_url": "https://arxiv.org/pdf/2208.01623",
+    "retrieved": "2026-11-12",
+    "license": "arXiv non-exclusive (Nature Photonics 正式版付费)"
+  },
+  "version_note": "arXiv 版标题为 'accelerated training'，准确率 92.7%、时延 435 ps；Nature Photonics 正式版标题为 'forward-only training'，用户提供的数字为 92.5%、410 ps。两者差异见 README §5。",
+  "topics": ["in-situ-training", "coherent-matrix-multiply", "on-chip-nonlinearity"],
+  "reading_order": 4
+}

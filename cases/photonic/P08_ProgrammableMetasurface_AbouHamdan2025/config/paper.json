@@ -1,0 +1,25 @@
+{
+  "id": "P08",
+  "slug": "P08_ProgrammableMetasurface_AbouHamdan2025",
+  "track": "C_hybrid",
+  "title": "Programmable metasurfaces for future photonic artificial intelligence",
+  "authors": ["Loubnan Abou-Hamdan", "Emil Marinov", "Peter Wiecha",
+              "Philipp del Hougne", "Tianyu Wang", "Patrice Genevet"],
+  "venue": "Nature Reviews Physics",
+  "volume": "7",
+  "issue": "6",
+  "pages": "331-347",
+  "year": 2025,
+  "doi": "10.1038/s42254-025-00831-7",
+  "pdf": {
+    "present": true,
+    "file": "AbouHamdan2025_arXiv.pdf",
+    "version": "arxiv-preprint",
+    "source_url": "https://arxiv.org/pdf/2505.11659v1",
+    "retrieved": "2026-11-12",
+    "license": "arXiv non-exclusive (Nature Reviews Physics 正式版付费)"
+  },
+  "topics": ["programmable-metasurface", "scalability", "io-overhead",
+             "in-situ-training", "3d-stacking"],
+  "reading_order": 8
+}

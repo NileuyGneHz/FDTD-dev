@@ -1,0 +1,9 @@
+metric,value_paper,value_checked,match,source,note
+test_accuracy,92.7%,92.7%,yes,Bandyopadhyay2024_arXiv.pdf p.1 Abstract,"vowel 6-class, test set"
+test_accuracy_published,92.5%,NOT OBTAINED,unverified,用户提供（正式版）,"需 Nature Photonics 正式版 PDF 核对"
+latency,435 ps,435 ps,yes,Bandyopadhyay2024_arXiv.pdf Discussion,"estimated: 3tCMXU+2tNOFU+...≈435 ps"
+latency_published,410 ps,NOT OBTAINED,unverified,用户提供（正式版）,"需正式版核对"
+network_scale,3 layers / 12 NOFU / 3 CMXU,"3-layer DNN comprising 12 NOFUs and three CMXUs",yes,p.1 Abstract,"原文写法；数字与我的归纳一致"
+energy_per_op_thermal,11.7 pJ/OP,11.7 pJ/OP,yes,Table I,"Etotal,est; thermal phase shifter"
+energy_per_op_phase_shifter,9.8 pJ/OP,9.8 pJ/OP,yes,Table I,"EOP column"
+throughput,0.53 TOPS,0.53,yes,Table I,"N=6 row; unit TOPS stated in table header"

@@ -1,0 +1,42 @@
+# agent.yaml — lit-build-agent
+
+name: lit-build-agent
+version: 0.1.0
+entrypoint: AGENT.md
+
+description: >
+  Build role for paper archiving: fetch an open-access PDF, scaffold the package,
+  extract grep-verifiable quotes, and fill the numeric claim table with honest
+  yes/no/unverified verdicts. Does not judge whether a paper's conclusions are correct.
+
+domain: literature processing
+runtime:
+  contract: ../../iterations/iter-1-foundation/runtime-contract.md
+
+references:
+  skills: skills.yaml
+  tools: tools.yaml
+  memory: memory/
+  evals: evals/
+
+capabilities:
+  - fetch an open-access PDF from arXiv, PMC, or a CC BY publisher endpoint
+  - scaffold cases/P0N_* and write config/paper.json
+  - extract exact quotes from a PDF and verify each one with grep
+  - fill results/claims.csv and mark unverifiable values as unverified
+
+limits:
+  require_oa_before_fetch: true
+  require_pdf_backing_for_yes: true
+  never_bypass_paywall: true
+  never_hand_type_quotes: true
+  never_upgrade_unverified_without_check: true
+  never_fabricate_sources: true
+
+handoff:
+  on_paywall: record missing_reason, open defects/D-xxx, stop
+  on_quote_miss: re-copy from PDF, do not weaken the checker
+  on_three_failures: stop, write journal, hand back to the human
+
+change_log:
+  - 0.1.0 (2026-11-12): initial build role

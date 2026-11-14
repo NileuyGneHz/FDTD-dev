@@ -1,0 +1,41 @@
+# skills.yaml — core-lead-agent
+# 只登记真实存在的技能；K12 会验证 path。
+
+skills:
+  - id: core-skill-authoring
+    path: ../../skills/core-skill-authoring
+    stage: 0
+    load_when:
+      - a new capability will be reused by a second unit
+      - a skill skeleton must be created with the contract already satisfied
+      - someone asks "where should this logic live?"
+    consumes: a skill spec JSON
+    produces: skills/<name>/ skeleton + one INDEX row
+    exit_criteria:
+      - target directory does not overwrite an existing skill
+      - INDEX.md has exactly one new row and the marker is intact
+      - check_skill_contract.py and skills_doctor.py both exit 0
+    hands_to: core-lead-agent
+    note: on-demand only; do not add to load_order
+
+  - id: lit-paper-intake
+    path: ../../skills/lit-paper-intake
+    stage: 1
+    load_when:
+      - a new paper must be archived into cases/
+      - a package skeleton and paper.json must be created
+    consumes: an intake spec JSON with DOI, title and PDF path
+    produces: cases/P0N_*/ skeleton + config/paper.json + paper/*.pdf
+    exit_criteria:
+      - check_packages.py --pkg P0N reports no ERROR
+    hands_to: lit-build-agent
+    note: delegate to lit-build-agent; lead does not run it directly
+
+load_order: []
+
+rules:
+  - Load one primary skill at a time; add only the supporting skills the task names.
+  - Do not load a skill "just in case" - competing instructions degrade decisions.
+  - If memory and a skill disagree, trust the measured entry in memory and fix the skill
+    in the same turn.
+  - Skills changed in this session take effect in the next session for WorkBuddy.

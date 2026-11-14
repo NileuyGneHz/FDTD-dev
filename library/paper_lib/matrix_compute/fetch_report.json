@@ -1,0 +1,111 @@
+[
+  {
+    "idx": 3,
+    "title": "Large-Scale Optical Neural Networks Based on Photoelectric Multiplication",
+    "doi": "10.1103/physrevx.9.021032",
+    "status": "ok",
+    "detail": "0.82 MB (ctype=application/pdf)",
+    "file": "03_Large-Scale Optical Neural Networks Based on Photoelectric Multiplication.pdf",
+    "source": "scihub"
+  },
+  {
+    "idx": 2,
+    "title": "Programmable phase-change metasurfaces on waveguides for multimode photonic convolutional neural network",
+    "doi": "10.1038/s41467-020-20365-z",
+    "status": "ok",
+    "detail": "2.27 MB (ctype=application/pdf)",
+    "file": "02_Programmable phase-change metasurfaces on waveguides for multimode photonic convolutional neural network.pdf",
+    "source": "scihub"
+  },
+  {
+    "idx": 4,
+    "title": "Lightening-Transformer: A Dynamically-Operated Optically-Interconnected Photonic Transformer Accelerator",
+    "doi": "10.1109/hpca57654.2024.00059",
+    "status": "ok",
+    "detail": "1.35 MB (ctype=application/pdf)",
+    "file": "04_Lightening-Transformer A Dynamically-Operated Optically-Interconnected Photonic Transformer Accelerator.pdf",
+    "source": "scihub"
+  },
+  {
+    "idx": 1,
+    "title": "11 TOPS photonic convolutional accelerator for optical neural networks",
+    "doi": "10.1038/s41586-020-03063-0",
+    "status": "scihub-fail",
+    "detail": "not-pdf (ctype=text/html, first=)",
+    "source": "scihub"
+  },
+  {
+    "idx": 5,
+    "title": "Si Microring Resonator Crossbar Array for On-Chip Inference and Training of the Optical Neural Network",
+    "doi": "10.1021/acsphotonics.1c01777",
+    "status": "scihub-fail",
+    "detail": "not-pdf (ctype=text/html, first=)",
+    "source": "scihub"
+  },
+  {
+    "idx": 6,
+    "title": "Matrix-vector multiplication for photonic tensor core in optical neural network",
+    "doi": "10.1088/1402-4896/ae8345",
+    "status": "scihub-fail",
+    "detail": "not-pdf (ctype=text/html, first=)",
+    "source": "scihub"
+  },
+  {
+    "idx": 7,
+    "title": "Photonic matrix multiplication lights up photonic accelerator and beyond",
+    "doi": "10.1038/s41377-022-00717-8",
+    "status": "scihub-fail",
+    "detail": "not-pdf (ctype=text/html, first=)",
+    "source": "scihub"
+  },
+  {
+    "idx": 8,
+    "title": "Metasurfaces for Edge Detection and Spatial Differentiation in Free Space",
+    "doi": "10.1002/adfm.74788",
+    "status": "scihub-fail",
+    "detail": "not-pdf (ctype=text/html, first=)",
+    "source": "scihub"
+  },
+  {
+    "idx": 6,
+    "title": "Matrix-vector multiplication for photonic tensor core in optical neural network",
+    "doi": "10.1088/1402-4896/ae8345",
+    "status": "closed-access",
+    "detail": "No OA version found",
+    "source": "none"
+  },
+  {
+    "idx": 5,
+    "title": "Si Microring Resonator Crossbar Array for On-Chip Inference and Training of the Optical Neural Network",
+    "doi": "10.1021/acsphotonics.1c01777",
+    "status": "oa-fail",
+    "detail": "HTTP 403",
+    "source": "unpaywall"
+  },
+  {
+    "idx": 8,
+    "title": "Metasurfaces for Edge Detection and Spatial Differentiation in Free Space",
+    "doi": "10.1002/adfm.74788",
+    "status": "closed-access",
+    "detail": "No OA version found",
+    "source": "none"
+  },
+  {
+    "idx": 7,
+    "title": "Photonic matrix multiplication lights up photonic accelerator and beyond",
+    "doi": "10.1038/s41377-022-00717-8",
+    "status": "ok",
+    "detail": "5.38 MB (ctype=application/pdf)",
+    "file": "07_Photonic matrix multiplication lights up photonic accelerator and beyond.pdf",
+    "source": "unpaywall"
+  },
+  {
+    "idx": 1,
+    "title": "11 TOPS photonic convolutional accelerator for optical neural networks",
+    "doi": "10.1038/s41586-020-03063-0",
+    "status": "ok",
+    "detail": "1.99 MB (ctype=application/pdf)",
+    "file": "01_11 TOPS photonic convolutional accelerator for optical neural networks.pdf",
+    "source": "unpaywall"
+  }
+]

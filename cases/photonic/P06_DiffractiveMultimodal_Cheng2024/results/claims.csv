@@ -1,0 +1,9 @@
+metric,value_paper,value_checked,match,source,note
+test_accuracy,85.7%,85.7%,yes,Cheng2024_NatCommun.pdf p.1 Abstract,"four-class, multimodal test sets"
+system_energy_efficiency,7.28 TOPS/W,7.28 TOPS/W,yes,p.1 Abstract,"system-level"
+optical_latency,30.2 ps,30.2 ps,yes,p.1 Abstract,"optical only"
+throughput_potential,217.6 TOPS,217.6 TOPS,yes,p.1 Abstract,"POTENTIAL value, not measured"
+compute_density,447.7 TOPS/mm2,447.7 TOPS/mm2,yes,p.1 Abstract,"potential"
+layer_count,1 input + 5 hidden + 1 output = 7,7,yes,p.1 Abstract,"TDONN chip"
+class_count,4,4,yes,p.1 Abstract,"vision / audio / touch"
+dropout_convergence_speedup,36.5%,36.5%,yes,Sec. Results,"vs no drop-out"

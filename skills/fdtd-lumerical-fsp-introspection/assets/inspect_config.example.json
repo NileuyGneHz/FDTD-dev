@@ -6,11 +6,11 @@
     "target_wavelength_um": 6.0
   },
   "fsp": [
-    "cases/P01_Absorber_042/model/infrared_perfect_absorber.fsp",
-    "cases/P01_Absorber_042/model/d2_perfectCross.fsp",
-    "cases/P01_Absorber_042/results/repro_p01/point_00_base.fsp"
+    "cases/metasurface/P01_Absorber_042/model/infrared_perfect_absorber.fsp",
+    "cases/metasurface/P01_Absorber_042/model/d2_perfectCross.fsp",
+    "cases/metasurface/P01_Absorber_042/results/repro_p01/point_00_base.fsp"
   ],
   "mode": "both",
   "full_props": false,
-  "reference_spec": "cases/P01_Absorber_042/config/spec_p01.json"
+  "reference_spec": "cases/metasurface/P01_Absorber_042/config/spec_p01.json"
 }

@@ -1,0 +1,5 @@
+metric,value_paper,value_checked,match,source,note
+mvm_method_count,3 类,three categories,yes,Sec. 2,"原文：mainly fall into three categories"
+journal_volume_page,11(1) 30,"Light: Science & Applications (2022) 11:30",yes,页眉,"页眉直接可 grep"
+publication_year,2022,2022,yes,页眉与 Crossref
+mzi_arbitrary_matrix_method,rotation submatrix + SVD,"rotation submatrix decomposition and singular value decomposi- tion",yes,Sec. 2 Fig. 1b,"纠正了「MZI 只能做酉变换」的误读"

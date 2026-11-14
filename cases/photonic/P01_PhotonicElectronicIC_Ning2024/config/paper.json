@@ -1,0 +1,26 @@
+{
+  "id": "P01",
+  "slug": "P01_PhotonicElectronicIC_Ning2024",
+  "track": "A_review",
+  "title": "Photonic-Electronic Integrated Circuits for High-Performance Computing and AI Accelerators",
+  "authors": ["Shupeng Ning", "Hanqing Zhu", "Chenghao Feng", "Jiaqi Gu",
+              "Zhixing Jiang", "Zhoufeng Ying", "Jason Midkiff", "Sourabh Jain",
+              "May H. Hlaing", "David Z. Pan", "Ray T. Chen"],
+  "venue": "Journal of Lightwave Technology",
+  "volume": "42",
+  "issue": "22",
+  "pages": "7834-7859",
+  "year": 2024,
+  "doi": "10.1109/JLT.2024.3427716",
+  "pdf": {
+    "present": true,
+    "file": "Ning2024_JLT.pdf",
+    "version": "arxiv-preprint",
+    "source_url": "https://arxiv.org/pdf/2403.14806v2",
+    "retrieved": "2026-11-12",
+    "license": "arXiv non-exclusive (IEEE 正式版付费)"
+  },
+  "topics": ["photonic-electronic-co-design", "analog-computing-robustness",
+             "dac-adc-overhead", "software-hardware-co-design"],
+  "reading_order": 2
+}

@@ -1,0 +1,4 @@
+metric,value_paper,value_checked,match,source,note
+own_experimental_numbers,none,none,unverified,全文,"综述文章，无自有实验数字；所有 TOPS/W 均为转述"
+packaging_bottleneck_claim,stated,"bulky packaging, align- ment challenges, and scalability limits",yes,Sec. Packaging,"原文用词；可 grep"
+journal_volume_issue,38(50) e08029,not in PDF,unverified,Crossref DOI 10.1002/adma.202508029,"书目元数据来自 Crossref；页眉 ADMA-38-e08029 可核"

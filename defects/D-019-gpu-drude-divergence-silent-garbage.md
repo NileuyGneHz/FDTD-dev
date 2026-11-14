@@ -16,7 +16,7 @@ real32 的舍入误差在这里会被放大 → 场发散。引擎确实检测�
 
 ## 实测对照（2026-11-11，同一 spec 同一机器）
 
-工程：`cases/P01_Absorber_042/config/spec_p01.json`（Au Drude + Al2O3 + Si）
+工程：`cases/metasurface/P01_Absorber_042/config/spec_p01.json`（Au Drude + Al2O3 + Si）
 
 | 引擎 | wall | 迭代数 | peak A | 日志 | 结论 |
 |---|---|---|---|---|---|
@@ -80,15 +80,15 @@ $PY="C:\Users\saber\.workbuddy\binaries\python\envs\default\Scripts\python.exe"
 $PY="C:\Users\saber\.workbuddy\binaries\python\envs\default\Scripts\python.exe"
 
 # 判据正例：全介质工程应放行 GPU
-& $PY tools/gpu_guard.py --fsp cases/P03_HWP_Ding2015/model/t4_tio2_unitcell.fsp --dry-run
+& $PY tools/gpu_guard.py --fsp cases/metasurface/P03_HWP_Ding2015/model/t4_tio2_unitcell.fsp --dry-run
 # 期望：GPU ... 3D + 平面波源 + 介质/低显存 -> 可走 GPU
 
 # 判据负例：Drude 工程必须拦下
-& $PY tools/gpu_guard.py --fsp cases/P01_Absorber_042/model/d2_perfectCross.fsp --dry-run
+& $PY tools/gpu_guard.py --fsp cases/metasurface/P01_Absorber_042/model/d2_perfectCross.fsp --dry-run
 # 期望：CPU ... 金属/有损材料 ['user_Au'] ... 走 CPU
 
 # 负例：日志有发散前兆必须拦下
-& $PY tools/gpu_guard.py --fsp cases/P03_HWP_Ding2015/model/fig1_hwp_paper_materials.fsp --dry-run --probe-log
+& $PY tools/gpu_guard.py --fsp cases/metasurface/P03_HWP_Ding2015/model/fig1_hwp_paper_materials.fsp --dry-run --probe-log
 # 期望：CPU ... --probe-log 未放行：日志有 `0 < permittivity < 1` → 实测会发散
 
 # 全局开关可逆
